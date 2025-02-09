@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Empty Container Condition Survey Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-gray-100 p-4">
+
+  <div class="max-w-4xl mx-auto bg-white p-6 border border-gray-300">
+    <div class="text-center mb-4">
+      <img alt="Viking Marine Inc. logo" class="mx-auto mb-2" height="120" src="{{ url_for('static', filename='logo.jpg') }}" width="120"/>
+      <h1 class="text-2xl font-bold text-red-600">VIKING MARINE INC.</h1>
+      <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+      <p class="text-sm">C/o. Inland Container Depot, Whitefield, Bangalore - 560 066.</p>
+      <p class="text-sm">Phone : +91 9035015240, +91 9036015243, +91 9036015255 &amp; +91 9036015249.</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('add_survey') }}" class="p-4 border border-gray-300">     
+       <div class="border-t border-b border-gray-300 py-2 mb-4">
+        <div class="flex justify-between">
+          <div>
+            <label class="block text-sm font-semibold">Report No.:</label>
+            <input type="text" name="CertificateNumber" id="CertificateNumber" required class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold">Date:</label>
+            <input type="date" name="date" id="date" required class="border border-gray-300 p-1 w-full"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center bg-red-600 text-white py-2 mb-4">
+        <h2 class="text-lg font-semibold">EMPTY CONTAINER CONDITION SURVEY REPORT</h2>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-semibold">Applicant for Survey:</label>
+          <input type="text" name="applicant_for_survey" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Date of Inspection:</label>
+          <input type="date" name="date_of_inspection" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Container No.:</label>
+          <input type="text" name="container_no" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Place of Inspection:</label>
+          <input type="text" name="place_of_inspection" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Type:</label>
+          <input type="text" name="type" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Size:</label>
+          <input type="text" name="size" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Tare Weight:</label>
+          <input type="text" name="tare_weight" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">CSC No.:</label>
+          <input type="text" name="csc_no" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Payload Capacity:</label>
+          <input type="text" name="payload_capacity" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Year of Manufacture:</label>
+          <input type="text" name="year_of_manufacture" class="border border-gray-300 p-1 w-full"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Max. Gross Weight:</label>
+          <input type="text" name="max_gross_weight" class="border border-gray-300 p-1 w-full"/>
+        </div>
+      </div>
+   
+     <div class="mb-4">
+        <table class="w-full border border-gray-300">
+          <tbody>
+            <tr>
+              <td class="border border-gray-300 p-2">Rear End</td>
+              <td class="border border-gray-300 p-2">Are any Holes Found?</td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="rearEndHoles" value="Yes"/>
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="rearEndHoles" value="No"/>
+              </td>
+            </tr>
+            <tr>
+              <td class="border border-gray-300 p-2">Right Panel</td>
+              <td class="border border-gray-300 p-2">Are Doors Closing Properly?</td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="rightPanelDoors" value="Yes"/>
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="rightPanelDoors" value="No"/>
+              </td>
+            </tr>
+            <tr>
+              <td class="border border-gray-300 p-2">Left Panel</td>
+              <td class="border border-gray-300 p-2">Are there any Patches in Container?</td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="leftPanelPatches" value="Yes"/>
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="leftPanelPatches" value="No"/>
+              </td>
+            </tr>
+            <tr>
+              <td class="border border-gray-300 p-2">Front Panel</td>
+              <td class="border border-gray-300 p-2">Are any Stickers/Marks found in Container?</td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="frontPanelStickers" value="Yes"/>
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                <input type="checkbox" name="frontPanelStickers" value="No"/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Remarks -->
+      <div class="mb-4">
+        <label class="block text-sm font-semibold">Remarks:</label>
+        <textarea class="border border-gray-300 p-2 w-full h-24" name="remarks"></textarea>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-sm font-semibold">For Viking Marine Inc.</p>
+          <div class="mt-8">
+            <label class="block text-sm font-semibold">Surveyor</label>
+            <input class="border border-gray-300 p-1 w-full" type="text" name="surveyor"/>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-sm italic">"Issued Without Prejudice"</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button type="submit" id="submit-btn" class="btn btn-primary" >
+          Submit
+        </button>
+        </div>
+    </form>
+  </div>  
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Generate CertificateNumber
+    function generateCertificateNumber() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = ('0' + (today.getMonth() + 1)).slice(-2); // Ensure two digits
+        const currentYearMonth = `${year}${month}`;
+
+        // Retrieve the last used number from localStorage or initialize to 0
+        let lastNumber = localStorage.getItem('lastCertificateNumber') || 0;
+        lastNumber = parseInt(lastNumber, 10);
+
+        // Increment the number
+        const nextNumber = lastNumber + 1;
+
+        // Save the new number to localStorage
+        localStorage.setItem('lastCertificateNumber', nextNumber);
+
+        // Format the number to 6 digits
+        const formattedNumber = String(nextNumber).padStart(6, '0');
+
+        // Combine year, month, and sequential number
+        return `${currentYearMonth}${formattedNumber}`;
+    }
+
+    // Set the generated CertificateNumber in the input field
+    const certificateNumberInput = document.getElementById('CertificateNumber');
+    certificateNumberInput.value = generateCertificateNumber();
+
+    // Set current date in the date input field
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = ('0' + (today.getMonth() + 1)).slice(-2);
+    const day = ('0' + today.getDate()).slice(-2);
+    const formattedDate = `${year}-${month}-${day}`;
+    document.getElementById('date').value = formattedDate;
+
+    // Disable submit button after first click
+    const form = document.querySelector("form");
+    const submitButton = document.getElementById("submit-btn");
+
+    form.addEventListener("submit", function (e) {
+        if (submitButton.disabled) {
+            e.preventDefault(); // Prevent second submission
+            return;
+        }
+        submitButton.disabled = true; // Disable the button after the first click
+        submitButton.innerText = "Submitting..."; // Optional: Change button text
+    });
+});
+</script>
+
+</body>
+</html>

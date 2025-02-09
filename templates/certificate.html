@@ -1,0 +1,240 @@
+<html>
+<head>
+    <title>Certificate of Measurement Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto bg-white p-6 shadow-md">
+        <div class="text-center">
+            <img alt="Viking Marine Inc. logo" class="mx-auto mb-2" height="120" src="{{ url_for('static', filename='logo.jpg') }}" width="120"/>
+            <h1 class="text-2xl font-bold text-red-700">VIKING MARINE INC.</h1>
+            <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+            <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
+            <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
+            <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
+            <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
+        </div>
+        <div class="text-center my-4">
+            <span class="bg-red-700 text-white px-4 py-1 rounded">CERTIFICATE OF MEASUREMENT</span>
+        </div>
+        <form method="POST" action="{{ url_for('submit_cer') }}">
+            <div class="flex justify-between mb-4">
+                <div>
+                    <label class="text-sm">Cert. No.</label>
+                    <input type="text" id="CertificateNumber" name="CertificateNumber" class="border border-gray-300 rounded p-1 ml-2" readonly/>
+                </div>
+                <div>
+                    <label class="text-sm">Date</label>
+                    <input type="date" class="border border-gray-300 rounded p-1 ml-2" id="dateInput" name="date"/>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-sm">Name of the applicant</label>
+                    <input type="text" name="applicantName" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">Shipper</label>
+                    <input type="text" name="shipper" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">Consignee</label>
+                    <input type="text" name="consignee" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">Commodity</label>
+                    <input type="text" name="commodity" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">Port of Discharge</label>
+                    <input type="text" name="portOfDischarge" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                </div>
+                <div>
+                    <label class="text-sm">S.B. No.</label>
+                    <input type="text" name="sb_number" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">Quantity</label>
+                    <input type="text" name="quantity" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">Gr. Wt.</label>
+                    <input type="text" name="gross_weight" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">C &amp; F Agent</label>
+                    <input type="text" name="cf_agent" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                    <label class="text-sm">Container No.</label>
+                    <input type="text" name="container_number" class="border border-gray-300 rounded w-full p-1 mt-1"/>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h2 class="text-center font-bold">Survey Measure</h2>
+                <table class="w-full border-collapse border border-black text-sm">
+                    <thead>
+                        <tr>
+                            <th class="border border-black p-1">Marks Nos.</th>
+                            <th class="border border-black p-1">No. of Pkgs</th>
+                            <th class="border border-black p-1">Length</th>
+                            <th class="border border-black p-1">Breadth</th>
+                            <th class="border border-black p-1">Height</th>
+                            <th class="border border-black p-1">Volume in Cu. M</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" /></td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" /></td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" /></td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" /></td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" /></td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                            <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" /></td>
+                        </tr>
+                        <!-- Repeat the above row as needed -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between mb-4">
+                <div>
+                    <label class="text-sm">Total No. of Pkgs</label>
+                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" name="totalPkgs" readonly />
+                </div>
+                <div>
+                    <label class="text-sm">Total No. of Cu. M</label>
+                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" name="totalVolume" readonly />
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-sm font-bold">ISSUED WITHOUT PREJUDICE</p>
+                </div>
+                <div>
+                    <p class="text-sm">For <span class="font-bold">VIKING MARINE INC.,</span></p>
+                    <p class="text-sm">Surveyor</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Generate certificate number on page load
+        function generateCertificateNumber() {
+    const today = new Date();
+    const year = today.getFullYear().toString();
+    const month = ('0' + (today.getMonth() + 1)).slice(-2); // Ensure 2-digit month
+
+    let certificateNumber = "000000"; // Start from zero-padded number
+    const inputField = document.getElementById("CertificateNumber");
+
+    if (!inputField) {
+        console.error("CertificateNumber input field not found!");
+        return;
+    }
+
+    function updateCertificateNumber() {
+        certificateNumber = (parseInt(certificateNumber) + 1).toString().padStart(6, '0');
+        inputField.value = year + month + certificateNumber;
+    }
+
+    // Auto-generate when page loads
+    updateCertificateNumber();
+
+    // Attach the function to a button (if needed)
+    document.getElementById("generateButton")?.addEventListener("click", updateCertificateNumber);
+}
+
+// Ensure the function runs after the page loads
+document.addEventListener("DOMContentLoaded", generateCertificateNumber);
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("/get_last_certificate_number")
+        .then(response => response.json())
+        .then(data => {
+            // Make sure the response contains the 'certificateNumber' key
+            if (data.certificateNumber) {
+                document.getElementById("CertificateNumber").value = data.certificateNumber;
+            } else {
+                console.error("Certificate number not found in response.");
+            }
+        })
+        .catch(error => console.error("Error fetching certificate number:", error));
+});
+        // Set current date in the date input field
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = ('0' + (today.getMonth() + 1)).slice(-2);
+        const day = ('0' + today.getDate()).slice(-2);
+        const formattedDate = `${year}-${month}-${day}`;
+        document.getElementById('dateInput').value = formattedDate;
+
+        // Function to calculate volume for each row and update totals
+        function calculateVolume() {
+            const rows = document.querySelectorAll('table tbody tr');
+            let totalVolume = 0;
+            let totalPackages = 0;
+
+            rows.forEach(row => {
+                const length = parseFloat(row.querySelector('td:nth-child(3) input').value) || 0;
+                const breadth = parseFloat(row.querySelector('td:nth-child(4) input').value) || 0;
+                const height = parseFloat(row.querySelector('td:nth-child(5) input').value) || 0;
+                const noOfPkgs = parseInt(row.querySelector('td:nth-child(2) input').value) || 0;
+
+                // Calculate volume for the current row
+                const volume = length * breadth * height;
+                row.querySelector('td:nth-child(6) input').value = volume.toFixed(2);
+
+                // Add to total values
+                totalVolume += volume;
+                totalPackages += noOfPkgs;
+            });
+
+            // Update total volume and total packages fields
+            document.querySelector('input[name="totalVolume"]').value = totalVolume.toFixed(2);
+            document.querySelector('input[name="totalPkgs"]').value = totalPackages;
+        }
+
+        // Trigger volume calculation whenever input values change
+        document.querySelectorAll('table input').forEach(input => {
+            input.addEventListener('input', calculateVolume);
+        });
+
+        // Initialize the volume and packages calculation
+        calculateVolume();
+    </script>
+</body>
+</html>

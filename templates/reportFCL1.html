@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .left-section, .right-section {
+            width: 50%;
+            padding: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+
+        .custom-table th, .custom-table td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo">
+        <h2>VIKING MARINE INC.</h2>
+        <h3>SURVEYORS AND CONSULTING ENGINEERS</h3>
+        <p># 143, Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.<br>
+           Phone: +91-9035015240, +91-9036015249 & +91-9243185125.
+        </p>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content">
+        <!-- Left Section -->
+        <div class="left-section">
+          {% for record in form %}
+            <table>
+                <tr>
+                    <th>Applicant for Survey:</th>
+                    <td>{{ record['applicantName'] }}</td>
+                </tr>
+                <tr>
+                    <th>Container No.:</th>
+                    <td>{{ record['containerNumber'] }}</td>
+                </tr>
+                <tr>
+                    <th>Stuffing Comm. Date and Time:</th>
+                    <td>{{ record['stuffingCommDateTime'] }}</td>
+                </tr>
+                <tr>
+                    <th>Size / Type:</th>
+                    <td>{{ record['sizeType'] }}</td>
+                </tr>
+                <tr>
+                    <th>Tare Weight:</th>
+                    <td>{{ record['tareWeight'] }}</td>
+                </tr>
+            </table>
+
+        </div>
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <table>
+                <tr>
+                    <th>Stuffing Comp. Date and Time:</th>
+                    <td>{{ record['stuffingCompDateTime'] }}</td>
+                </tr>
+                <tr>
+                    <th>Payload Capacity:</th>
+                    <td>{{ record['payloadCapacity'] }}</td>
+                </tr>
+                <tr>
+                    <th>Seal No.:</th>
+                    <td>{{ record['sealNumber'] }}</td>
+                </tr>
+                <tr>
+                    <th>Cargo Weight (As Declared):</th>
+                    <td>{{ record['declaredTotalWeight'] }}</td>
+                </tr>
+                <tr>
+                    <th>Sealing Date and Time:</th>
+                    <td>{{ record['stuffingCompDateTime'] }}</td>
+                </tr>
+                <tr>
+                    <th>Remarks:</th>
+                    <td>{{ record['others'] }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Consignment Details -->
+    <h3>Consignment Details</h3>
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>Consignor</th>
+                <th>Consignee</th>
+                <th>Description of Cargo</th>
+                <th>Marks & Nos.</th>
+                <th>No. of Packages</th>
+                <th>Gross Weight (Kgs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Consignor 1</td>
+                <td>Consignee 1</td>
+                <td>Cargo 1</td>
+                <td>Mark 1</td>
+                <td>10</td>
+                <td>1000</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Remarks Section -->
+    <h3>Remarks</h3>
+    <table class="custom-table">
+        <tr>
+            <th>Loading Condition</th>
+            <td>{{ record['loadingCondition'] }}</td>
+        </tr>
+        <tr>
+            <th>Lashing</th>
+            <td>{{ record['lashing'] }}</td>
+        </tr>
+        <tr>
+            <th>Others</th>
+            <td>{{ record['others'] }}</td>
+        </tr>
+    </table>
+
+    <!-- Weather Condition -->
+    <h3>Weather Condition</h3>
+    <p>{{ record['weatherCondition'] }}</p>
+
+    <!-- Surveyor Details -->
+    <h3>Surveyor Details</h3>
+    <table class="custom-table">
+        <tr>
+            <th>Name of Surveyor</th>
+            <td>{{ record['surveyorName'] }}</td>
+        </tr>
+        <tr>
+            <th>Signature</th>
+            <td>____________________</td>
+        </tr>
+    </table>
+    {% endfor %}
+
+</body>
+</html>
