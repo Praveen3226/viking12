@@ -26,7 +26,7 @@
             perspective: 1500px;
         }
 
-        /* Navigation Bar */
+        /* Navigation Bar (Initially Hidden) */
         .navbar {
             position: absolute;
             top: 0;
@@ -36,12 +36,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 40px;
-            background: rgba(0, 0, 0, 0.2); /* Transparent background */
-            backdrop-filter: blur(5px); /* Frosted glass effect */
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
             z-index: 100;
+            display: none;  /* Initially hidden */
+            opacity: 0;     /* Invisible */
+            transition: opacity 1s ease-in-out;
         }
 
-        /* Bitsmart Logo / Header */
+        /* Bitsmart Logo */
         .navbar .logo {
             font-size: 1.8em;
             font-weight: bold;
@@ -81,7 +84,7 @@
             z-index: 2;
         }
 
-        /* Main Content */
+        /* Main Content (Initially Hidden) */
         #main-content {
             text-align: center;
             margin-top: 20px;
@@ -174,8 +177,9 @@
             animation: moveBackground 10s ease-in-out infinite;
             z-index: 1;
         }
-        /* Move the background in 3D space */
-        @keyframes moveBackground {
+
+                /* Move the background in 3D space */
+                @keyframes moveBackground {
             0% {
                 transform: rotateX(10deg) rotateY(10deg) translate3d(0, 0, 0);
             }
@@ -190,8 +194,8 @@
 </head>
 <body>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar">
+    <!-- Navigation Bar (Initially Hidden) -->
+    <nav class="navbar" id="navbar">
         <div class="logo">Bitsmart</div>
         <ul class="nav-links">
             <li><a href="#">Home</a></li>
@@ -209,20 +213,14 @@
         <h1 id="typed-text">Welcome to <span id="bitsmart">Bitsmart</span></h1>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content (Initially Hidden) -->
     <div id="main-content">
-        <h2>Projects</h2>
+        <h2>PROJECTS</h2>
         <div class="projects">
             <div class="project-box">
                 VIKING MARINE INC.
                 <div class="project-description">
                     <a href="{{ url_for('login') }}" target="_blank" class="visit-button">Visit Website</a>
-                </div>
-            </div>
-            <div class="project-box">
-                Project 2
-                <div class="project-description">
-                    <a href="https://example.com/project2" class="visit-button" target="_blank">Visit Website</a>
                 </div>
             </div>
         </div>
@@ -232,6 +230,7 @@
         const typedText = document.getElementById('typed-text');
         const mainContent = document.getElementById('main-content');
         const welcomeMessage = document.getElementById('welcome');
+        const navbar = document.getElementById('navbar');
 
         let text = " Crafting Innovators";
         let i = 0;
@@ -247,6 +246,12 @@
                     welcomeMessage.style.opacity = 0;
                     setTimeout(() => {
                         welcomeMessage.style.display = 'none';
+
+                        navbar.style.display = 'flex'; // Show navbar
+                        setTimeout(() => {
+                            navbar.style.opacity = 1;
+                        }, 100);
+
                         mainContent.style.display = 'block';
                         setTimeout(() => {
                             mainContent.style.opacity = 1;
