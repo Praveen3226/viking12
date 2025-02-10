@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitsmart</title>
     <style>
-        /* General reset for the page */
+        /* General Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Center the welcome message with black background */
+        /* Full-page Background */
         body {
             height: 100vh;
             display: flex;
@@ -23,27 +23,65 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
             position: relative;
-            perspective: 1500px; /* Create a 3D perspective for the page */
+            perspective: 1500px;
         }
 
-        /* Styling the welcome message */
+        /* Navigation Bar */
+        .navbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.2); /* Transparent background */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            z-index: 100;
+        }
+
+        /* Bitsmart Logo / Header */
+        .navbar .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links li {
+            display: inline;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #4CAF50;
+        }
+
+        /* Welcome Message */
         .welcome-message {
             text-align: center;
             font-size: 2.5em;
             opacity: 1;
             transition: opacity 1s ease-in-out;
             position: relative;
-            z-index: 2; /* Make sure it's above the background */
+            z-index: 2;
         }
 
-        /* Styling the typed "Bitsmart" part */
-        #bitsmart {
-            color: #4CAF50; /* Green color */
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        /* Main content section */
+        /* Main Content */
         #main-content {
             text-align: center;
             margin-top: 20px;
@@ -51,25 +89,28 @@
             display: none;
             opacity: 0;
             transition: opacity 1s ease-in-out;
-            z-index: 2; /* Ensure it appears above the background */
+            z-index: 2;
+        }
+
+        /* Typing Effect */
+        #bitsmart {
+            color: #4CAF50;
+            font-weight: bold;
         }
 
         /* Projects Section */
         .projects {
             margin-top: 40px;
             display: flex;
-            justify-content: left;
+            justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
         }
 
-        /* Styling the project boxes */
+        /* Project Boxes */
         .project-box {
-            position: relative;
-            display: inline-block;
             width: 200px;
-            height: 200px; /* Increased height to fit content */
-            margin: 15px;
+            height: 200px;
             background-color: #4CAF50;
             color: white;
             text-align: center;
@@ -77,34 +118,62 @@
             font-size: 1.2em;
             border-radius: 10px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.2); /* Light white box shadow */
+            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.2);
         }
 
         .project-box:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 10px rgba(255, 255, 255, 0.4); /* Hover effect to increase shadow */
+            box-shadow: 0 6px 10px rgba(255, 255, 255, 0.4);
         }
 
-        /* Styling for the project description and button */
-        .project-description {
+        /* Visit Button */
+        .visit-button {
+            display: inline-block;
             margin-top: 10px;
-            font-size: 0.9em;
-        }
-
-        .project-link {
-            display: block;
-            margin-top: 5px;
-            color: #4CAF50;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
             text-decoration: none;
-            transition: color 0.3s ease;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
-        .project-link:hover {
-            text-decoration: underline;
-            color: #FFEB3B; /* Hover effect for the button */
+        .visit-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
         }
 
+        /* 3D Background */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+            background-image: url('{{ url_for("static", filename="dodecahedron.jpg") }}');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            animation: moveBackground 10s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .background-duplicate {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50%;
+            height: 50%;
+            background-image: url('{{ url_for("static", filename="dodecahedron.jpg") }}');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            animation: moveBackground 10s ease-in-out infinite;
+            z-index: 1;
+        }
         /* Move the background in 3D space */
         @keyframes moveBackground {
             0% {
@@ -117,152 +186,77 @@
                 transform: rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0);
             }
         }
-/* Styling for the project description and button */
-.project-description {
-    margin-top: 10px;
-    font-size: 0.9em;
-}
-        /* Button styles */
-.visit-button {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 12px 24px;
-    background-color: #4CAF50; /* Green color */
-    color: white;
-    text-decoration: none;
-    font-size: 1em;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 25px; /* Rounded corners */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Shadow effect */
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Hover effect for the button */
-.visit-button:hover {
-    background-color: #45a049; /* Slightly darker green */
-    transform: scale(1.05); /* Scale up the button */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Increase shadow */
-}
-
-/* Active state for the button */
-.visit-button:active {
-    background-color: #388e3c; /* Darker green */
-    transform: scale(1); /* Remove scaling on click */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Return to normal shadow */
-}
-        /* Apply the animation to the background */
-        .background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 50%;
-            background-image: url('dodecahedron.jpg'); /* Path to your image */
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            animation: moveBackground 10s ease-in-out infinite; /* Apply the 3D movement */
-            z-index: 1; /* Place it behind the content */
-        }
-
-        /* Duplicate the background to bottom-right */
-        .background-duplicate {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 50%;
-            height: 50%;
-            background-image: url('dodecahedron.gif'); /* Path to your image */
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            animation: moveBackground 10s ease-in-out infinite; /* Apply the 3D movement */
-            z-index: 1; /* Place it behind the content */
-        }
-
     </style>
 </head>
 <body>
-    <!-- 3D Background (top-left) -->
-    <div class="background"></div>
 
-    <!-- 3D Background (bottom-right) duplicate -->
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">Bitsmart</div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+        </ul>
+    </nav>
+
+    <!-- 3D Background -->
+    <div class="background"></div>
     <div class="background-duplicate"></div>
 
-    <!-- Welcome Page with Typing Effect -->
+    <!-- Welcome Message -->
     <div id="welcome" class="welcome-message">
         <h1 id="typed-text">Welcome to <span id="bitsmart">Bitsmart</span></h1>
     </div>
 
-    <!-- Main Content Section -->
+    <!-- Main Content -->
     <div id="main-content">
         <h2>Projects</h2>
         <div class="projects">
             <div class="project-box">
                 VIKING MARINE INC.
                 <div class="project-description">
-
-                    <a href="{{ url_for('login') }}" target="_blank" class="project-link visit-button">Visit Website</a>
+                    <a href="{{ url_for('login') }}" target="_blank" class="visit-button">Visit Website</a>
                 </div>
             </div>
             <div class="project-box">
                 Project 2
                 <div class="project-description">
-                    <p></p>
-                    <a href="https://example.com/project2" class="project-link" target="_blank">Visit Website</a>
-                </div>
-            </div>
-            <div class="project-box">
-                Project 3
-                <div class="project-description">
-                    <p> </p>
-                    <a href="https://example.com/project3" class="project-link" target="_blank">Visit Website</a>
+                    <a href="https://example.com/project2" class="visit-button" target="_blank">Visit Website</a>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Typing effect for "Bitsmart" word
         const typedText = document.getElementById('typed-text');
-        const bitsmart = document.getElementById('bitsmart');
         const mainContent = document.getElementById('main-content');
         const welcomeMessage = document.getElementById('welcome');
 
-        let text = " Crafting innovators";
+        let text = " Crafting Innovators";
         let i = 0;
-        let typingSpeed = 100; // Speed of typing
+        let typingSpeed = 100;
 
-        // Function to type the text letter by letter
         function typeText() {
             if (i < text.length) {
                 typedText.innerHTML += text.charAt(i);
                 i++;
                 setTimeout(typeText, typingSpeed);
             } else {
-                // After typing is complete, show the main content after a delay
-                setTimeout(function() {
-                    // Fade out the welcome message
+                setTimeout(() => {
                     welcomeMessage.style.opacity = 0;
-
-                    // After fading out, hide the welcome message completely
-                    setTimeout(function() {
+                    setTimeout(() => {
                         welcomeMessage.style.display = 'none';
-
-                        // Show the main content
                         mainContent.style.display = 'block';
-
-                        // Fade in the main content
-                        setTimeout(function() {
+                        setTimeout(() => {
                             mainContent.style.opacity = 1;
-                        }, 100); // Delay before fading in main content
-                    }, 1000); // Delay before hiding welcome message completely
-                }, 1000); // Delay after typing effect finishes
+                        }, 100);
+                    }, 1000);
+                }, 1000);
             }
         }
 
-        typeText(); // Start typing the text
+        typeText();
     </script>
 </body>
 </html>
