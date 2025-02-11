@@ -87,24 +87,26 @@
         </div>
         <div>
           <label class="block text-sm font-semibold">Tare Weight:</label>
-          <input type="text" name="tare_weight" class="border border-gray-300 p-1 w-full"/>
-        </div>
+          <input type="number" name="tare_weight" id="tare_weight" class="border border-gray-300 p-1 w-full"/>
+      </div>
+      <div>
+          <label class="block text-sm font-semibold">Payload Capacity:</label>
+          <input type="number" name="payload_capacity" id="payload_capacity" class="border border-gray-300 p-1 w-full"/>
+      </div>
+      <div>
+          <label class="block text-sm font-semibold">Max. Gross Weight:</label>
+          <input type="number" name="max_gross_weight" id="max_gross_weight" class="border border-gray-300 p-1 w-full" readonly/>
+      </div>
         <div>
           <label class="block text-sm font-semibold">CSC No.:</label>
           <input type="text" name="csc_no" class="border border-gray-300 p-1 w-full"/>
         </div>
-        <div>
-          <label class="block text-sm font-semibold">Payload Capacity:</label>
-          <input type="text" name="payload_capacity" class="border border-gray-300 p-1 w-full"/>
-        </div>
+
         <div>
           <label class="block text-sm font-semibold">Year of Manufacture:</label>
           <input type="text" name="year_of_manufacture" class="border border-gray-300 p-1 w-full"/>
         </div>
-        <div>
-          <label class="block text-sm font-semibold">Max. Gross Weight:</label>
-          <input type="text" name="max_gross_weight" class="border border-gray-300 p-1 w-full"/>
-        </div>
+
       </div>
    
 
@@ -188,6 +190,20 @@
         submitButton.disabled = true; // Disable the button after the first click
         submitButton.innerText = "Submitting..."; // Optional: Change button text
     });
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const tareWeightInput = document.getElementById("tare_weight");
+    const payloadCapacityInput = document.getElementById("payload_capacity");
+    const maxGrossWeightInput = document.getElementById("max_gross_weight");
+
+    function updateMaxGrossWeight() {
+        const tareWeight = parseFloat(tareWeightInput.value) || 0;
+        const payloadCapacity = parseFloat(payloadCapacityInput.value) || 0;
+        maxGrossWeightInput.value = tareWeight + payloadCapacity;
+    }
+
+    tareWeightInput.addEventListener("input", updateMaxGrossWeight);
+    payloadCapacityInput.addEventListener("input", updateMaxGrossWeight);
 });
 </script>
 
