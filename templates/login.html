@@ -5,111 +5,114 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f0f0f0;
-}
+  /* Make sure body and html take full height */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f0f0;
+  }
 
-.container {
-  display: flex;
-  max-width: 800px;
-  margin: 50px auto;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+  /* Main container should take up all available space */
+  .main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .container {
+    display: flex;
+    max-width: 400px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
 
-.right-panel {
-  flex: 1;
-  padding: 20px;
-}
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
 
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-}
+  form {
+    width: 100%;
+  }
 
-form {
-  margin-top: 20px;
-}
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
 
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
+  label {
+    font-weight: bold;
+  }
 
-label {
-  font-weight: bold;
-}
+  .forgot-password {
+    text-align: right;
+    margin-bottom: 15px;
+  }
 
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-}
+  button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+  }
 
-.checkbox-container input[type="checkbox"] {
-  margin-right: 10px;
-}
+  button:hover {
+    background-color: #0056b3;
+  }
 
-.forgot-password {
-  text-align: right;
-  margin-bottom: 15px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-.footer {
-  text-align: center;
-  padding: 10px;
-  color: white;
-  background-color: rgb(49, 45, 45);
-  border-top: 1px solid #e7e7e7;
-  margin-top: auto;
-}
+  /* Footer stays at the bottom */
+  .footer {
+    text-align: center;
+    padding: 10px;
+    color: white;
+    background-color: rgb(49, 45, 45);
+    border-top: 1px solid #e7e7e7;
+  }
 </style>
 </head>
 <body>
-<div class="container">
 
-  <div class="right-panel">
-    <h2>Login</h2>
-    <form action="#" method="post">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required>
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <div class="container">
+      <div class="right-panel">
+        <h2>Login</h2>
+        <form action="#" method="post">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required>
 
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required>
 
-      <div class="forgot-password">
-        <a href="#">Forgot password?</a>
+          <div class="forgot-password">
+            <a href="#">Forgot password?</a>
+          </div>
+
+          <button type="submit">Login</button>
+        </form>
       </div>
-
-      <button type="submit">Login</button>
-    </form>
+    </div>
   </div>
-</div>
-    <!-- Footer -->
-    <footer class="footer">
-      &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+
+  <!-- Footer -->
+  <footer class="footer">
+    &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
   </footer>
+
 </body>
 </html>
