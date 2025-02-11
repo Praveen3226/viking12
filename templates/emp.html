@@ -47,60 +47,87 @@ h1{
 }
 
 .form-group {
-    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-    font-weight: 500;
-    align-items: flex-start;
+    width: 20%; /* Reduce label width */
+    text-align: left;
+    font-size: 14px;
+    margin-right: 10px; /* Reduce gap between label and input */
 }
 
 .form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%; /* This keeps the width responsive */
+.form-group select,
+.form-group textarea {
+    width: 80%; /* Increase input width */
     padding: 10px;
+    font-size: 14px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 14px;
 }
 
-.form-group textarea {
-    resize: vertical;
-    height: 200px; /* Increase height for better visibility */
+.custom-table th,
+.custom-table td {
+    padding: 6px; /* Reduce padding */
+    text-align: left;
 }
 
-.form-group input[type="text"] {
-    height: 40px; /* Increase height for text input */
-    font-size: 16px;
-}
+@media (max-width: 768px) {
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
+    .form-group label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+    }
+}
 .custom-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
 
-.custom-table th,
-.custom-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+/* Reduce label space */
+.custom-table td:first-child {
+    width: 30%; /* Adjust based on your needs */
+    padding: 8px 10px;
+    white-space: nowrap; /* Prevent label wrapping */
 }
 
+/* Increase input space */
+.custom-table td:last-child {
+    width: 70%; /* Remaining space for inputs */
+}
+
+.custom-table input {
+    width: 100%; /* Make inputs fill their container */
+    padding: 10px 12px; /* Increase input field padding */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Optional: Style labels for better alignment */
+.custom-table label {
+    display: block;
+    padding-right: 15px;
+    font-weight: 500;
+    text-align: right; /* Align labels to the right */
+}
 .custom-table th {
     background-color: #f4f4f4;
     color: #333;
 }
-.custom-table input[type="text"],
-.custom-table input[type="number"],
-.custom-table input[type="datetime-local"] {
-    height: 40px; /* Increase the height of table inputs */
-    font-size: 16px;
-}
+
 .btn {
     display: inline-block;
     background-color: #7d2ae8;
@@ -114,7 +141,6 @@ h1{
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .btn:hover {
     background-color: #5c1bb7;
 }
@@ -124,7 +150,6 @@ h1{
         padding: 20px;
     }
 }
-
 .modal {
 display: none;
 position: fixed;
@@ -254,7 +279,7 @@ z-index: 10;
                 </tr>
                 <tr>
                     <th>Container Number</th>
-                    <td><input type="number" id="containerNumber" name="containerNumber" required></td>
+                    <td><input type="text" id="containerNumber" name="containerNumber" required></td>
                 </tr>
                 <tr>
                     <th>Size/Type</th>
