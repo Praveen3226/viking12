@@ -29,73 +29,18 @@
         cursor: pointer;
         transition: background-color 0.3s;
     }
-            /* Navigation Bar */
-                .nav-bar {
-            background-color: #282525;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-bar h1 {
-            color: white;
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .nav-links ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #007bff;
-        }
-
-        /* Main container for sidebar and content */
-        .main-content {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
 </style>
 </head>
 <body class="bg-gray-100 p-4">
 
-        <div class="nav-bar">
-            <a href="{{ url_for('admindash') }}" 
-            style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
-            onmouseover="this.style.backgroundColor='#0056b3'"
-            onmouseout="this.style.backgroundColor='#007bff'">
-            Back
-         </a>
-            <nav class="nav-links">
-                <ul>
-                    <li><a href="{{ url_for('admindash') }}">Home</a></li>
-                    <li><a href="{{ url_for('forms') }}">Forms</a></li>
-                    <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                </ul>
-            </nav>
-        </div>
-            <h1 class="text-2xl font-bold text-red-700">VIKING MARINE INC.</h1>
-            <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
-            <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
-            <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
-            <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
-            <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
-        </div>
+  <div class="max-w-4xl mx-auto bg-white p-6 border border-gray-300">
+    <div class="text-center mb-4">
+      <img alt="Viking Marine Inc. logo" class="mx-auto mb-2" height="120" src="{{ url_for('static', filename='logo.jpg') }}" width="120"/>
+      <h1 class="text-2xl font-bold text-red-600">VIKING MARINE INC.</h1>
+      <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+      <p class="text-sm">C/o. Inland Container Depot, Whitefield, Bangalore - 560 066.</p>
+      <p class="text-sm">Phone : +91 9035015240, +91 9036015243, +91 9036015255 &amp; +91 9036015249.</p>
+    </div>
 
     <form method="POST" action="{{ url_for('add_survey') }}" class="p-4 border border-gray-300">     
        <div class="border-t border-b border-gray-300 py-2 mb-4">
