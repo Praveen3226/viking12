@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,29 +7,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-<style>    .footer {
-  text-align: center;
-  padding: 10px;
-  color: white;
-  background-color: rgb(49, 45, 45);
-  border-top: 1px solid #e7e7e7;
-  margin-top: auto;
-}
+<style>    
+    .footer {
+        text-align: center;
+        padding: 10px;
+        color: white;
+        background-color: rgb(49, 45, 45);
+        border-top: 1px solid #e7e7e7;
+        margin-top: auto;
+    }
     .btn {
-    display: inline-block;
-    background-color: #7d2ae8;
-    color: #fff;
-    text-decoration: none;
-    text-align: center;
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        display: inline-block;
+        background-color: #7d2ae8;
+        color: #fff;
+        text-decoration: none;
+        text-align: center;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
 </style>
-  </head>
+</head>
 <body class="bg-gray-100 p-4">
 
   <div class="max-w-4xl mx-auto bg-white p-6 border border-gray-300">
@@ -108,7 +108,93 @@
         </div>
 
       </div>
-   
+
+      <!-- Radio Box Questions in Table Format -->
+     <style>
+  .invisible-border {
+    border: none !important;
+  }
+  .radio-column {
+    text-align: center;
+  }
+</style>
+
+<table class="w-full mb-4 invisible-border">
+  <tbody>
+    <tr>
+      <td class="font-semibold invisible-border">Rear End</td>
+      <td class="invisible-border">Are any holes found?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="rear_end" value="Yes"> Yes</label>
+        <label><input type="radio" name="rear_end" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Right Panel</td>
+      <td class="invisible-border">Are doors closing properly?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="right_panel" value="Yes"> Yes</label>
+        <label><input type="radio" name="right_panel" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Left Panel</td>
+      <td class="invisible-border">Are there any patches in the container?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="left_panel" value="Yes"> Yes</label>
+        <label><input type="radio" name="left_panel" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Front Panel</td>
+      <td class="invisible-border">Are any stickers or marks found in the container?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="front_panel" value="Yes"> Yes</label>
+        <label><input type="radio" name="front_panel" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Roof Panel</td>
+      <td class="invisible-border">Is the floor clean and free from damages?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="roof_panel" value="Yes"> Yes</label>
+        <label><input type="radio" name="roof_panel" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Floor Board</td>
+      <td class="invisible-border">Any objectionable odor persist?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="floor_board" value="Yes"> Yes</label>
+        <label><input type="radio" name="floor_board" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Understructure</td>
+      <td class="invisible-border">Any evidence of contamination or infestation found?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="understructure" value="Yes"> Yes</label>
+        <label><input type="radio" name="understructure" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Interior</td>
+      <td class="invisible-border">Any toxic chemical residues found?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="interior" value="Yes"> Yes</label>
+        <label><input type="radio" name="interior" value="No"> No</label>
+      </td>
+    </tr>
+    <tr>
+      <td class="font-semibold invisible-border">Exterior</td>
+      <td class="invisible-border">Is there any presence of high rust formation inside the container?</td>
+      <td class="radio-column invisible-border">
+        <label><input type="radio" name="exterior" value="Yes"> Yes</label>
+        <label><input type="radio" name="exterior" value="No"> No</label>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
       <!-- Remarks -->
       <div class="mb-4">
@@ -130,7 +216,7 @@
       </div>
 
       <div class="text-center mt-4">
-        <button type="submit" id="btn" class="btn btn-primary" >
+        <button type="submit" id="btn" class="btn btn-primary">
           Submit
         </button>
         </div>
@@ -195,7 +281,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const tareWeightInput = document.getElementById("tare_weight");
     const payloadCapacityInput = document.getElementById("payload_capacity");
     const maxGrossWeightInput = document.getElementById("max_gross_weight");
-
+    const remarksTextArea = document.querySelector("textarea[name='remarks']");
+    
     function updateMaxGrossWeight() {
         const tareWeight = parseFloat(tareWeightInput.value) || 0;
         const payloadCapacity = parseFloat(payloadCapacityInput.value) || 0;
@@ -204,6 +291,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     tareWeightInput.addEventListener("input", updateMaxGrossWeight);
     payloadCapacityInput.addEventListener("input", updateMaxGrossWeight);
+
+    // Auto-update Remarks when "Yes" is selected
+    const radioButtons = document.querySelectorAll("input[type='radio']");
+    const remarksMessages = {
+        rear_end: "1. Holes found in the rear end.",
+        right_panel: "2. Doors are not closing properly.",
+        left_panel: "3. Patches found in the container.",
+        front_panel: "4. Stickers or marks found in the container.",
+        roof_panel: "5. Floor is not clean or has damages.",
+        floor_board: "6. Objectionable odor persists.",
+        understructure: "7. Contamination or infestation found.",
+        interior: "8. Toxic chemical residues found.",
+        exterior: "9. High rust formation inside the container."
+    };
+
+    function updateRemarks() {
+        let remarks = [];
+
+        radioButtons.forEach(radio => {
+            if (radio.checked && radio.value === "Yes") {
+                remarks.push(remarksMessages[radio.name]);
+            }
+        });
+
+        remarksTextArea.value = remarks.join("\n");
+    }
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener("change", updateRemarks);
+    });
 });
 </script>
 
