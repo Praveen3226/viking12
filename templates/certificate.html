@@ -27,7 +27,18 @@
         .delete-mode .delete-checkbox {
             display: table-cell;
         }
-                /* Navigation Bar */
+
+        .cancel-btn {
+            background-color: #6b7280 !important; /* Gray color */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .cancel-btn.active {
+            background-color: #ef4444 !important; /* Red color */
+            cursor: pointer;
+            opacity: 1;
+        }
+        /* Navigation Bar */
                 .nav-bar {
             background-color: #282525;
             padding: 10px 20px;
@@ -70,7 +81,6 @@
     </style>
 </head>
 <body class="bg-gray-100 p-4">
-
     <div class="max-w-4xl mx-auto bg-white p-6 shadow-md">
         <div class="text-center">
                     <!-- Navigation Bar -->
@@ -157,13 +167,17 @@
                     </div>
                     <div class="flex gap-2">
                         <button type="button" onclick="addNewRow()" 
-                                class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
                             Add Row
                         </button>
                         <button type="button" onclick="toggleDeleteMode()" id="deleteBtn"
-                                class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
-                            Delete Rows
+                        class="bg-red-700 text-white px-3 py-1 rounded text-sm hover:bg-red-800">
+                        Delete Rows
                         </button>
+                        <button type="button" onclick="cancelDelete()" id="cancelBtn"
+            class="cancel-btn text-white px-3 py-1 rounded text-sm" disabled>
+        Cancel
+    </button>
                     </div>
                 </div>
                 <div class="scrollable-table">
@@ -194,7 +208,55 @@
                                 <td class="border border-black p-1"><input type="text" name="volumePerUnit[]" class="w-full border-none" readonly /></td>
                                 <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" readonly /></td>
                             </tr>
-                            <!-- Repeat 3 more initial rows -->
+                            <tr>
+                                <td class="border border-black p-1 delete-checkbox">
+                                    <input type="checkbox" class="row-checkbox">
+                                </td>
+                                <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumePerUnit[]" class="w-full border-none" readonly /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" readonly /></td>
+                            </tr>
+                            <tr>
+                                <td class="border border-black p-1 delete-checkbox">
+                                    <input type="checkbox" class="row-checkbox">
+                                </td>
+                                <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumePerUnit[]" class="w-full border-none" readonly /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" readonly /></td>
+                            </tr>
+                            <tr>
+                                <td class="border border-black p-1 delete-checkbox">
+                                    <input type="checkbox" class="row-checkbox">
+                                </td>
+                                <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumePerUnit[]" class="w-full border-none" readonly /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" readonly /></td>
+                            </tr>
+                            <tr>
+                                <td class="border border-black p-1 delete-checkbox">
+                                    <input type="checkbox" class="row-checkbox">
+                                </td>
+                                <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumePerUnit[]" class="w-full border-none" readonly /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" readonly /></td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -209,34 +271,89 @@
 
     <script>
         // Delete functionality
-        let deleteMode = false;
+    let deleteMode = false;
+    const cancelBtn = document.getElementById('cancelBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
 
-        function toggleDeleteMode() {
-            const table = document.querySelector('table');
-            const deleteBtn = document.querySelector('#deleteBtn');
-            
-            deleteMode = !deleteMode;
-            table.classList.toggle('delete-mode', deleteMode);
-            
-            if (deleteMode) {
-                deleteBtn.textContent = 'Confirm Delete';
-                deleteBtn.classList.add('bg-red-700');
-            } else {
-                deleteBtn.textContent = 'Delete Rows';
-                deleteBtn.classList.remove('bg-red-700');
-                deleteSelectedRows();
-            }
+    function toggleDeleteMode() {
+        const table = document.querySelector('table');
+        const deleteBtn = document.querySelector('#deleteBtn');
+        
+        deleteMode = !deleteMode;
+        table.classList.toggle('delete-mode', deleteMode);
+        
+        if (deleteMode) {
+            deleteBtn.textContent = 'Confirm Delete';
+            // Remove color change classes
+            deleteBtn.classList.remove('bg-red-500', 'bg-red-700', 'bg-red-800');
+            deleteBtn.classList.add('bg-red-700');
+        } else {
+            deleteBtn.textContent = 'Delete Rows';
+            // Maintain same color
+            deleteBtn.classList.remove('bg-red-500', 'bg-red-800');
+            deleteBtn.classList.add('bg-red-700');
+            deleteSelectedRows();
+        }
+    }
+    function cancelDelete() {
+        if (!deleteMode) return;
+        
+        // Uncheck all checkboxes
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // Exit delete mode
+        deleteMode = false;
+        document.querySelector('table').classList.remove('delete-mode');
+        deleteBtn.textContent = 'Delete Rows';
+        deleteBtn.classList.remove('bg-red-700');
+        deleteBtn.classList.add('bg-red-500');
+        
+        // Deactivate cancel button
+        cancelBtn.classList.remove('active');
+        cancelBtn.disabled = true;
+    }
+
+    function deleteSelectedRows() {
+        if (!deleteMode) return;
+
+        const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert('Please select at least one row to delete!');
+            return;
         }
 
-        function deleteSelectedRows() {
-            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-            checkboxes.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-                row.remove();
-            });
-            calculateVolume();
-        }
+        const confirmDelete = confirm(`Are you sure you want to delete ${checkboxes.length} row(s)?`);
+        if (!confirmDelete) return;
 
+        checkboxes.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            row.remove();
+        });
+
+        // Exit delete mode after deletion
+        cancelDelete();
+        calculateVolume();
+    }
+
+    // Update the toggleDeleteMode function
+    function toggleDeleteMode() {
+        if (!deleteMode) {
+            // Enter delete mode
+            deleteMode = true;
+            document.querySelector('table').classList.add('delete-mode');
+            deleteBtn.textContent = 'Confirm Delete';
+            deleteBtn.classList.replace('bg-red-500', 'bg-red-700');
+            
+            // Activate cancel button
+            cancelBtn.classList.add('active');
+            cancelBtn.disabled = false;
+        } else {
+            // Handle delete confirmation
+            deleteSelectedRows();
+        }
+    }
         // Add row functionality
         function addNewRow() {
             const tbody = document.querySelector('table tbody');
