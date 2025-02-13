@@ -4,69 +4,9 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Survey Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <style>
-        /* Add your CSS styles here */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        .header {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .content {
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            border: 1px solid #000;
-            margin: 20px;
-        }
-
-        .left-section, .right-section {
-            width: 50%;
-            padding: 10px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid black;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        .custom-table th, .custom-table td {
-            border: 1px solid black;
-            padding: 8px;
-        }
-
-        /* Add border to table rows */
-        table tr {
-            border: 1px solid black; /* Adds border to each row */
-        }
-
-        /* Make the table responsive */
-        @media screen and (max-width: 768px) {
-            .content {
-                flex-direction: column;
-            }
-
-            .left-section, .right-section {
-                width: 100%;
-                padding: 0;
-            }
-
-            table {
-                font-size: 14px;
-            }
-        }
         .footer {
             text-align: center;
             padding: 10px;
@@ -77,141 +17,159 @@
         }
     </style>
 </head>
-<body>
-
-    <!-- Header Section -->
-    <div class="header">
-        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo" style="max-width: 100px;"/>
-        <h2>VIKING MARINE INC.</h2>
-        <h3>SURVEYORS AND CONSULTING ENGINEERS</h3>
-        <p># 143, Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.<br>
-           Phone: +91-9035015240, +91-9036015249 & +91-9243185125.
-        </p>
-    </div>
-
-    {% for entry in form %}
-    <!-- Content Section -->
-    <div class="content">
-        <!-- Left Section -->
-        <div class="left-section">
-            <table>
-                <tr>
-                    <th>Applicant for Survey:</th>
-                    <td>{{ entry['applicant_name'] }}</td>
-                </tr>
-                <tr>
-                    <th>Container No.:</th>
-                    <td>{{ entry['container_number'] }}</td>
-                </tr>
-                <tr>
-                    <th>Stuffing Comm. Date and Time:</th>
-                    <td>{{ entry['stuffingCommDateTime'] }}</td>
-                </tr>
-                <tr>
-                    <th>Size / Type:</th>
-                    <td>{{ entry['size_type'] }}</td>
-                </tr>
-                <tr>
-                    <th>Tare Weight:</th>
-                    <td>{{ entry['tare_weight'] }}</td>
-                </tr>
-            </table>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto bg-white p-6 border border-gray-300">
+        <!-- Header Section -->
+        <div class="text-center mb-4">
+            <img alt="Viking Marine Inc. logo" class="mx-auto mb-2" height="120" src="{{ url_for('static', filename='logo.jpg') }}" width="120"/>
+            <h1 class="text-2xl font-bold text-red-600">VIKING MARINE INC.</h1>
+            <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+            <p class="text-sm"># 143, Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
+            <p class="text-sm">Phone: +91-9035015240, +91-9036015249 & +91-9243185125.</p>
         </div>
 
-        <!-- Right Section -->
-        <div class="right-section">
-            <table>
-                <tr>
-                    <th>Stuffing Comp. Date and Time:</th>
-                    <td>{{ entry['stuffing_comm_date_time'] }}</td>
-                </tr>
-                <tr>
-                    <th>Payload Capacity:</th>
-                    <td>{{ entry['payload_capacity'] }}</td>
-                </tr>
-                <tr>
-                    <th>Seal No.:</th>
-                    <td>{{ entry['seal_number'] }}</td>
-                </tr>
-                <tr>
-                    <th>Cargo Weight (As Declared):</th>
-                    <td>{{ entry['declared_total_weight'] }}</td>
-                </tr>
-                <tr>
-                    <th>Sealing Date and Time:</th>
-                    <td>{{ entry['stuffing_comp_date_time'] }}</td>
-                </tr>
-                <tr>
-                    <th>Remarks:</th>
-                    <td>{{ entry['others'] }}</td>
-                </tr>
-            </table>
+        <!-- Report Title -->
+        <div class="border-t border-b border-gray-300 py-2 mb-4">
+            <h2 class="text-lg font-semibold text-center">FCL STUFFING SURVEY REPORT</h2>
         </div>
+
+        <!-- Report Data Table -->
+        <table class="w-full border border-gray-300 mb-4">
+            <thead>
+                <tr>
+                    <th class="border border-gray-300 p-2 text-left">Field</th>
+                    <th class="border border-gray-300 p-2 text-left">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Certificate Number</td>
+                    <td class="border border-gray-300 p-2">{{ form['CertificateNumber'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Date</td>
+                    <td class="border border-gray-300 p-2">{{ form['date'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Applicant Name</td>
+                    <td class="border border-gray-300 p-2">{{ form['applicant_name'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Container Number</td>
+                    <td class="border border-gray-300 p-2">{{ form['container_number'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Size/Type</td>
+                    <td class="border border-gray-300 p-2">{{ form['size_type'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Tare Weight</td>
+                    <td class="border border-gray-300 p-2">{{ form['tare_weight'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Payload Capacity</td>
+                    <td class="border border-gray-300 p-2">{{ form['payload_capacity'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Declared Total Weight</td>
+                    <td class="border border-gray-300 p-2">{{ form['declared_total_weight'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Stuffing Commencement Date & Time</td>
+                    <td class="border border-gray-300 p-2">{{ form['stuffing_comm_date_time'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Stuffing Completion Date & Time</td>
+                    <td class="border border-gray-300 p-2">{{ form['stuffing_comp_date_time'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Seal Number</td>
+                    <td class="border border-gray-300 p-2">{{ form['seal_number'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Port of Discharge</td>
+                    <td class="border border-gray-300 p-2">{{ form['port_of_discharge'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Place of Stuffing</td>
+                    <td class="border border-gray-300 p-2">{{ form['place_of_stuffing'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">CBM</td>
+                    <td class="border border-gray-300 p-2">{{ form['cbm'] | default('N/A') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Consignment Details -->
+        <h3 class="text-lg font-semibold mb-2">Consignment Details</h3>
+        <table class="w-full border border-gray-300 mb-4">
+            <thead>
+                <tr>
+                    <th class="border border-gray-300 p-2 text-left">Consignor</th>
+                    <th class="border border-gray-300 p-2 text-left">Consignee</th>
+                    <th class="border border-gray-300 p-2 text-left">Description of Cargo</th>
+                    <th class="border border-gray-300 p-2 text-left">Marks & Nos.</th>
+                    <th class="border border-gray-300 p-2 text-left">No. of Packages</th>
+                    <th class="border border-gray-300 p-2 text-left">Gross Weight (Kgs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in form['consignment_details'] | default([], true) %}
+                <tr>
+                    <td class="border border-gray-300 p-2">{{ item['consignor'] | default('N/A') }}</td>
+                    <td class="border border-gray-300 p-2">{{ item['consignee'] | default('N/A') }}</td>
+                    <td class="border border-gray-300 p-2">{{ item['description'] | default('N/A') }}</td>
+                    <td class="border border-gray-300 p-2">{{ item['marksNos'] | default('N/A') }}</td>
+                    <td class="border border-gray-300 p-2">{{ item['packages'] | default('N/A') }}</td>
+                    <td class="border border-gray-300 p-2">{{ item['weight'] | default('N/A') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Remarks Section -->
+        <h3 class="text-lg font-semibold mb-2">Remarks</h3>
+        <table class="w-full border border-gray-300 mb-4">
+            <tbody>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Loading Condition</td>
+                    <td class="border border-gray-300 p-2">{{ form['loading_condition'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Lashing</td>
+                    <td class="border border-gray-300 p-2">{{ form['lashing'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Others</td>
+                    <td class="border border-gray-300 p-2">{{ form['others'] | default('N/A') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Weather Condition -->
+        <h3 class="text-lg font-semibold mb-2">Weather Condition</h3>
+        <p class="border border-gray-300 p-2">{{ form['weather_condition'] | default('N/A') }}</p>
+
+        <!-- Surveyor Details -->
+        <h3 class="text-lg font-semibold mb-2">Surveyor Details</h3>
+        <table class="w-full border border-gray-300 mb-4">
+            <tbody>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Name of Surveyor</td>
+                    <td class="border border-gray-300 p-2">{{ form['surveyor_name'] | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 p-2 font-semibold">Signature</td>
+                    <td class="border border-gray-300 p-2">{{ form['signature'] | default('N/A') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Footer -->
+        <footer class="footer">
+            &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+        </footer>
     </div>
-
-    <!-- Consignment Details -->
-    <h3>Consignment Details</h3>
-    <table class="custom-table">
-        <thead>
-            <tr>
-                <th>Consignor</th>
-                <th>Consignee</th>
-                <th>Description of Cargo</th>
-                <th>Marks & Nos.</th>
-                <th>No. of Packages</th>
-                <th>Gross Weight (Kgs)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in entry['consignment_details'] | default([], true) %}
-            <tr>
-                <td>{{ item['consignor'] }}</td>
-                <td>{{ item['consignee'] }}</td>
-                <td>{{ item['description'] }}</td>
-                <td>{{ item['marks_numbers'] }}</td>
-                <td>{{ item['no_of_packages'] }}</td>
-                <td>{{ item['gross_weight'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- Remarks Section -->
-    <h3>Remarks</h3>
-    <table class="custom-table">
-        <tr>
-            <th>Loading Condition</th>
-            <td>{{ entry['loading_condition'] }}</td>
-        </tr>
-        <tr>
-            <th>Lashing</th>
-            <td>{{ entry['lashing'] }}</td>
-        </tr>
-        <tr>
-            <th>Others</th>
-            <td>{{ entry['others'] }}</td>
-        </tr>
-    </table>
-
-    <!-- Weather Condition -->
-    <h3>Weather Condition</h3>
-    <p>{{ entry['weather_condition'] }}</p>
-
-    <!-- Surveyor Details -->
-    <h3>Surveyor Details</h3>
-    <table class="custom-table">
-        <tr>
-            <th>Name of Surveyor</th>
-            <td>{{ entry['surveyor_name'] }}</td>
-        </tr>
-        <tr>
-            <th>Signature</th>
-            <td>{{ entry['signature'] }}</td>
-        </tr>
-    </table>
-    {% endfor %}
-    <footer class="footer">
-        &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
-    </footer>
 </body>
 </html>
