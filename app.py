@@ -77,47 +77,65 @@ def logout():
 
 
 
+
 @app.route('/reportFCL')
 @login_required
 def reportFCL():
     try:
-        # Connect to the database
         conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor = conn.cursor()
 
-        # Fetch relevant data from the `form` table
+        # Fetch all reports
         cursor.execute("SELECT CertificateNumber, date, applicant_name, container_number FROM form")
-        form = cursor.fetchall()
+        forms = cursor.fetchall()
 
         conn.close()
 
-        # Pass the data to the report.html template
-        return render_template('reportFCL.html', form=form)
-    except Error as e:
+        return render_template('reportFCL.html', forms=forms)  # Render a list of reports
+    except pymysql.Error as e:
         print(f"Error: {e}")
         flash('An error occurred while fetching the reports. Please try again.', 'error')
-        return redirect(url_for('reportFCL'))
-    
+        return redirect(url_for('dashboard'))
+
 @app.route('/reportFCL1/<int:CertificateNumber>')
 @login_required
 def report(CertificateNumber):
+    conn = None
     try:
         # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-        # Fetch all reports from the `form` table
+        # Fetch the report from the `form` table
         cursor.execute("SELECT * FROM form WHERE CertificateNumber = %s", (CertificateNumber,))
-        form = cursor.fetchall()
+        form = cursor.fetchone()  # Fetch a single row
 
-        conn.close()
-        
+        # Handle case where no data is found
+        if not form:
+            flash('No report found for the given Certificate Number.', 'error')
+            return redirect(url_for('reportFCL'))
+
+        # Parse the `consignment_details` JSON string into a Python object
+        if form.get('consignment_details'):
+            try:
+                form['consignment_details'] = json.loads(form['consignment_details'])
+            except json.JSONDecodeError:
+                form['consignment_details'] = []  # Default to an empty list if JSON is invalid
+        else:
+            form['consignment_details'] = []
+
         # Pass the fetched data to the report.html template
         return render_template('reportFCL1.html', form=form)
+
     except Error as e:
         print(f"Error: {e}")
         flash('An error occurred while fetching the reports. Please try again.', 'error')
         return redirect(url_for('reportFCL'))
+
+    finally:
+        # Close the database connection
+        if conn:
+            conn.close()
     
 @app.route('/reportCER')
 @login_required
@@ -496,8 +514,8 @@ def submit():
         tare_weight = request.form.get('tareWeight', '')
         payload_capacity = request.form.get('payloadCapacity', '')
         declared_total_weight = request.form.get('declaredTotalWeight', '')
-        stuffing_comm_date_time = request.form.get('stuffingCommDateTime', None)
-        stuffing_comp_date_time = request.form.get('stuffingCompDateTime', None)
+        stuffing_comm_date_time = request.form.get('stuffingCommDateTime')
+        stuffing_comp_date_time = request.form.get('stuffingCompDateTime')
         seal_number = request.form.get('sealNumber', '')
         port_of_discharge = request.form.get('portOfDischarge', '')
         place_of_stuffing = request.form.get('placeOfStuffing', '')
@@ -509,7 +527,7 @@ def submit():
         surveyor_name = request.form.get('surveyorName', '')
         signature = request.form.get('signature', '')
 
-        # ✅ Debugging: Print form data to verify it is received correctly
+        # Debugging: Print form data
         print("Received Form Data:", request.form)
 
         # Retrieve and validate consignment_details JSON
@@ -517,19 +535,16 @@ def submit():
         if consignment_details:
             try:
                 consignment_details = json.loads(consignment_details)  # Ensure valid JSON
-                print("Parsed Consignment Details:", consignment_details)  # Debugging
+                print("Parsed Consignment Details:", consignment_details)
             except json.JSONDecodeError:
                 flash("Invalid consignment details format.", "error")
                 return redirect(url_for("forms"))
         else:
             consignment_details = []
 
-        # Convert empty values and date-time fields
-        date = date if date else None
-        stuffing_comm_date_time = stuffing_comm_date_time if stuffing_comm_date_time else None
-        stuffing_comp_date_time = stuffing_comp_date_time if stuffing_comp_date_time else None
 
-        # ✅ Debugging: Print final values before inserting
+
+        # Debugging: Print final values before inserting
         values = [
             CertificateNumber, date, applicant_name, container_number, size_type, tare_weight, 
             payload_capacity, declared_total_weight, stuffing_comm_date_time, stuffing_comp_date_time, 
@@ -548,6 +563,8 @@ def submit():
                 lashing, others, weather_condition, surveyor_name, signature, consignment_details
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
+        print("Executing Query:", insert_query)
+        print("With Values:", values)
 
         # Execute the query
         cursor.execute(insert_query, tuple(values))
