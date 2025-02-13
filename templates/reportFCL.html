@@ -133,7 +133,7 @@
                     <td>{{ record['date'] }}</td> 
                     <td>{{ record['container_number'] }}</td>
                     <td>
-                        <a href="{{ url_for('report', CertificateNumber=record.CertificateNumber) }}" class="btn">View</a>
+                        <a href="{{ url_for('reportFCL1', CertificateNumber=record.CertificateNumber) }}" class="btn">View</a>
                     </td>
                 </tr>
                 {% endfor %}
