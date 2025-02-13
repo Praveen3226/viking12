@@ -83,10 +83,37 @@
     background-color: rgb(49, 45, 45);
     border-top: 1px solid #e7e7e7;
   }
+  #flash-message {
+    width: 80%; 
+    max-width: 400px;
+    padding: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+    background-color: #10f85d; /* Your preferred color */
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+    position: fixed; /* Ensure it stays in place */
+    top: 20%; /* Position vertically at the center */
+    left: 50%; /* Position horizontally at the center */
+    transform: translate(-50%, -50%); /* Offset it by 50% of its own size */
+    z-index: 9999; /* Ensure it stays on top of other elements */
+}
 </style>
 </head>
 <body>
-
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+      <div id="flash-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 max-w-4xl w-full text-white text-center p-8 rounded-lg shadow-lg">
+          {% for category, message in messages %}
+              <div class="bg-{{ 'green-500' if category == 'success' else 'red-500' }} p-6 rounded-lg text-2xl font-semibold">
+                  {{ message }}
+              </div>
+          {% endfor %}
+      </div>
+  {% endif %}
+  {% endwith %}
   <!-- Main Content Area -->
   <div class="main-content">
     <div class="container">
@@ -113,6 +140,10 @@
   <footer class="footer">
     &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
   </footer>
-
+  <script>
+    setTimeout(() => {
+    document.getElementById('flash-message').style.display = 'none';
+}, 2000); 
+</script>
 </body>
 </html>
