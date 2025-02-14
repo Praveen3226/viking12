@@ -43,10 +43,16 @@
             color: #777;
         }
 
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 20px;
+        }
+
         .custom-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            min-width: 700px;
         }
 
         .custom-table th,
@@ -81,70 +87,73 @@
 
         @media (max-width: 768px) {
             .form-container {
-                padding: 20px;
+                padding: 15px;
+                width: 95%;
             }
-
-            .form-header {
-                flex-direction: column;
-                align-items: center;
+            
+            .form-header h1 {
+                font-size: 1.4em;
             }
-
-            .form-header img {
-                margin-bottom: 10px;
+            
+            .form-header p {
+                font-size: 0.8em;
             }
         }
+
         .footer {
             text-align: center;
             padding: 10px;
             color: white;
             background-color: rgb(49, 45, 45);
             border-top: 1px solid #e7e7e7;
-            margin-top: auto;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="form-container">
-
-
-    <div class="form-header">
-        <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo">
-        <div>
-            <h1>VIKING MARINE INC.</h1>
-            <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
-            <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
+        <div class="form-header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo">
+            <div>
+                <h1>VIKING MARINE INC.</h1>
+                <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
+                <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
+            </div>
+            <h1>FCL STUFFING SURVEY REPORT</h1>
         </div>
-        <h1>FCL STUFFING SURVEY REPORT</h1>
-        <table class="custom-table">
-            <thead>
-                <tr>
-                    <th>Certificate Number</th>
-                    <th>Date</th>
-                    <th>Applicant Name</th>
-                    <th>Shipper</th>
-                    <th>Consignee</th>
-                    <th>Total Packages</th>
-                    <th>View Report</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cer in cer_data %}
-                <tr>
-                    <td>{{ cer.CertificateNumber }}</td>
-                    <td>{{ cer.date }}</td>
-                    <td>{{ cer.applicant_name }}</td>
-                    <td>{{ cer.shipper }}</td>
-                    <td>{{ cer.consignee }}</td>
-                    <td>{{ cer.total_pkgs }}</td>
-                    <td><a href="{{ url_for('reportCER1', CertificateNumber=cer.CertificateNumber) }}">View</a></td>
 
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-            <!-- Footer -->
-    <footer class="footer">
-        &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
-    </footer>
-    </body>
-    </html>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Certificate Number</th>
+                        <th>Date</th>
+                        <th>Applicant Name</th>
+                        <th>Shipper</th>
+                        <th>Consignee</th>
+                        <th>Total Packages</th>
+                        <th>View Report</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cer in cer_data %}
+                    <tr>
+                        <td>{{ cer.CertificateNumber }}</td>
+                        <td>{{ cer.date }}</td>
+                        <td>{{ cer.applicant_name }}</td>
+                        <td>{{ cer.shipper }}</td>
+                        <td>{{ cer.consignee }}</td>
+                        <td>{{ cer.total_pkgs }}</td>
+                        <td><a href="{{ url_for('reportCER1', CertificateNumber=cer.CertificateNumber) }}" class="btn">View</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="footer">
+            &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+        </footer>
+    </div>
+</body>
+</html>
