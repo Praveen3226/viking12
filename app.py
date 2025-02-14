@@ -633,7 +633,6 @@ def get_last_certificate_number_api():
         return {'certificateNumber': certificate_number}, 200
     except Exception as e:
         return {'error': str(e)}, 500
-
 @app.route('/submit_cer', methods=['POST'])
 @login_required
 def submit_cer():
@@ -651,9 +650,9 @@ def submit_cer():
         # Safely parse numerical fields (handle missing or invalid data)
         def safe_float(value):
             try:
-                return float(value)
+                return float(value) if value.strip() else "" # Return None if value is empty
             except ValueError:
-                return 0.0
+                return ""  # Return None if conversion fails
 
         quantity = safe_float(request.form['quantity'])
         gross_weight = safe_float(request.form['gross_weight'])
@@ -665,20 +664,20 @@ def submit_cer():
         survey_data = []
         rows = len(request.form.getlist('marksNos[]'))  # Getting the number of rows submitted
         for i in range(rows):
-            marks_no = request.form.getlist('marksNos[]')[i]
-            no_of_pkgs = int(request.form.getlist('noOfPkgs[]')[i]) if request.form.getlist('noOfPkgs[]')[i] else 0
+            marks_no = request.form.getlist('marksNos[]')[i] if request.form.getlist('marksNos[]')[i].strip() else ""
+            no_of_pkgs = int(request.form.getlist('noOfPkgs[]')[i]) if request.form.getlist('noOfPkgs[]')[i].strip() else ""
             length = safe_float(request.form.getlist('length[]')[i])
             breadth = safe_float(request.form.getlist('breadth[]')[i])
             height = safe_float(request.form.getlist('height[]')[i])
             volume_unit = safe_float(request.form.getlist('volumeUnit[]')[i])
-            
+
             # Calculate volume and volume in cubic meters
-            volume = length * breadth * height
-            volume_cum = volume_unit * volume
+            volume = length * breadth * height if all([length, breadth, height]) else ""
+            volume_cum = volume_unit * volume if volume and volume_unit else ""
 
             # Append survey data
             survey_data.append({
-                'marks_no': marks_no,
+                'marks_no': marks_no,  # Blank if empty
                 'no_of_pkgs': no_of_pkgs,
                 'length': length,
                 'breadth': breadth,
@@ -689,8 +688,8 @@ def submit_cer():
             })
 
         # Calculate total volume and total packages
-        total_volume = sum([row['volume'] for row in survey_data])
-        total_pkgs = sum([row['no_of_pkgs'] for row in survey_data])
+        total_volume = sum([row['volume'] for row in survey_data if row['volume'] is not ""])
+        total_pkgs = sum([row['no_of_pkgs'] for row in survey_data if row['no_of_pkgs'] is not ""])
 
         # Database insertion logic
         conn = get_db_connection()
@@ -712,8 +711,11 @@ def submit_cer():
         # Execute the insert query
         cursor.execute(insert_query, (
             certificate_number, date, applicant_name, shipper, consignee, commodity, 
-            port_of_discharge, sb_number, quantity, gross_weight, cf_agent, container_number,
-            total_volume, total_pkgs, survey_data_json
+            port_of_discharge, sb_number, quantity if quantity is not "" else "",
+            gross_weight if gross_weight is not "" else "", cf_agent, container_number,
+            total_volume if total_volume is not "" else "",
+            total_pkgs if total_pkgs is not "" else "",
+            survey_data_json
         ))
 
         conn.commit()  # Commit the transaction
@@ -727,11 +729,6 @@ def submit_cer():
         print(f"Error: {e}")
         flash(f'An error occurred while submitting the form. Error: {e}', 'error')
         return redirect(url_for('forms'))  # Redirect to show error flash message
-
-
-
         
-
-
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
