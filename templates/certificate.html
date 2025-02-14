@@ -277,9 +277,35 @@
                     </table>
                 </div>
             </div>
-            <button type="submit" class="btn">Submit</button>
-            <!-- ... (rest of the form remains unchanged) ... -->
-        </form>
+     
+
+            <div class="flex justify-between mb-4">
+                <div>
+                    <label class="text-sm">Total No. of Pkgs</label>
+                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" name="totalPkgs" readonly />
+                </div>
+                <div>
+                    <label class="text-sm">Total No. of Cu. M</label>
+                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" name="totalVolume" readonly />
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-sm font-bold">ISSUED WITHOUT PREJUDICE</p>
+                </div>
+                <div>
+                    <p class="text-sm">For <span class="font-bold">VIKING MARINE INC.,</span></p>
+                    <p class="text-sm">Surveyor</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+            </div>
+
+
+
         <footer class="footer">
             &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
         </footer>
@@ -419,30 +445,56 @@ document.addEventListener("DOMContentLoaded", function () {
             deleteSelectedRows();
         }
     }
-        // Add row functionality
-        function addNewRow() {
-            const tbody = document.querySelector('table tbody');
-            const newRow = tbody.firstElementChild.cloneNode(true);
-            
-            newRow.querySelectorAll('input').forEach(input => {
-                if (input.type === 'checkbox') {
-                    input.checked = false;
-                } else {
-                    input.value = '';
-                    if(input.name === 'volumePerUnit[]' || input.name === 'volumeUnit[]') {
-                        input.value = '';
-                    }
-                }
-            });
-            
-            newRow.querySelectorAll('input').forEach(input => {
-                if(!input.readOnly && input.type !== 'checkbox') {
-                    input.addEventListener('input', calculateVolume);
-                }
-            });
-            
-            tbody.appendChild(newRow);
+
+    function addNewRow() {
+    const tbody = document.querySelector('table tbody');
+    let newRow;
+
+    // Check if there are any existing rows to clone
+    if (tbody.children.length === 0) {
+        // Create a new row from scratch
+        newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td class="border border-black p-1 delete-checkbox">
+                <input type="checkbox" class="row-checkbox">
+            </td>
+            <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" /></td>
+            <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" /></td>
+            <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" /></td>
+            <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" /></td>
+            <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" /></td>
+            <td class="border border-black p-1"><input type="text" name="volumePerUnit[]" class="w-full border-none" readonly /></td>
+            <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" readonly /></td>
+        `;
+    } else {
+        // Clone the first existing row
+        newRow = tbody.firstElementChild.cloneNode(true);
+    }
+
+    // Clear input values in the new row
+    newRow.querySelectorAll('input').forEach(input => {
+        if (input.type !== 'checkbox') {
+            input.value = '';
+        } else {
+            input.checked = false;
         }
+    });
+
+    // Add event listeners to the new inputs for volume calculation
+    newRow.querySelectorAll('input').forEach(input => {
+        if (!input.readOnly && input.type !== 'checkbox') {
+            input.addEventListener('input', calculateVolume);
+        }
+    });
+
+    // Append the new row to the table body
+    tbody.appendChild(newRow);
+
+    // Recalculate volumes after adding the new row
+    calculateVolume();
+}
+
+    
 
         // Search functionality
         function searchMarks() {
