@@ -250,7 +250,18 @@
     border: 1px solid black; /* Add border to each column */
     padding: 8px; /* Add padding for better spacing */
 }
-        .modal {
+.modal-content {
+    max-width: 500px; /* Adjust width as needed */
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    max-height: 80vh; /* Set a max height */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.modal {
     display: none;
     position: fixed;
     top: 0;
@@ -270,6 +281,7 @@
     text-align: right;
     border-top: 1px solid #ddd;
 }
+
     </style>
 </head>
 <body>
