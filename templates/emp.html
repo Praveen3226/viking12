@@ -1,0 +1,600 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>FCL Stuffing Survey Report Form</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> 
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    #add-container-modal .custom-table th,
+#add-container-modal .custom-table td {
+    border: 1px solid black; /* Add border to each column */
+    padding: 8px; /* Add padding for better spacing */
+}
+
+/* Add borders to the "Add Consignment" table columns */
+#modal .custom-table th,
+#modal .custom-table td {
+    border: 1px solid black; /* Add border to each column */
+    padding: 8px; /* Add padding for better spacing */
+}
+    h1{
+        -webkit-text-fill-color: #da3936;
+    }
+    .form-container {
+        background: #fff;
+        padding: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        width: 100%;
+        max-width: 1200px;
+        overflow-y: auto;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-header h1 {
+        margin: 0;
+        font-size: 1.8em;
+        color: #333;
+    }
+
+    .form-header p {
+        margin: 5px 0;
+        font-size: 0.9em;
+        color: #777;
+    }
+
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .form-group label {
+        width: 20%; /* Reduce label width */
+        text-align: left;
+        font-size: 14px;
+        margin-right: 10px; /* Reduce gap between label and input */
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 80%; /* Increase input width */
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        padding: 6px; /* Reduce padding */
+        text-align: left;
+    }
+
+    @media (max-width: 768px) {
+        .form-group {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .form-group label {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+        }
+    }
+    .custom-table {
+        width: 100%;
+
+        margin-bottom: 20px;
+    }
+
+    /* Reduce label space */
+    .custom-table td:first-child {
+        width: 30%; /* Adjust based on your needs */
+        padding: 8px 10px;
+        white-space: nowrap; /* Prevent label wrapping */
+    }
+
+    /* Increase input space */
+    .custom-table td:last-child {
+        width: 70%; /* Remaining space for inputs */
+    }
+
+    .custom-table input {
+        width: 100%; /* Make inputs fill their container */
+        padding: 10px 12px; /* Increase input field padding */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+
+    /* Optional: Style labels for better alignment */
+    .custom-table label {
+        display: block;
+        padding-right: 15px;
+        font-weight: 500;
+        text-align: right; /* Align labels to the right */
+    }
+    .custom-table th {
+        background-color: #f4f4f4;
+        color: #333;
+    }
+
+    .btn {
+        display: inline-block;
+        background-color: #7d2ae8;
+        color: #fff;
+        text-decoration: none;
+        text-align: center;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .btn:hover {
+        background-color: #5c1bb7;
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 20px;
+        }
+    }
+    .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 90%;
+        overflow-y: auto;
+    }
+
+    .popup-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .popup-container {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        z-index: 1000;
+    }
+    .footer {
+    text-align: center;
+    padding: 10px;
+    color: white;
+    background-color: rgb(49, 45, 45);
+    border-top: 1px solid #e7e7e7;
+    margin-top: auto;
+    }
+    </style>
+    </head>
+    <body>
+        <div class="form-container">
+            <div class="form-header">
+                <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company Logo">
+                <h1 >VIKING MARINE INC.</h1>
+                <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
+                <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
+            </div>
+            <h1>FCL STUFFING SURVEY REPORT FORM</h1>
+            <form method="POST" action="{{ url_for('submit') }}">
+                <table class="custom-table">
+                    <tr>
+                        <th>Certificate Number</th>
+                        <td><input type="text" id="CertificateNumber" name="CertificateNumber" ></td>
+                    </tr>
+                    <tr>
+                        <th>Date</th>
+                        <td><input type="date" id="date" name="date" ></td>
+                    </tr>
+                </table>
+
+                <h3>Applicant Details</h3>
+                <button id="add-container-btn" class="btn" >Add Container</button>
+                <div id="add-container-modal" class="modal">
+                    <div class="modal-content">
+                        <h4>Select Container Details</h4>
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Container Number</th>
+                                    <th>Applicant Name</th>
+                                    <th>Size/Type</th>
+                                    <th>Tare Weight (in Kgs)</th>
+                                    <th>Payload Capacity (in Kgs)</th>
+                                    <th>Declared Total Weight of the Container (in Kgs)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <button id="add-container-to-main" class="btn">Add Selected</button>
+                        <button id="close-container-modal" class="btn">Close</button>
+                    </div>
+                </div>
+                
+                <!-- Add Consignment Modal -->
+                <div id="modal" class="modal">
+                    <div class="modal-content">
+                        <h4>Select Consignment Details</h4>
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Consignor</th>
+                                    <th>Consignee</th>
+                                    <th>Description of Cargo</th>
+                                    <th>Marks & Nos.</th>
+                                    <th>No. of Packages</th>
+                                    <th>Gross Weight (Kgs)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <button id="fill-table" class="btn">Add Selected</button>
+                        <button id="close-modal" class="btn">Close</button>
+                    </div>
+                </div>
+            
+                <table class="custom-table">
+                    <tr>
+                        <th>Applicant Name</th>
+                        <td><input type="text" id="applicantName" name="applicantName" ></td>
+                    </tr>
+                    <tr>
+                        <th>Container Number</th>
+                        <td><input type="text" id="containerNumber" name="containerNumber" ></td>
+                    </tr>
+                    <tr>
+                        <th>Size/Type</th>
+                        <td><input type="text" id="sizeType" name="sizeType"></td>
+                    </tr>
+                    <tr>
+                        <th>Tare Weight (in Kgs)</th>
+                        <td><input type="number" id="tareWeight" name="tareWeight"></td>
+                    </tr>
+                    <tr>
+                        <th>Payload Capacity (in Kgs)</th>
+                        <td><input type="number" id="payloadCapacity" name="payloadCapacity"></td>
+                    </tr>
+                    <tr>
+                        <th>Declared Total Weight of the Container (in Kgs)</th>
+                        <td><input type="number" id="declaredTotalWeight" name="declaredTotalWeight"></td>
+                    </tr>
+                </table>
+                
+                <h3>Stuffing Details</h3>
+                <table id="added-containers-table" class="custom-table">
+                    <tr>
+                        <th>Stuffing Commencement Date & Time</th>
+                        <td><input type="datetime-local" id="stuffingCommDateTime" name="stuffingCommDateTime"></td>
+                    </tr>
+                    <tr>
+                        <th>Stuffing Completion Date & Time</th>
+                        <td><input type="datetime-local" id="stuffingCompDateTime" name="stuffingCompDateTime"></td>
+                    </tr>
+                    <tr>
+                        <th>Seal Number(s)</th>
+                        <td><input type="text" id="sealNumber" name="sealNumber"></td>
+                    </tr>
+                    <tr>
+                        <th>Port of Discharge</th>
+                        <td><input type="text" id="portOfDischarge" name="portOfDischarge"></td>
+                    </tr>
+                    <tr>
+                        <th>Place of Stuffing</th>
+                        <td><input type="text" id="placeOfStuffing" name="placeOfStuffing"></td>
+                    </tr>
+                    <tr>
+                        <th>CBM</th>
+                        <td><input type="text" id="cbm" name="cbm"></td>
+                    </tr>
+                </table>
+
+                <h3>Consignment Details</h3>
+                <div class="table-container">
+                    <table class="custom-table" id="main-table">
+                        <thead>
+                            <tr>
+                                <th>Consignor</th>
+                                <th>Consignee</th>
+                                <th>Description of Cargo</th>
+                                <th>Marks & Nos.</th>
+                                <th>No. of Packages</th>
+                                <th>Gross Weight (Kgs)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Add consignment details here -->
+                        </tbody>
+                    </table>
+                    <button id="open-modal" class="btn">Add Consignment Details</button>
+                </div>
+            
+                <!-- Modal -->
+                <div id="modal" class="modal">
+                    <div class="modal-content">
+                        <h4>Select Consignment Details</h4>
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Consignor</th>
+                                    <th>Consignee</th>
+                                    <th>Description of Cargo</th>
+                                    <th>Marks & Nos.</th>
+                                    <th>No. of Packages</th>
+                                    <th>Gross Weight (Kgs)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                
+                                </tr>
+                                <!-- Add more rows as needed -->
+                            </tbody>
+                        </table>
+                        <button id="fill-table" class="btn" onclick="">Add Selected</button>
+                        <button id="close-modal" class="btn">Close</button>
+                    </div>
+                </div>
+        
+                <h3>Remarks</h3>
+                <table class="custom-table">
+                    <tr>
+                        <th>Loading Condition</th>
+                        <td><input type="text" id="loadingCondition" name="loadingCondition"></td>
+                    </tr>
+                    <tr>
+                        <th>Lashing</th>
+                        <td><input type="text" id="lashing" name="lashing"></td>
+                    </tr>
+                    <tr>
+                        <th>Others</th>
+                        <td><textarea id="others" name="others"></textarea></td>
+                    </tr>
+                </table>
+
+                <h3>Weather Condition</h3>
+                <div class="form-group">
+                    <select name="weatherCondition" >
+                        <option value="Sunny">Sunny</option>
+                        <option value="Rainy">Rainy</option>
+                        <option value="Normal">Normal</option>
+                    </select>
+                </div>
+
+                <h3>Surveyor Details</h3>
+                <table class="custom-table">
+                    <tr>
+                        <th>Name of Surveyor</th>
+                        <td><input type="text" id="surveyorName" name="surveyorName" required></td>
+                    </tr>
+                    <tr>
+                        <th>Signature</th>
+                        <td><input type="text" id="signature" name="signature"></td>
+                    </tr>
+                </table>
+                <input type="hidden" id="consignmentDetails" name="consignmentDetails">
+                <button type="submit" class="btn">Submit</button>
+
+            </form>
+                <!-- Footer -->
+        <footer class="footer">
+            &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+        </footer>
+        </div>
+        <script>
+
+document.getElementById("add-container-btn").addEventListener("click", function () {
+    fetch('/get_containers')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector('#add-container-modal tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            // If no containers are found
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">No containers available</td></tr>';
+                return;
+            }
+
+            // Populate modal with container data
+            data.forEach(container => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="container-check" data-row="${container.container_no}"></td>
+                    <td>${container.container_no}</td>
+                    <td>${container.applicant_for_survey}</td>
+                    <td>${container.size}</td>
+                    <td>${container.tare_weight}</td>
+                    <td>${container.payload_capacity}</td>
+                    <td>${container.max_gross_weight}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching container details:', error));
+
+    document.getElementById('add-container-modal').style.display = 'flex';
+});
+
+document.getElementById("open-modal").addEventListener("click", function () {
+    fetch('/get_consignment_details')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector('#modal tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            // If no consignments are found
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">No consignments available</td></tr>';
+                return;
+            }
+
+            // Populate modal with consignment data
+            data.forEach(consignment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="row-check" data-row="${consignment.id}"></td>
+                    <td>${consignment.shipper}</td>
+                    <td>${consignment.consignee}</td>
+                    <td>${consignment.commodity}</td>
+                    <td>${consignment.sb_number}</td>
+                    <td>${consignment.total_pkgs}</td>
+                    <td>${consignment.total_volume}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching consignment details:', error));
+
+    document.getElementById('modal').style.display = 'flex';
+});
+
+// Close container modal
+document.getElementById("close-container-modal").addEventListener("click", function() {
+    document.getElementById("add-container-modal").style.display = "none";
+});
+
+// Close consignment modal
+document.getElementById("close-modal").addEventListener("click", function() {
+    document.getElementById("modal").style.display = "none";
+});
+
+// Add selected container to the main form
+document.getElementById("add-container-to-main").addEventListener("click", function () {
+    const selectedRow = document.querySelector(".container-check:checked");
+
+    if (selectedRow) {
+        const row = selectedRow.closest("tr");
+        const cells = row.querySelectorAll("td");
+
+        document.getElementById("containerNumber").value = cells[1].textContent.trim();
+        document.getElementById("applicantName").value = cells[2].textContent.trim();
+        document.getElementById("sizeType").value = cells[3].textContent.trim();
+        document.getElementById("tareWeight").value = cells[4].textContent.trim();
+        document.getElementById("payloadCapacity").value = cells[5].textContent.trim();
+        document.getElementById("declaredTotalWeight").value = cells[6].textContent.trim();
+
+        document.getElementById('add-container-modal').style.display = 'none';
+    } else {
+        alert("Please select a container to add!");
+    }
+});
+
+// Add selected consignment details to the main table
+document.getElementById('fill-table').addEventListener('click', function () {
+    const selectedRows = document.querySelectorAll('.modal-content .row-check:checked');
+    const mainTableBody = document.querySelector('#main-table tbody');
+    const consignmentDetails = []; // Array to store consignment details
+
+    if (selectedRows.length === 0) {
+        alert("Please select at least one consignment!");
+        return;
+    }
+
+    selectedRows.forEach((checkbox, index) => {
+        const row = checkbox.closest('tr');
+        const cells = row.querySelectorAll('td');
+        const newRow = document.createElement('tr');
+
+        // Create an object for each consignment detail
+        const consignment = {
+            consignor: cells[1].textContent.trim(),
+            consignee: cells[2].textContent.trim(),
+            description: cells[3].textContent.trim(),
+            marksNos: cells[4].textContent.trim(),
+            packages: cells[5].textContent.trim(),
+            weight: cells[6].textContent.trim()
+        };
+
+        // Add the consignment object to the array
+        consignmentDetails.push(consignment);
+
+        // Add the row to the main table
+        for (let i = 1; i < cells.length; i++) {
+            const newCell = document.createElement('td');
+            newCell.textContent = cells[i].textContent.trim();
+            newRow.appendChild(newCell);
+        }
+        mainTableBody.appendChild(newRow);
+    });
+
+    // Update the hidden input field with the consignment details as a JSON string
+    document.getElementById('consignmentDetails').value = JSON.stringify(consignmentDetails);
+
+    // Close the modal
+    document.getElementById('modal').style.display = 'none';
+});
+// Fetch certificate number on page load
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("/get_number")
+        .then(response => response.json())
+        .then(data => {
+            // Correctly access the certificateNumber from the response
+            document.getElementById("CertificateNumber").value = data.certificateNumber;
+        })
+        .catch(error => console.error("Error fetching certificate number:", error));
+});
+
+// Set today's date as the default value for the date field
+const today = new Date();
+const year = today.getFullYear();
+const month = ('0' + (today.getMonth() + 1)).slice(-2);
+const day = ('0' + today.getDate()).slice(-2);
+const formattedDate = `${year}-${month}-${day}`;
+document.getElementById('date').value = formattedDate;
+
+        </script>
+        
+    </body>
+    </html>
