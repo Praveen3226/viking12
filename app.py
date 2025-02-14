@@ -82,20 +82,22 @@ def logout():
 @login_required
 def reportFCL():
     try:
+        # Connect to the database
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-        # Fetch all reports
+        # Fetch relevant data from the `form` table
         cursor.execute("SELECT CertificateNumber, date, applicant_name, container_number FROM form")
-        forms = cursor.fetchall()
+        form = cursor.fetchall()
 
         conn.close()
 
-        return render_template('reportFCL.html', forms=forms)  # Render a list of reports
-    except pymysql.Error as e:
+        # Pass the data to the report.html template
+        return render_template('reportFCL.html', form=form)
+    except Error as e:
         print(f"Error: {e}")
         flash('An error occurred while fetching the reports. Please try again.', 'error')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('reportFCL'))
 
 @app.route('/reportFCL1/<int:CertificateNumber>')
 @login_required
