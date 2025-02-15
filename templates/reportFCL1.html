@@ -15,13 +15,62 @@
             border-top: 1px solid #e7e7e7;
             margin-top: auto;
         }
+         /* Navigation Bar */
+         .nav-bar {
+            background-color: #282525;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-bar h1 {
+            color: white;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-links ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #007bff;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 p-4">
     <div class="max-w-4xl mx-auto bg-white p-6 border border-gray-300">
         <!-- Header Section -->
         <div class="text-center mb-4">
-            <img alt="Viking Marine Inc. logo" class="mx-auto mb-2" height="120" src="{{ url_for('static', filename='logo.jpg') }}" width="120"/>
+            <div class="nav-bar">
+                <a href="{{ url_for('certificatert') }}" 
+                style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
+                onmouseover="this.style.backgroundColor='#0056b3'"
+                onmouseout="this.style.backgroundColor='#007bff'">
+                Back
+             </a>
+                <nav class="nav-links">
+                    <ul>
+                        <li><a href="{{ url_for('admindash') }}">Home</a></li>
+                        <li><a href="{{ url_for('forms') }}">Forms</a></li>
+                        <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
             <h1 class="text-2xl font-bold text-red-600">VIKING MARINE INC.</h1>
             <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
             <p class="text-sm"># 143, Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
