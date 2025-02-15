@@ -137,7 +137,6 @@
             width: 25%;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -176,7 +175,6 @@
             margin-left: 10px;
         }
 
-        /* Delete Modal Specific Styles */
         .employee-list-container {
             max-height: 300px;
             overflow-y: auto;
@@ -212,76 +210,58 @@
         .btn-danger:hover {
             background-color: #c82333;
         }
-  
 
-        @media (max-width: 768px) {
-            .form-container {
-                padding: 20px;
-            }
-
-            .btn {
-                font-size: 14px;
-            }
-
-            .action-buttons .btn {
-                width: 48%;
-            }
-
-            .search-bar input {
-                width: 60%;
-            }
-
-            .search-bar .btn {
-                width: 35%;
-            }
-
-            .modal-content {
-                width: 90%;
-            }
-        }
         .employee-table {
             width: 100%;
             min-width: 700px;
-            border: 1px solid black; /* Add border to each column */
-            padding: 8px; /* Add padding for better spacing */
+            border: 1px solid black;
+            padding: 8px;
         }
-        .employee-table  th,
-        .employee-table  td {
-    border: 1px solid black; /* Add border to each column */
-    padding: 8px; /* Add padding for better spacing */
-}
-.modal-content {
-    max-width: 500px; /* Adjust width as needed */
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    position: relative;
-    max-height: 80vh; /* Set a max height */
-    overflow-y: auto; /* Enable vertical scrolling */
-}
 
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-}
+        .employee-table th,
+        .employee-table td {
+            border: 1px solid black;
+            padding: 8px;
+        }
 
-.modal-footer {
-    position: sticky;
-    bottom: 0;
-    background: white;
-    padding: 10px;
-    text-align: right;
-    border-top: 1px solid #ddd;
-}
+        .employee-table th {
+            background-color: #f4f4f4;
+        }
 
+        .checkbox-cell {
+            width: 20px;
+        }
+
+        #cancelEditBtn {
+            background-color: #dc3545;
+            margin-right: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: 1px solid #dc3545;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #cancelEditBtn:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+            border-color: #c82333;
+        }
+
+        .delete-controls {
+            display: none;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -301,6 +281,7 @@
             <input type="text" placeholder="Search employees...">
             <button class="btn">Search</button>
         </div>
+
         <table class="employee-table">
             <thead>
                 <tr>
@@ -313,11 +294,40 @@
                 </tr>
             </thead>
             <tbody id="employeeTableBody">
-               <tr>
-                <td></td>
-               </tr>
+                <tr>
+                    <td contenteditable="false">123</td>
+                    <td contenteditable="false">Praveen</td>
+                    <td contenteditable="false">123456789</td>
+                    <td contenteditable="false">Basaveshwaranagar</td>
+                    <td contenteditable="false">abc</td>
+                    <td contenteditable="false">abc</td>
+                </tr>
+                <tr>
+                    <td contenteditable="false">456</td>
+                    <td contenteditable="false">Prajwal</td>
+                    <td contenteditable="false">123456789</td>
+                    <td contenteditable="false">Basaveshwaranagar</td>
+                    <td contenteditable="false">abc</td>
+                    <td contenteditable="false">abc</td>
+                </tr>
+                <tr>
+                    <td contenteditable="false">789</td>
+                    <td contenteditable="false">Likith</td>
+                    <td contenteditable="false">123456789</td>
+                    <td contenteditable="false">Basaveshwaranagar</td>
+                    <td contenteditable="false">abc</td>
+                    <td contenteditable="false">abc</td>
+                </tr>
             </tbody>
         </table>
+
+        <div class="delete-controls" id="deleteControls">
+            <button class="btn btn-danger" id="confirmDeleteBtn">Confirm Delete</button>
+            <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+        </div>
+
+        <button class="btn" id="saveChangesBtn" style="display: none;">Save Changes</button>
+        <button class="btn" id="cancelEditBtn" style="display: none;">Cancel</button>
     </div>
 
     <!-- Add Employee Modal -->
@@ -325,7 +335,7 @@
         <div class="modal-content">
             <div class="modal-header">Add Employee</div>
             <form method="POST" action="/add_employee" id="employeeForm">
-                    <div class="form-group">
+                <div class="form-group">
                     <label for="empId">Employee ID</label>
                     <input type="text" id="empId" name="empId" required>
                 </div>
@@ -357,315 +367,207 @@
             </form>
         </div>
     </div>
-    <!-- Edit Employee Modal -->
-    <div class="modal" id="editEmployeeModal">
-        <div class="modal-content">
-            <div class="modal-header">Edit Employee</div>
-            <form method="POST" action="/edit_employee"  id="editEmployeeForm">
-                <div class="form-group">
-                    <label for="editEmpId">Employee ID</label>
-                    <input type="text" id="editEmpId" name="editEmpId" required>
-                </div>
-                <div class="form-group">
-                    <label for="editName">Name</label>
-                    <input type="text" id="editName" name="editName" required>
-                </div>
-                <div class="form-group">
-                    <label for="editPhone">Phone Number</label>
-                    <input type="tel" id="editPhone" name="editPhone" required>
-                </div>
-                <div class="form-group">
-                    <label for="editAddress">Address</label>
-                    <textarea id="editAddress" name="editAddress" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="editUsername">Username</label>
-                    <input type="text" id="editUsername" name="editUsername" required>
-                </div>
-                <div class="form-group">
-                    <label for="editPassword">Password</label>
-                    <input type="password" id="editPassword" name="editPassword" required>
-                    <i class="fas fa-eye password-toggle" id="toggleEditPassword"></i>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn" onclick="closeModal('editEmployeeModal')">Cancel</button>
-                    <button type="submit" class="btn">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Delete Employee Modal -->
-    <div class="modal" id="deleteEmployeeModal">
-        <div class="modal-content">
-            <div class="modal-header">Delete Employees</div>
-            <div class="employee-list-container">
-                <div class="select-all">
-                    <input type="checkbox" id="selectAll">
-                    <label for="selectAll">Select All</label>
-                </div>
-                <div id="employeeList"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn" onclick="closeModal('deleteEmployeeModal')">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Selected</button>
-            </div>
-        </div>
-
-    </div>
 
     <script>
-
-
-
-    // Modal Management
-    function openModal(modalId) {
-        document.getElementById(modalId).style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    // Add Employee Functionality
-    document.getElementById('addEmployeeBtn').addEventListener('click', () => openModal('addEmployeeModal'));
-
-
-
-    // Delete Employee Functionality
-    document.getElementById('deleteEmployeeBtn').addEventListener('click', () => {
-        openModal('deleteEmployeeModal');
-        populateEmployeeList();
-    });
-
-    // Password Generation
-    function generatePassword(username) {
-        const firstThreeLetters = username.substring(0, 3).toUpperCase();
-        const randomNumbers = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return `${firstThreeLetters}VKM${randomNumbers}`;
-    }
-
-    // Username Generation
-    document.getElementById('name').addEventListener('input', function () {
-        const username = this.value.trim().replace(/\s+/g, '_');
-        document.getElementById('username').value = username;
-        if (username.length >= 3) {
-            document.getElementById('password').value = generatePassword(username);
+        let originalData = [];
+    
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
         }
-    });
-
-    // Password Toggles
-    document.getElementById('togglePassword').addEventListener('click', function () {
-        const passwordField = document.getElementById('password');
-        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('fa-eye-slash');
-    });
-
-    document.getElementById('toggleEditPassword').addEventListener('click', function () {
-        const passwordField = document.getElementById('editPassword');
-        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('fa-eye-slash');
-    });
-
-    // Delete Modal Functions
-    function populateEmployeeList() {
-        const container = document.getElementById('employeeList');
-        container.innerHTML = '';
-
-        employees.forEach(employee => {
-            const div = document.createElement('div');
-            div.className = 'employee-item';
-            div.innerHTML = `
-                <input type="checkbox" id="emp_${employee.id}" value="${employee.id}">
-                <label for="emp_${employee.id}">${employee.name} (${employee.id})</label>
-            `;
-            container.appendChild(div);
-        });
-
-        document.getElementById('selectAll').addEventListener('change', function () {
-            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-        });
-    }
-
-    async function confirmDelete() {
-        const selected = Array.from(document.querySelectorAll('#employeeList input[type="checkbox"]:checked'))
-            .map(checkbox => checkbox.value);
-
-        if (selected.length === 0) {
-            alert('Please select at least one employee to delete.');
-            return;
+    
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
-
-        if (confirm(`Are you sure you want to delete ${selected.length} employee(s)?`)) {
+    
+        document.getElementById('addEmployeeBtn').addEventListener('click', () => openModal('addEmployeeModal'));
+    
+        document.getElementById('editEmployeeBtn').addEventListener('click', () => {
+            const rows = document.querySelectorAll('#employeeTableBody tr');
+            originalData = [];
+    
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                cells.forEach(cell => {
+                    rowData.push(cell.textContent);
+                    cell.contentEditable = true;
+                });
+                originalData.push(rowData);
+            });
+    
+            document.getElementById('saveChangesBtn').style.display = 'block';
+            document.getElementById('cancelEditBtn').style.display = 'block';
+        });
+    
+        document.getElementById('saveChangesBtn').addEventListener('click', async () => {
+            const rows = document.querySelectorAll('#employeeTableBody tr');
+            const updatedEmployees = [];
+    
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const employee = {
+                    empId: cells[0].textContent.trim(),
+                    name: cells[1].textContent.trim(),
+                    phone: cells[2].textContent.trim(),
+                    address: cells[3].textContent.trim(),
+                    username: cells[4].textContent.trim(),
+                    password: cells[5].textContent.trim(),
+                };
+                updatedEmployees.push(employee);
+            });
+    
+            try {
+                const response = await fetch('/edit_employee', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedEmployees),
+                });
+    
+                if (!response.ok) throw new Error('Failed to update employees');
+    
+                const result = await response.json();
+                alert(result.message);
+                fetchEmployees();
+            } catch (error) {
+                console.error('Error updating employees:', error);
+                alert('Failed to update employees. Please try again.');
+            }
+    
+            rows.forEach(row => row.querySelectorAll('td').forEach(cell => (cell.contentEditable = false)));
+    
+            document.getElementById('saveChangesBtn').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        });
+    
+        document.getElementById('cancelEditBtn').addEventListener('click', () => {
+            const rows = document.querySelectorAll('#employeeTableBody tr');
+            rows.forEach((row, rowIndex) => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach((cell, cellIndex) => {
+                    cell.textContent = originalData[rowIndex][cellIndex];
+                    cell.contentEditable = false;
+                });
+            });
+    
+            document.getElementById('saveChangesBtn').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            alert('Edit cancelled. No changes were saved.');
+        });
+    
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            const selectedCheckboxes = document.querySelectorAll('.employee-checkbox:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.closest('tr').querySelector('td').textContent);
+    
+            if (selectedIds.length === 0) {
+                alert('Please select at least one employee to delete.');
+                return;
+            }
+    
+            if (!confirm(`Are you sure you want to delete ${selectedIds.length} employee(s)?`)) return;
+    
             try {
                 const response = await fetch('/delete_employees', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ ids: selected }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: selectedIds }),
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to delete employees');
-                }
-
-                closeModal('deleteEmployeeModal');
-                fetchEmployees(); // Refresh the employee list
-                alert('Selected employees have been deleted.');
+    
+                if (!response.ok) throw new Error('Failed to delete employees');
+    
+                const result = await response.json();
+                alert(result.message);
+                fetchEmployees();
             } catch (error) {
                 console.error('Error deleting employees:', error);
+                alert('Failed to delete employees. Please try again.');
             }
-        }
-    }
-
-    // Close modals when clicking outside
-    window.addEventListener('click', (event) => {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-        }
-    });
-
-    // Form Submissions
-    document.getElementById('employeeForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const formData = {
-            empId: document.getElementById('empId').value,
-            name: document.getElementById('name').value,
-            phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
-            username: document.getElementById('username').value,
-            password: document.getElementById('password').value,
-        };
-
-        try {
-            const response = await fetch('/add_employee', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add employee');
-            }
-
-            closeModal('addEmployeeModal');
-            fetchEmployees(); // Refresh the employee list
-        } catch (error) {
-            console.error('Error adding employee:', error);
-        }
-    });
-
-    document.getElementById('editEmployeeForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const formData = {
-            empId: document.getElementById('editEmpId').value,
-            name: document.getElementById('editName').value,
-            phone: document.getElementById('editPhone').value,
-            address: document.getElementById('editAddress').value,
-            username: document.getElementById('editUsername').value,
-            password: document.getElementById('editPassword').value,
-        };
-
-        try {
-            const response = await fetch('/edit_employee', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to edit employee');
-            }
-
-            closeModal('editEmployeeModal');
-            fetchEmployees(); // Refresh the employee list
-        } catch (error) {
-            console.error('Error editing employee:', error);
-        }
-    });
-// Function to fetch and display employees
-// Function to fetch and display employees
-async function fetchEmployees() {
-    try {
-        const response = await fetch('/employees');
-        const employees = await response.json();
-        console.log("Received Employees:", employees); // Debugging
-
-        const tableBody = document.getElementById('employeeTableBody');
-        tableBody.innerHTML = ''; // Clear existing rows
-
-        employees.forEach(emp => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${emp.empId}</td>
-                <td>${emp.name}</td>
-                <td>${emp.phone}</td>
-                <td>${emp.address}</td>
-                <td>${emp.username}</td>
-                <td>${emp.password}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error("Error fetching employees:", error);
-    }
-}
-
-// Fetch employees when the page loads
-window.onload = fetchEmployees;
-
-
-
-document.getElementById('employeeForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevents default form submission (only needed for AJAX handling)
     
-    const formData = new FormData(this);
-
-    fetch('/add_employee', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json()) 
-    .then(data => {
-        closeModal('addEmployeeModal');
-        location.reload(); // Refresh to show the updated employee list
-    })
-    .catch(error => console.error('Error:', error));
-});
-
-
-function updateEmployeeTable() {
-    const tbody = document.getElementById('employeeTableBody');
-    tbody.innerHTML = '';
-
-    employees.forEach(emp => {
-        const row = `<tr>
-            <td>${emp.id}</td>
-            <td>${emp.name}</td>
-            <td>${emp.phone}</td>
-            <td>${emp.address}</td>
-            <td>${emp.username}</td>
-            <td>${emp.password}</td>
-        </tr>`;
-        tbody.innerHTML += row;
-    });
-}
-
-// Load initial data (for testing)
-employees = [
-    { id: 'E001', name: 'Alice Johnson', phone: '9876543210', address: 'Downtown', username: 'alice_j', password: 'ALIVKM123' },
-    { id: 'E002', name: 'Bob Smith', phone: '8765432109', address: 'Uptown', username: 'bob_s', password: 'BOBVKM456' }
-];
-updateEmployeeTable();
-</script>
-
+            document.getElementById('cancelDeleteBtn').click();
+        });
+    
+        function generatePassword(username) {
+            const firstThreeLetters = username.substring(0, 3).toUpperCase();
+            const randomNumbers = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${firstThreeLetters}VKM${randomNumbers}`;
+        }
+    
+        document.getElementById('name').addEventListener('input', function () {
+            const name = this.value.trim();
+            if (name.length < 3) return;
+            const username = name.substring(0, 3).toUpperCase() + 'VKM' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = username;
+        });
+    
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+            this.classList.toggle('fa-eye-slash');
+        });
+    
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) event.target.style.display = 'none';
+        });
+    
+        document.getElementById('employeeForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+    
+            const formData = {
+                empId: document.getElementById('empId').value.trim(),
+                name: document.getElementById('name').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                username: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value.trim(),
+            };
+    
+            try {
+                const response = await fetch('/add_employee', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+    
+                if (!response.ok) throw new Error('Failed to add employee');
+    
+                closeModal('addEmployeeModal');
+                fetchEmployees();
+            } catch (error) {
+                console.error('Error adding employee:', error);
+            }
+        });
+    
+        async function fetchEmployees() {
+            try {
+                const response = await fetch('/employees');
+                if (!response.ok) throw new Error('Failed to fetch employees');
+    
+                const employees = await response.json();
+                console.log("Received Employees:", employees);
+    
+                const tableBody = document.getElementById('employeeTableBody');
+                tableBody.innerHTML = '';
+    
+                employees.forEach(emp => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td contenteditable="false">${emp.empId}</td>
+                        <td contenteditable="false">${emp.name}</td>
+                        <td contenteditable="false">${emp.phone}</td>
+                        <td contenteditable="false">${emp.address}</td>
+                        <td contenteditable="false">${emp.username}</td>
+                        <td contenteditable="false">${emp.password}</td>
+                        <td><input type="checkbox" class="employee-checkbox"></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error fetching employees:", error);
+            }
+        }
+    
+        window.onload = fetchEmployees;
+    </script>
+    
 </body>
 </html>
