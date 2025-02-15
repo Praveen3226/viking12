@@ -315,11 +315,6 @@
             <tbody id="employeeTableBody">
                <tr>
                 <td></td>
-               <td>Praveen</td>
-               <td>123456789</td>
-               <td>Basaveshwaranagar</td>
-               <td>abc</td>
-               <td>abc</td>
                </tr>
             </tbody>
         </table>
@@ -421,8 +416,7 @@
 
     <script>
 
-    // Sample employee data (for initial testing, can be removed after backend integration)
-    let employees = [];
+
 
     // Modal Management
     function openModal(modalId) {
@@ -436,18 +430,7 @@
     // Add Employee Functionality
     document.getElementById('addEmployeeBtn').addEventListener('click', () => openModal('addEmployeeModal'));
 
-    // Edit Employee Functionality
-    document.getElementById('editEmployeeBtn').addEventListener('click', () => {
-        const selectedEmployee = {
-            empId: 'E123',
-            name: 'John Doe',
-            phone: '1234567890',
-            address: '123 Main St, City, Country',
-            username: 'john_doe',
-            password: 'JOHVKM123'
-        };
-        openModal('editEmployeeModal');
-    });
+
 
     // Delete Employee Functionality
     document.getElementById('deleteEmployeeBtn').addEventListener('click', () => {
