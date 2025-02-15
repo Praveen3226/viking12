@@ -108,13 +108,62 @@
             border-top: 1px solid #e7e7e7;
             margin-top: 20px;
         }
+        /* Navigation Bar */
+        .nav-bar {
+            background-color: #282525;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-bar h1 {
+            color: white;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-links ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
     <div class="form-container">
         <div class="form-header">
-            <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo">
             <div>
+                <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <a href="{{ url_for('certificatert') }}" 
+            style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
+            onmouseover="this.style.backgroundColor='#0056b3'"
+            onmouseout="this.style.backgroundColor='#007bff'">
+            Back
+         </a>
+            <nav class="nav-links">
+                <ul>
+                    <li><a href="{{ url_for('admindash') }}">Home</a></li>
+                    <li><a href="{{ url_for('forms') }}">Forms</a></li>
+                    <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
                 <h1>VIKING MARINE INC.</h1>
                 <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
                 <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
@@ -126,25 +175,27 @@
             <table class="custom-table">
                 <thead>
                     <tr>
+                        <th>View Report</th>
                         <th>Certificate Number</th>
                         <th>Date</th>
                         <th>Applicant Name</th>
                         <th>Shipper</th>
                         <th>Consignee</th>
                         <th>Total Packages</th>
-                        <th>View Report</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
                     {% for cer in cer_data %}
                     <tr>
+                        <td><a href="{{ url_for('reportCER1', CertificateNumber=cer.CertificateNumber) }}" class="btn">View</a></td>
                         <td>{{ cer.CertificateNumber }}</td>
                         <td>{{ cer.date }}</td>
                         <td>{{ cer.applicant_name }}</td>
                         <td>{{ cer.shipper }}</td>
                         <td>{{ cer.consignee }}</td>
                         <td>{{ cer.total_pkgs }}</td>
-                        <td><a href="{{ url_for('reportCER1', CertificateNumber=cer.CertificateNumber) }}" class="btn">View</a></td>
+                        
                     </tr>
                     {% endfor %}
                 </tbody>
