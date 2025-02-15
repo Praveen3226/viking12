@@ -24,6 +24,7 @@
             border-radius: 10px;
             width: 90%;
             max-width: 900px;
+            margin: 20px auto;
         }
 
         .form-header {
@@ -33,116 +34,204 @@
 
         .form-header h1 {
             margin: 0;
-            font-size: 1.8em;
+            font-size: clamp(1.5rem, 2.5vw, 1.8em);
             color: #333;
         }
 
         .form-header p {
             margin: 5px 0;
-            font-size: 0.9em;
+            font-size: clamp(0.8rem, 1.2vw, 0.9em);
             color: #777;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
         }
 
         .custom-table {
             width: 100%;
+            min-width: 600px;
             border-collapse: collapse;
-            margin-top: 20px;
+            background: white;
         }
 
         .custom-table th,
         .custom-table td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
+            white-space: nowrap;
         }
 
         .custom-table th {
             background-color: #f4f4f4;
             color: #333;
+            font-weight: 600;
+        }
+
+        .custom-table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
         .btn {
             background-color: #7d2ae8;
             color: #fff;
-            padding: 5px 10px;
+            padding: 8px 16px;
             border-radius: 5px;
             text-decoration: none;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            display: inline-block;
+            font-size: 0.9em;
         }
 
         .btn:hover {
             background-color: #5c1bb7;
+            transform: translateY(-1px);
         }
 
-        .form-header img {
-            height: 60px;
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: white;
+            background-color: rgb(49, 45, 45);
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            background-color: #282525;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .nav-links ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
+            transition: color 0.3s ease;
+            padding: 5px 10px;
+        }
+
+        .nav-links a:hover {
+            color: #007bff;
         }
 
         @media (max-width: 768px) {
             .form-container {
-                padding: 20px;
+                padding: 15px;
+                width: 95%;
             }
 
-            .form-header {
+            .nav-bar {
                 flex-direction: column;
-                align-items: center;
+                padding: 10px;
             }
 
-            .form-header img {
-                margin-bottom: 10px;
+            .nav-links ul {
+                gap: 1rem;
+                justify-content: center;
+            }
+
+            .custom-table {
+                font-size: 0.9em;
+                min-width: 500px;
+            }
+
+            .custom-table th,
+            .custom-table td {
+                padding: 10px;
             }
         }
-        .footer {
-            text-align: center;
-            padding: 10px;
-            color: white;
-            background-color: rgb(49, 45, 45);
-            border-top: 1px solid #e7e7e7;
-            margin-top: auto;
+
+        @media (max-width: 480px) {
+            .custom-table {
+                min-width: 400px;
+            }
+
+            .btn {
+                padding: 6px 12px;
+                font-size: 0.8em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="form-container">
-
-
-    <div class="form-header">
-        <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo">
-        <div>
-            <h1>VIKING MARINE INC.</h1>
-            <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
-            <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
+        <div class="form-header">
+            <!-- Navigation Bar -->
+            <div class="nav-bar">
+                <a href="{{ url_for('certificatert') }}" class="btn">
+                    Back
+                </a>
+                <nav class="nav-links">
+                    <ul>
+                        <li><a href="{{ url_for('admindash') }}">Home</a></li>
+                        <li><a href="{{ url_for('forms') }}">Forms</a></li>
+                        <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+            
+            <div>
+                <h1>VIKING MARINE INC.</h1>
+                <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
+                <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
+            </div>
+            <h1>FCL STUFFING SURVEY REPORT</h1>
         </div>
-        <h1>FCL STUFFING SURVEY REPORT</h1>
-        <table class="custom-table">
-            <thead>
-                <tr>
-                    <th>Report Number</th>
-                    <th>Applicant Name</th>
-                    <th>Date</th>
-                    <th>Container Number</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in form %}
-                <tr>
-                    <td>{{ record['CertificateNumber'] }}</td>
-                    <td>{{ record['applicant_name'] }}</td>
-                    <td>{{ record['date'] }}</td> 
-                    <td>{{ record['container_number'] }}</td>
-                    <td>
-                        <a href="{{ url_for('report', CertificateNumber=record.CertificateNumber) }}" class="btn">View</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <footer class="footer">
-            &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
-        </footer>
 
+        <div class="table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Actions</th> <!-- Moved to first position -->
+                        <th>Report Number</th>
+                        <th>Applicant Name</th>
+                        <th>Date</th>
+                        <th>Container Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in form %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('report', CertificateNumber=record.CertificateNumber) }}" class="btn">View</a>
+                        </td>
+                        <td>{{ record['CertificateNumber'] }}</td>
+                        <td>{{ record['applicant_name'] }}</td>
+                        <td>{{ record['date'] }}</td> 
+                        <td>{{ record['container_number'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="footer">
+            &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+        </footer>
     </div>
 </body>
 </html>
