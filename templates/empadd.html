@@ -313,12 +313,14 @@
                 </tr>
             </thead>
             <tbody id="employeeTableBody">
-               <td>1</td>
+               <tr>
+                <td></td>
                <td>Praveen</td>
                <td>123456789</td>
                <td>Basaveshwaranagar</td>
                <td>abc</td>
                <td>abc</td>
+               </tr>
             </tbody>
         </table>
     </div>
@@ -327,8 +329,8 @@
     <div class="modal" id="addEmployeeModal">
         <div class="modal-content">
             <div class="modal-header">Add Employee</div>
-            <form id="employeeForm">
-                <div class="form-group">
+            <form method="POST" action="/add_employee" id="employeeForm">
+                    <div class="form-group">
                     <label for="empId">Employee ID</label>
                     <input type="text" id="empId" name="empId" required>
                 </div>
@@ -364,7 +366,7 @@
     <div class="modal" id="editEmployeeModal">
         <div class="modal-content">
             <div class="modal-header">Edit Employee</div>
-            <form id="editEmployeeForm">
+            <form method="POST" action="/edit_employee"  id="editEmployeeForm">
                 <div class="form-group">
                     <label for="editEmpId">Employee ID</label>
                     <input type="text" id="editEmpId" name="editEmpId" required>
@@ -418,152 +420,269 @@
     </div>
 
     <script>
-        // Sample employee data
-        let employees = [
-            { id: 'E001', name: 'John Doe', username: 'john_doe' },
-            { id: 'E002', name: 'Jane Smith', username: 'jane_smith' },
-            { id: 'E003', name: 'Bob Johnson', username: 'bob_j' }
-        ];
 
-        // Modal Management
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
+    // Sample employee data (for initial testing, can be removed after backend integration)
+    let employees = [];
+
+    // Modal Management
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Add Employee Functionality
+    document.getElementById('addEmployeeBtn').addEventListener('click', () => openModal('addEmployeeModal'));
+
+    // Edit Employee Functionality
+    document.getElementById('editEmployeeBtn').addEventListener('click', () => {
+        const selectedEmployee = {
+            empId: 'E123',
+            name: 'John Doe',
+            phone: '1234567890',
+            address: '123 Main St, City, Country',
+            username: 'john_doe',
+            password: 'JOHVKM123'
+        };
+        openModal('editEmployeeModal');
+    });
+
+    // Delete Employee Functionality
+    document.getElementById('deleteEmployeeBtn').addEventListener('click', () => {
+        openModal('deleteEmployeeModal');
+        populateEmployeeList();
+    });
+
+    // Password Generation
+    function generatePassword(username) {
+        const firstThreeLetters = username.substring(0, 3).toUpperCase();
+        const randomNumbers = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        return `${firstThreeLetters}VKM${randomNumbers}`;
+    }
+
+    // Username Generation
+    document.getElementById('name').addEventListener('input', function () {
+        const username = this.value.trim().replace(/\s+/g, '_');
+        document.getElementById('username').value = username;
+        if (username.length >= 3) {
+            document.getElementById('password').value = generatePassword(username);
+        }
+    });
+
+    // Password Toggles
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const passwordField = document.getElementById('password');
+        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    document.getElementById('toggleEditPassword').addEventListener('click', function () {
+        const passwordField = document.getElementById('editPassword');
+        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    // Delete Modal Functions
+    function populateEmployeeList() {
+        const container = document.getElementById('employeeList');
+        container.innerHTML = '';
+
+        employees.forEach(employee => {
+            const div = document.createElement('div');
+            div.className = 'employee-item';
+            div.innerHTML = `
+                <input type="checkbox" id="emp_${employee.id}" value="${employee.id}">
+                <label for="emp_${employee.id}">${employee.name} (${employee.id})</label>
+            `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('selectAll').addEventListener('change', function () {
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+        });
+    }
+
+    async function confirmDelete() {
+        const selected = Array.from(document.querySelectorAll('#employeeList input[type="checkbox"]:checked'))
+            .map(checkbox => checkbox.value);
+
+        if (selected.length === 0) {
+            alert('Please select at least one employee to delete.');
+            return;
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+        if (confirm(`Are you sure you want to delete ${selected.length} employee(s)?`)) {
+            try {
+                const response = await fetch('/delete_employees', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ids: selected }),
+                });
 
-        // Add Employee Functionality
-        document.getElementById('addEmployeeBtn').addEventListener('click', () => openModal('addEmployeeModal'));
-        
-        // Edit Employee Functionality
-        document.getElementById('editEmployeeBtn').addEventListener('click', () => {
-            const selectedEmployee = {
-                empId: 'E123',
-                name: 'John Doe',
-                phone: '1234567890',
-                address: '123 Main St, City, Country',
-                username: 'john_doe',
-                password: 'JOHVKM123'
-            };
-            openModal('editEmployeeModal');
-        });
+                if (!response.ok) {
+                    throw new Error('Failed to delete employees');
+                }
 
-        // Delete Employee Functionality
-        document.getElementById('deleteEmployeeBtn').addEventListener('click', () => {
-            openModal('deleteEmployeeModal');
-            populateEmployeeList();
-        });
-
-        // Password Generation
-        function generatePassword(username) {
-            const firstThreeLetters = username.substring(0, 3).toUpperCase();
-            const randomNumbers = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-            return `${firstThreeLetters}VKM${randomNumbers}`;
-        }
-
-        // Username Generation
-        document.getElementById('name').addEventListener('input', function() {
-            const username = this.value.trim().replace(/\s+/g, '_');
-            document.getElementById('username').value = username;
-            if (username.length >= 3) {
-                document.getElementById('password').value = generatePassword(username);
-            }
-        });
-
-        // Password Toggles
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('password');
-            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-            this.classList.toggle('fa-eye-slash');
-        });
-
-        document.getElementById('toggleEditPassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('editPassword');
-            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-            this.classList.toggle('fa-eye-slash');
-        });
-
-        // Delete Modal Functions
-        function populateEmployeeList() {
-            const container = document.getElementById('employeeList');
-            container.innerHTML = '';
-            
-            employees.forEach(employee => {
-                const div = document.createElement('div');
-                div.className = 'employee-item';
-                div.innerHTML = `
-                    <input type="checkbox" id="emp_${employee.id}" value="${employee.id}">
-                    <label for="emp_${employee.id}">${employee.name} (${employee.id})</label>
-                `;
-                container.appendChild(div);
-            });
-
-            document.getElementById('selectAll').addEventListener('change', function() {
-                const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-            });
-        }
-
-        function confirmDelete() {
-            const selected = Array.from(document.querySelectorAll('#employeeList input[type="checkbox"]:checked'))
-                                .map(checkbox => checkbox.value);
-
-            if (selected.length === 0) {
-                alert('Please select at least one employee to delete.');
-                return;
-            }
-
-            if (confirm(`Are you sure you want to delete ${selected.length} employee(s)?`)) {
-                employees = employees.filter(emp => !selected.includes(emp.id));
                 closeModal('deleteEmployeeModal');
+                fetchEmployees(); // Refresh the employee list
                 alert('Selected employees have been deleted.');
+            } catch (error) {
+                console.error('Error deleting employees:', error);
             }
         }
+    }
 
-        // Close modals when clicking outside
-        window.addEventListener('click', (event) => {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
+    // Close modals when clicking outside
+    window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    });
+
+    // Form Submissions
+    document.getElementById('employeeForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = {
+            empId: document.getElementById('empId').value,
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+        };
+
+        try {
+            const response = await fetch('/add_employee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add employee');
             }
-        });
 
-        // Form Submissions
-        document.getElementById('employeeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
             closeModal('addEmployeeModal');
-            this.reset();
-        });
+            fetchEmployees(); // Refresh the employee list
+        } catch (error) {
+            console.error('Error adding employee:', error);
+        }
+    });
 
-        document.getElementById('editEmployeeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+    document.getElementById('editEmployeeForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = {
+            empId: document.getElementById('editEmpId').value,
+            name: document.getElementById('editName').value,
+            phone: document.getElementById('editPhone').value,
+            address: document.getElementById('editAddress').value,
+            username: document.getElementById('editUsername').value,
+            password: document.getElementById('editPassword').value,
+        };
+
+        try {
+            const response = await fetch('/edit_employee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to edit employee');
+            }
+
             closeModal('editEmployeeModal');
-            this.reset();
-        });
-        // Function to fetch and display employees
+            fetchEmployees(); // Refresh the employee list
+        } catch (error) {
+            console.error('Error editing employee:', error);
+        }
+    });
+// Function to fetch and display employees
+// Function to fetch and display employees
 async function fetchEmployees() {
-    const response = await fetch('/employees');
-    const employees = await response.json();
-    const tableBody = document.getElementById('employeeTableBody');
-    tableBody.innerHTML = '';
+    try {
+        const response = await fetch('/employees');
+        const employees = await response.json();
+        console.log("Received Employees:", employees); // Debugging
+
+        const tableBody = document.getElementById('employeeTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        employees.forEach(emp => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${emp.empId}</td>
+                <td>${emp.name}</td>
+                <td>${emp.phone}</td>
+                <td>${emp.address}</td>
+                <td>${emp.username}</td>
+                <td>${emp.password}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching employees:", error);
+    }
+}
+
+// Fetch employees when the page loads
+window.onload = fetchEmployees;
+
+
+
+document.getElementById('employeeForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevents default form submission (only needed for AJAX handling)
+    
+    const formData = new FormData(this);
+
+    fetch('/add_employee', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        closeModal('addEmployeeModal');
+        location.reload(); // Refresh to show the updated employee list
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+
+function updateEmployeeTable() {
+    const tbody = document.getElementById('employeeTableBody');
+    tbody.innerHTML = '';
 
     employees.forEach(emp => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
+        const row = `<tr>
             <td>${emp.id}</td>
             <td>${emp.name}</td>
             <td>${emp.phone}</td>
             <td>${emp.address}</td>
             <td>${emp.username}</td>
             <td>${emp.password}</td>
-        `;
-        tableBody.appendChild(row);
+        </tr>`;
+        tbody.innerHTML += row;
     });
 }
 
-// Call fetchEmployees on page load
-document.addEventListener('DOMContentLoaded', fetchEmployees);
-    </script>
+// Load initial data (for testing)
+employees = [
+    { id: 'E001', name: 'Alice Johnson', phone: '9876543210', address: 'Downtown', username: 'alice_j', password: 'ALIVKM123' },
+    { id: 'E002', name: 'Bob Smith', phone: '8765432109', address: 'Uptown', username: 'bob_s', password: 'BOBVKM456' }
+];
+updateEmployeeTable();
+</script>
+
 </body>
 </html>
