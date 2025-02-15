@@ -13,7 +13,9 @@ def get_db_connection():
         host="localhost",
         user="root",
         password="Money2035",
-        database="leads"
+        database="leads",
+        cursorclass=pymysql.cursors.DictCursor  # Ensures dictionary output
+
     )
 
 # User Authentication Data
@@ -378,10 +380,6 @@ def emp():
 def employee():
     return render_template('employee.html')
 
-@app.route('/empadd')
-@login_required
-def empadd():
-    return render_template('empadd.html')
 
 @app.route('/forms')
 @login_required
@@ -413,14 +411,18 @@ def get_number():
         cursor.execute("SELECT CertificateNumber FROM form ORDER BY id DESC LIMIT 1")
         last_record = cursor.fetchone()
 
-        if last_record:
-            last_number = int(last_record[0][6:])  # Access the first element (CertificateNumber)
+        print("Database fetched record:", last_record)  # Debugging log
+
+        if last_record and "CertificateNumber" in last_record:
+            last_number = int(last_record["CertificateNumber"][6:])
             next_number = last_number + 1
         else:
             next_number = 1  # Start if no record exists
 
         current_year_month = datetime.now().strftime("%Y%m")
         new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
+
+        print("Generated Certificate Number:", new_certificate_number)  # Debugging log
 
         return jsonify({"certificateNumber": new_certificate_number})
 
@@ -429,9 +431,8 @@ def get_number():
         return jsonify({"error": str(e)})
 
     finally:
-        cursor.close()
-        conn.close()
-
+        if conn:
+            conn.close()
 
 @app.route('/get_containers')
 @login_required
@@ -633,6 +634,7 @@ def get_last_certificate_number_api():
         return {'certificateNumber': certificate_number}, 200
     except Exception as e:
         return {'error': str(e)}, 500
+
 @app.route('/submit_cer', methods=['POST'])
 @login_required
 def submit_cer():
@@ -729,6 +731,95 @@ def submit_cer():
         print(f"Error: {e}")
         flash(f'An error occurred while submitting the form. Error: {e}', 'error')
         return redirect(url_for('forms'))  # Redirect to show error flash message
-        
+
+@app.route('/empadd')
+@login_required
+def empadd():
+    return render_template('empadd.html')
+
+# Route to fetch all employees
+# Fetch all employees
+@app.route('/employees', methods=['GET'])
+def get_employees():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM employees')
+    employees = cursor.fetchall()
+    conn.close()
+    
+    print("Fetched Employees:", employees)  # Debugging line
+    return jsonify(employees)  # Returns JSON data
+
+# Route to add a new employee
+@app.route('/add_employee', methods=['POST'])
+def add_employee():
+    try:
+        data = request.get_json()
+        empId = data['empId']
+        name = data['name']
+        phone = data['phone']
+        address = data['address']
+        username = data['username']
+        password = data['password']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO employees (empId, name, phone, address, username, password)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        ''', (empId, name, phone, address, username, password))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'message': 'Employee added successfully!'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Route to edit an employee
+@app.route('/edit_employee', methods=['POST'])
+def edit_employee():
+    try:
+        data = request.get_json()
+        empId = data['empId']
+        name = data['name']
+        phone = data['phone']
+        address = data['address']
+        username = data['username']
+        password = data['password']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE employees
+            SET name = %s, phone = %s, address = %s, username = %s, password = %s
+            WHERE empId = %s
+        ''', (name, phone, address, username, password, empId))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'message': 'Employee updated successfully!'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Route to delete employees
+@app.route('/delete_employees', methods=['POST'])
+def delete_employees():
+    try:
+        data = request.get_json()
+        employee_ids = data.get('ids', [])
+        if not employee_ids:
+            return jsonify({'error': 'No employees selected'}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        format_strings = ','.join(['%s'] * len(employee_ids))  # Adjusting query
+        cursor.execute(f'DELETE FROM employees WHERE empId IN ({format_strings})', tuple(employee_ids))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'message': 'Employees deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
