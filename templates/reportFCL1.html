@@ -143,12 +143,10 @@
                     <td class="border border-gray-300 p-2 font-semibold">Place of Stuffing</td>
                     <td class="border border-gray-300 p-2">{{ form['place_of_stuffing'] | default('N/A') }}</td>
                 </tr>
-                <tr>
-                    <td class="border border-gray-300 p-2 font-semibold">CBM</td>
-                    <td class="border border-gray-300 p-2">{{ form['cbm'] | default('N/A') }}</td>
-                </tr>
+
             </tbody>
         </table>
+
 
         <!-- Consignment Details -->
         <h3 class="text-lg font-semibold mb-2">Consignment Details</h3>
@@ -176,6 +174,19 @@
                 {% endfor %}
             </tbody>
         </table>
+
+            <!-- SI Unit Box for CBM and Total Packages -->
+            <div class="flex justify-between bg-gray-200 p-4 rounded-lg border border-gray-300 mb-4">
+                <div class="w-1/2 text-center">
+                    <h3 class="text-lg font-semibold">CBM</h3>
+                    <p class="text-xl font-bold">{{ form['cbm'] | default('N/A') }} CBM</p>
+                </div>
+                <div class="w-1/2 text-center">
+                    <h3 class="text-lg font-semibold">Total No. of Packages</h3>
+                    <p class="text-xl font-bold">{{ form['totalPackages'] | default('N/A') }} Pkgs</p>
+                </div>
+            </div>
+
 
         <!-- Remarks Section -->
         <h3 class="text-lg font-semibold mb-2">Remarks</h3>
