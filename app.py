@@ -326,15 +326,17 @@ def add_survey():
         for field, value in required_fields.items():
             if not value:
                 flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
-                return redirect(url_for('forms'))
+                return redirect(url_for('forms'))  # Redirect if a field is missing
 
-        # Check for duplicate CertificateNumber
-        cursor.execute("SELECT COUNT(*) FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
-        if cursor.fetchone()[0] > 0:
-            flash(f"Certificate Number {CertificateNumber} already exists!", "error")
-            return redirect(url_for('forms'))
+        # ✅ Check for duplicate CertificateNumber
+        cursor.execute("SELECT COUNT(*) AS count FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
+        result = cursor.fetchone()
 
-        # Insert data into the database
+        if result and result["count"] > 0:
+            flash(f"Error: Certificate Number {CertificateNumber} already exists!", "error")
+            return redirect(url_for('forms'))  # Redirect if duplicate exists
+
+        # ✅ Insert data into the database
         insert_query = """
             INSERT INTO container (
                 CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no, place_of_inspection,
@@ -352,22 +354,18 @@ def add_survey():
         conn.commit()
 
         flash('Survey added successfully!', 'success')
-        return redirect(url_for('forms'))
+        return redirect(url_for('forms'))  # ✅ Redirect on success
 
     except Exception as e:
-        print(f"❌ Error: {type(e).__name__} - {e}")
+        print(f"❌ Error: {type(e).__name__} - {e}")  # Log error
         flash(f'Error: {e}', 'error')
-        return redirect(url_for('forms'))
+        return redirect(url_for('forms'))  # ✅ Redirect on error
 
     finally:
-        cursor.close()
-        conn.close()
- # Redirect to show error flash message
-
-
-
-
-
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
 @app.route('/emp')
