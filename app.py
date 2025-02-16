@@ -522,13 +522,14 @@ def submit():
         seal_number = request.form.get('sealNumber', '')
         port_of_discharge = request.form.get('portOfDischarge', '')
         place_of_stuffing = request.form.get('placeOfStuffing', '')
-        cbm = request.form.get('cbm', '')
+        cbm = request.form.get('volume', '')
         loading_condition = request.form.get('loadingCondition', '')
         lashing = request.form.get('lashing', '')
         others = request.form.get('others', '')
         weather_condition = request.form.get('weatherCondition', '')
         surveyor_name = request.form.get('surveyorName', '')
         signature = request.form.get('signature', '')
+        totalPackages = request.form.get('totalPackages', '')
 
         # Debugging: Print form data
         print("Received Form Data:", request.form)
@@ -547,27 +548,25 @@ def submit():
 
 
 
-        # Debugging: Print final values before inserting
-        values = [
-            CertificateNumber, date, applicant_name, container_number, size_type, tare_weight, 
-            payload_capacity, declared_total_weight, stuffing_comm_date_time, stuffing_comp_date_time, 
-            seal_number, port_of_discharge, place_of_stuffing, cbm, loading_condition, 
-            lashing, others, weather_condition, surveyor_name, signature, 
-            json.dumps(consignment_details) if consignment_details else None  # Convert JSON to string
-        ]
-        print("Final Values to Insert:", values)
-
-        # Prepare the query to insert data into the form table
+        # Corrected SQL query
         insert_query = """
             INSERT INTO form (
                 CertificateNumber, date, applicant_name, container_number, size_type, tare_weight, 
                 payload_capacity, declared_total_weight, stuffing_comm_date_time, stuffing_comp_date_time, 
                 seal_number, port_of_discharge, place_of_stuffing, cbm, loading_condition, 
-                lashing, others, weather_condition, surveyor_name, signature, consignment_details
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                lashing, others, weather_condition, surveyor_name, signature, totalPackages, consignment_details
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)    
         """
-        print("Executing Query:", insert_query)
-        print("With Values:", values)
+
+        # Ensure correct order of values
+        values = [
+            CertificateNumber, date, applicant_name, container_number, size_type, tare_weight, 
+            payload_capacity, declared_total_weight, stuffing_comm_date_time, stuffing_comp_date_time,  #41710.00
+            seal_number, port_of_discharge, place_of_stuffing, cbm, loading_condition, 
+            lashing, others, weather_condition, surveyor_name, signature, 
+            totalPackages,  # Ensure totalPackages is correctly placed here
+            json.dumps(consignment_details) if consignment_details else None  # Ensure consignment_details is placed last
+        ]
 
         # Execute the query
         cursor.execute(insert_query, tuple(values))
@@ -775,29 +774,33 @@ def add_employee():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Route to edit an employee
+# Route to edit employees (bulk update)
 @app.route('/edit_employee', methods=['POST'])
 def edit_employee():
     try:
-        data = request.get_json()
-        empId = data['empId']
-        name = data['name']
-        phone = data['phone']
-        address = data['address']
-        username = data['username']
-        password = data['password']
-
+        data = request.get_json()  # Expecting a list of employees
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('''
-            UPDATE employees
-            SET name = %s, phone = %s, address = %s, username = %s, password = %s
-            WHERE empId = %s
-        ''', (name, phone, address, username, password, empId))
+
+        for emp in data:
+            empId = emp['empId']
+            name = emp['name']
+            phone = emp['phone']
+            address = emp['address']
+            username = emp['username']
+            password = emp['password']
+
+            cursor.execute('''
+                UPDATE employees
+                SET name = %s, phone = %s, address = %s, username = %s, password = %s
+                WHERE empId = %s
+            ''', (name, phone, address, username, password, empId))
+
         conn.commit()
+        cursor.close()
         conn.close()
 
-        return jsonify({'message': 'Employee updated successfully!'}), 200
+        return jsonify({'message': 'Employees updated successfully!'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -807,17 +810,22 @@ def delete_employees():
     try:
         data = request.get_json()
         employee_ids = data.get('ids', [])
+
         if not employee_ids:
             return jsonify({'error': 'No employees selected'}), 400
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        format_strings = ','.join(['%s'] * len(employee_ids))  # Adjusting query
-        cursor.execute(f'DELETE FROM employees WHERE empId IN ({format_strings})', tuple(employee_ids))
+
+        # Correct SQL query using tuple formatting
+        query = 'DELETE FROM employees WHERE empId IN ({})'.format(','.join(['%s'] * len(employee_ids)))
+        cursor.execute(query, tuple(employee_ids))
+
         conn.commit()
+        cursor.close()
         conn.close()
 
-        return jsonify({'message': 'Employees deleted successfully'}), 200
+        return jsonify({'message': 'Employees deleted successfully!'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
