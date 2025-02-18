@@ -101,14 +101,16 @@ def reportFCL():
         flash('An error occurred while fetching the reports. Please try again.', 'error')
         return redirect(url_for('reportFCL'))
 
+
 @app.route('/reportFCL1/<int:CertificateNumber>')
 @login_required
-def report(CertificateNumber):
+def reportFCL1(CertificateNumber):
     conn = None
+    cursor = None
     try:
         # Connect to the database
         conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor = conn.cursor()
 
         # Fetch the report from the `form` table
         cursor.execute("SELECT * FROM form WHERE CertificateNumber = %s", (CertificateNumber,))
@@ -120,7 +122,7 @@ def report(CertificateNumber):
             return redirect(url_for('reportFCL'))
 
         # Parse the `consignment_details` JSON string into a Python object
-        if form.get('consignment_details'):
+        if 'consignment_details' in form and form['consignment_details']:
             try:
                 form['consignment_details'] = json.loads(form['consignment_details'])
             except json.JSONDecodeError:
@@ -128,18 +130,21 @@ def report(CertificateNumber):
         else:
             form['consignment_details'] = []
 
-        # Pass the fetched data to the report.html template
+        # Render the template with the fetched data
         return render_template('reportFCL1.html', form=form)
 
-    except Error as e:
-        print(f"Error: {e}")
+    except pymysql.Error as e:
+        print(f"Database Error: {e}")
         flash('An error occurred while fetching the reports. Please try again.', 'error')
         return redirect(url_for('reportFCL'))
 
     finally:
-        # Close the database connection
+        # Close cursor and connection
+        if cursor:
+            cursor.close()
         if conn:
             conn.close()
+
     
 @app.route('/reportCER')
 @login_required
@@ -288,6 +293,40 @@ def certificate():
 def container():
     return render_template('container.html')
 
+
+            
+
+@app.route('/get_numbers')
+@login_required
+def get_numbers():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)  # Ensuring dictionary cursor
+
+        cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1")
+        last_record = cursor.fetchone()
+
+        print("Database fetched record:", last_record)  # Debugging log
+
+        if last_record and last_record["CertificateNumber"].isdigit():
+            next_number = int(last_record["CertificateNumber"]) + 1
+        else:
+            next_number = 1  # Start from 1 if no record exists
+
+        new_certificate_number = str(next_number)
+
+        print("Generated Certificate Number:", new_certificate_number)  # Debugging log
+
+        return jsonify({"certificateNumber": new_certificate_number})
+
+    except Exception as e:
+        print(f"Error fetching certificate number: {e}")
+        return jsonify({"error": str(e)})
+
+    finally:
+        if conn:
+            conn.close()
+
 @app.route('/add_survey', methods=['POST'])
 @login_required
 def add_survey():
@@ -400,25 +439,26 @@ def containerrpt():
     return render_template('containerrpt.html')
 
 # Fetch the latest certificate number
+
+
 @app.route('/get_number')
 @login_required
 def get_number():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)  # Ensuring dictionary cursor
+
         cursor.execute("SELECT CertificateNumber FROM form ORDER BY id DESC LIMIT 1")
         last_record = cursor.fetchone()
 
         print("Database fetched record:", last_record)  # Debugging log
 
-        if last_record and "CertificateNumber" in last_record:
-            last_number = int(last_record["CertificateNumber"][6:])
-            next_number = last_number + 1
+        if last_record and last_record["CertificateNumber"].isdigit():
+            next_number = int(last_record["CertificateNumber"]) + 1
         else:
-            next_number = 1  # Start if no record exists
+            next_number = 1  # Start from 1 if no record exists
 
-        current_year_month = datetime.now().strftime("%Y%m")
-        new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
+        new_certificate_number = str(next_number)
 
         print("Generated Certificate Number:", new_certificate_number)  # Debugging log
 
@@ -475,7 +515,7 @@ def get_consignment_details():
             database="leads"
         )
         cursor = conn.cursor()
-        cursor.execute("SELECT shipper, consignee, commodity, sb_number, total_pkgs,total_volume FROM cer")
+        cursor.execute("SELECT shipper, consignee, commodity, sb_number, total_pkgs,gross_weight,total_volume FROM cer")
         consignments = cursor.fetchall()
         conn.close()
 
@@ -488,7 +528,8 @@ def get_consignment_details():
                 "commodity": row[2],
                 "sb_number": row[3],
                 "total_pkgs":row[4],
-                "total_volume": row[5]
+                "gross_weight": row[5],
+                "total_volume": row[6]
             })
         return jsonify(consignment_data)
 
@@ -528,48 +569,40 @@ def submit():
         surveyor_name = request.form.get('surveyorName', '')
         signature = request.form.get('signature', '')
         totalPackages = request.form.get('totalPackages', '')
-
-        # Debugging: Print form data
-        print("Received Form Data:", request.form)
+        gross_weight = request.form.get('grossWeight', '')
 
         # Retrieve and validate consignment_details JSON
-        consignment_details = request.form.get('consignmentDetails', None)
-        if consignment_details:
-            try:
-                consignment_details = json.loads(consignment_details)  # Ensure valid JSON
-                print("Parsed Consignment Details:", consignment_details)
-            except json.JSONDecodeError:
-                flash("Invalid consignment details format.", "error")
-                return redirect(url_for("forms"))
-        else:
-            consignment_details = []
-
-
+        consignment_details = request.form.get('consignmentDetails', '[]')  # Default to empty list if missing
+        try:
+            consignment_details = json.loads(consignment_details)  # Ensure valid JSON
+            print("Parsed Consignment Details:", consignment_details)
+        except json.JSONDecodeError:
+            flash("Invalid consignment details format.", "error")
+            return redirect(url_for("forms"))
 
         # Corrected SQL query
         insert_query = """
             INSERT INTO form (
                 CertificateNumber, date, applicant_name, container_number, size_type, tare_weight, 
                 payload_capacity, declared_total_weight, stuffing_comm_date_time, stuffing_comp_date_time, 
-                seal_number, port_of_discharge, place_of_stuffing, cbm, loading_condition, 
+                seal_number, port_of_discharge, place_of_stuffing, cbm, total_gross_weight, loading_condition, 
                 lashing, others, weather_condition, surveyor_name, signature, totalPackages, consignment_details
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)    
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)    
         """
 
-        # Ensure correct order of values
         values = [
             CertificateNumber, date, applicant_name, container_number, size_type, tare_weight, 
-            payload_capacity, declared_total_weight, stuffing_comm_date_time, stuffing_comp_date_time,  #41710.00
-            seal_number, port_of_discharge, place_of_stuffing, cbm, loading_condition, 
+            payload_capacity, declared_total_weight, stuffing_comm_date_time, stuffing_comp_date_time,
+            seal_number, port_of_discharge, place_of_stuffing, cbm, gross_weight, loading_condition, 
             lashing, others, weather_condition, surveyor_name, signature, 
-            totalPackages,  # Ensure totalPackages is correctly placed here
-            json.dumps(consignment_details) if consignment_details else None  # Ensure consignment_details is placed last
+            totalPackages,
+            json.dumps(consignment_details)  # This will now always have a valid value
         ]
 
         # Execute the query
         cursor.execute(insert_query, tuple(values))
         conn.commit()
-        
+
         flash("Form submitted successfully!", "success")
         return redirect(url_for("forms"))
 
@@ -579,58 +612,52 @@ def submit():
         return redirect(url_for("forms"))
 
     finally:
-        if cursor:
+        if 'cursor' in locals():
             cursor.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()
 
-def get_last_certificate_number():
-    try:
-        # Establish a connection to the database
-        conn = get_db_connection()
-        cursor = conn.cursor()
 
-        # Query to get the last certificate number
+@app.route('/get_numbercer')
+@login_required
+def get_numbercer():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)  # Ensuring dictionary cursor
+
         cursor.execute("SELECT CertificateNumber FROM cer ORDER BY id DESC LIMIT 1")
         last_record = cursor.fetchone()
 
-        if last_record:
-            return last_record[0]
+        print("Database fetched record:", last_record)  # Debugging log
+
+        current_year_month = datetime.now().strftime("%Y%m")
+
+        if last_record and last_record["CertificateNumber"]:
+            last_certificate = last_record["CertificateNumber"]
+            last_year_month = last_certificate[:6]  # Extract YYYYMM
+
+            if last_year_month == current_year_month:
+                last_number = int(last_certificate[6:])  # Extract number part
+                next_number = last_number + 1
+            else:
+                next_number = 1  # Reset count for new month/year
         else:
-            return None  # No records found
+            next_number = 1  # Start fresh if no record exists
+
+        new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
+
+        print("Generated Certificate Number:", new_certificate_number)  # Debugging log
+
+        return jsonify({"certificateNumber": new_certificate_number})
 
     except Exception as e:
-        print(f"Error fetching last certificate number: {e}")
-        return None
+        print(f"Error fetching certificate number: {e}")
+        return jsonify({"error": str(e)})
+
     finally:
-        cursor.close()
-        conn.close()
+        if conn:
+            conn.close()
 
-def generate_certificate_number():
-    last_certificate_number = get_last_certificate_number()
-
-    if last_certificate_number:
-        # Extract the numeric part and increment it
-        last_number = int(last_certificate_number[6:])  # Assuming last 6 digits are the number
-        next_number = last_number + 1
-    else:
-        # Start from the first certificate number if no records exist
-        next_number = 1
-
-    # Format the new certificate number (e.g., 202502000001 for February 2025)
-    current_year_month = datetime.now().strftime("%Y%m")
-    new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
-
-    return new_certificate_number
-
-@app.route('/get_last_certificate_number', methods=['GET'])
-@login_required
-def get_last_certificate_number_api():
-    try:
-        certificate_number = generate_certificate_number()
-        return {'certificateNumber': certificate_number}, 200
-    except Exception as e:
-        return {'error': str(e)}, 500
 
 @app.route('/submit_cer', methods=['POST'])
 @login_required
