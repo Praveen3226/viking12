@@ -246,25 +246,27 @@ overflow-y: auto;
 }
 
 .input-container {
-display: flex;
-align-items: center;
+    display: flex;
+    align-items: center;
+    font-weight: bold; /* Makes all text inside bold */
 }
 
 .small-box {
-width: 80px; /* Adjust as needed */
-height: 35px; /* Adjust to match the design */
-font-size: 18px; /* Increase font size for readability */
-text-align: center;
-border: 2px solid black;
-border-radius: 5px;
-font-weight: bold;
-margin-right: 5px;
+    width: 80px; /* Adjust as needed */
+    height: 35px; /* Adjust to match the design */
+    font-size: 18px; /* Increase font size for readability */
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-weight: bold; /* Ensures input text is bold */
+    margin-right: 5px;
 }
 
 .unit {
-font-weight: bold;
-font-size: 18px;
+    font-weight: bold;
+    font-size: 18px;
 }
+
 
         /* Navigation Bar */
         .nav-bar {
@@ -332,7 +334,7 @@ font-size: 18px;
         <form method="POST" action="{{ url_for('submit') }}">
             <table class="custom-table">
                 <tr>
-                    <th>Certificate Number</th>
+                    <th>Report Number</th>
                     <td><input type="text" id="CertificateNumber" name="CertificateNumber" ></td>
                 </tr>
                 <tr>
@@ -385,6 +387,7 @@ font-size: 18px;
                                 <th>Marks & Nos.</th>
                                 <th>No. of Packages</th>
                                 <th>Gross Weight (Kgs)</th>
+                                <th>Volume (CBM)</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -459,6 +462,14 @@ font-size: 18px;
         <span class="unit">CBM</span>
     </td>
 </tr>
+<tr>
+    <th>Gross Weight</th>
+    <td class="input-container">
+        <input type="text" id="grossWeight" name="grossWeight" readonly class="small-box">
+        <span class="unit">Kgs</span>
+    </td>
+</tr>
+
 
     
 </table>
@@ -474,6 +485,7 @@ font-size: 18px;
                             <th>Marks & Nos.</th>
                             <th>No. of Packages</th>
                             <th>Gross Weight (Kgs)</th>
+                            <th>Volume (CBM)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -530,190 +542,180 @@ font-size: 18px;
     </footer>
     </div>
     <script>
-
 document.getElementById("add-container-btn").addEventListener("click", function () {
-fetch('/get_containers')
-    .then(response => response.json())
-    .then(data => {
-        const tbody = document.querySelector('#add-container-modal tbody');
-        tbody.innerHTML = ''; // Clear existing rows
+    fetch('/get_containers')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector('#add-container-modal tbody');
+            tbody.innerHTML = ''; // Clear existing rows
 
-        // If no containers are found
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7">No containers available</td></tr>';
-            return;
-        }
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">No containers available</td></tr>';
+                return;
+            }
 
-        // Populate modal with container data
-        data.forEach(container => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="checkbox" class="container-check" data-row="${container.container_no}"></td>
-                <td>${container.container_no}</td>
-                <td>${container.applicant_for_survey}</td>
-                <td>${container.size}</td>
-                <td>${container.tare_weight}</td>
-                <td>${container.payload_capacity}</td>
-                <td>${container.max_gross_weight}</td>
-            `;
-            tbody.appendChild(row);
-        });
-    })
-    .catch(error => console.error('Error fetching container details:', error));
+            data.forEach(container => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="container-check" data-row="${container.container_no}"></td>
+                    <td>${container.container_no}</td>
+                    <td>${container.applicant_for_survey}</td>
+                    <td>${container.size}</td>
+                    <td>${container.tare_weight}</td>
+                    <td>${container.payload_capacity}</td>
+                    <td>${container.max_gross_weight}</td>
+                    
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching container details:', error));
 
-document.getElementById('add-container-modal').style.display = 'flex';
+    document.getElementById('add-container-modal').style.display = 'flex';
 });
 
 document.getElementById("open-modal").addEventListener("click", function () {
-fetch('/get_consignment_details')
-    .then(response => response.json())
-    .then(data => {
-        const tbody = document.querySelector('#modal tbody');
-        tbody.innerHTML = ''; // Clear existing rows
+    fetch('/get_consignment_details')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector('#modal tbody');
+            tbody.innerHTML = ''; // Clear existing rows
 
-        // If no consignments are found
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7">No consignments available</td></tr>';
-            return;
-        }
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">No consignments available</td></tr>';
+                return;
+            }
 
-        // Populate modal with consignment data
-        data.forEach(consignment => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="checkbox" class="row-check" data-row="${consignment.id}"></td>
-                <td>${consignment.shipper}</td>
-                <td>${consignment.consignee}</td>
-                <td>${consignment.commodity}</td>
-                <td>${consignment.sb_number}</td>
-                <td>${consignment.total_pkgs}</td>
-                <td>${consignment.total_volume}</td>
-            `;
-            tbody.appendChild(row);
-        });
-    })
-    .catch(error => console.error('Error fetching consignment details:', error));
+            data.forEach(consignment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="row-check" data-row="${consignment.id}"></td>
+                    <td>${consignment.shipper}</td>
+                    <td>${consignment.consignee}</td>
+                    <td>${consignment.commodity}</td>
+                    <td>${consignment.sb_number}</td>
+                    <td>${consignment.total_pkgs}</td>
+                    <td>${consignment.gross_weight}</td>
+                    <td>${consignment.total_volume}</td> 
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching consignment details:', error));
 
-document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modal').style.display = 'flex';
 });
 
-// Close container modal
+// Close modals
 document.getElementById("close-container-modal").addEventListener("click", function() {
-document.getElementById("add-container-modal").style.display = "none";
+    document.getElementById("add-container-modal").style.display = "none";
 });
 
-// Close consignment modal
 document.getElementById("close-modal").addEventListener("click", function() {
-document.getElementById("modal").style.display = "none";
+    document.getElementById("modal").style.display = "none";
 });
 
-// Add selected container to the main form
+// Add selected container to main form
 document.getElementById("add-container-to-main").addEventListener("click", function () {
-const selectedRow = document.querySelector(".container-check:checked");
+    const selectedRow = document.querySelector(".container-check:checked");
 
-if (selectedRow) {
-    const row = selectedRow.closest("tr");
-    const cells = row.querySelectorAll("td");
+    if (selectedRow) {
+        const row = selectedRow.closest("tr");
+        const cells = row.querySelectorAll("td");
 
-    document.getElementById("containerNumber").value = cells[1].textContent.trim();
-    document.getElementById("applicantName").value = cells[2].textContent.trim();
-    document.getElementById("sizeType").value = cells[3].textContent.trim();
-    document.getElementById("tareWeight").value = cells[4].textContent.trim();
-    document.getElementById("payloadCapacity").value = cells[5].textContent.trim();
-    document.getElementById("declaredTotalWeight").value = cells[6].textContent.trim();
+        document.getElementById("containerNumber").value = cells[1].textContent.trim();
+        document.getElementById("applicantName").value = cells[2].textContent.trim();
+        document.getElementById("sizeType").value = cells[3].textContent.trim();
+        document.getElementById("tareWeight").value = cells[4].textContent.trim();
+        document.getElementById("payloadCapacity").value = cells[5].textContent.trim();
+        document.getElementById("declaredTotalWeight").value = cells[6].textContent.trim();
 
-    document.getElementById('add-container-modal').style.display = 'none';
-} else {
-    alert("Please select a container to add!");
-}
-});
-
-// Add selected consignment details to the main table
-// Add selected consignment details to the main table
-document.getElementById('fill-table').addEventListener('click', function () {
-const selectedRows = document.querySelectorAll('.modal-content .row-check:checked');
-const mainTableBody = document.querySelector('#main-table tbody');
-
-let consignmentDetails = [];
-
-// Retrieve existing consignment details from the hidden input field
-const existingConsignments = document.getElementById('consignmentDetails').value;
-if (existingConsignments) {
-    consignmentDetails = JSON.parse(existingConsignments); // Preserve previous selections
-}
-
-let totalPackages = parseInt(document.getElementById('totalPackages').value) || 0;
-let totalVolume = parseFloat(document.getElementById('volume').value) || 0;
-
-if (selectedRows.length === 0) {
-    alert("Please select at least one consignment!");
-    return;
-}
-
-selectedRows.forEach((checkbox) => {
-    const row = checkbox.closest('tr');
-    const cells = row.querySelectorAll('td');
-    const newRow = document.createElement('tr');
-
-    // Extract and sanitize numeric values
-    const packages = parseInt(cells[5].textContent.replace(/[^0-9]/g, ''), 10) || 0;
-    const volume = parseFloat(cells[6].textContent.replace(/[^0-9.]/g, '')) || 0;
-
-    // Create an object for each consignment detail
-    const consignment = {
-        consignor: cells[1].textContent.trim(),
-        consignee: cells[2].textContent.trim(),
-        description: cells[3].textContent.trim(),
-        marksNos: cells[4].textContent.trim(),
-        packages: packages,
-        weight: cells[6].textContent.trim(),
-        volume: volume
-    };
-
-    // Check if this consignment is already added
-    const isAlreadyAdded = consignmentDetails.some(existing => existing.consignor === consignment.consignor && existing.consignee === consignment.consignee);
-
-    if (!isAlreadyAdded) {
-        consignmentDetails.push(consignment);
-
-        // Add the row to the main table
-        for (let i = 1; i < cells.length; i++) {
-            const newCell = document.createElement('td');
-            newCell.textContent = cells[i].textContent.trim();
-            newRow.appendChild(newCell);
-        }
-        mainTableBody.appendChild(newRow);
-
-        // Update totals
-        totalPackages += packages;
-        totalVolume += volume;
+        document.getElementById('add-container-modal').style.display = 'none';
+    } else {
+        alert("Please select a container to add!");
     }
 });
 
-// Update the Total Packages and Volume fields
-document.getElementById('totalPackages').value = totalPackages;
-document.getElementById('volume').value = totalVolume.toFixed(2); // Format volume to 2 decimal places
+// Add selected consignment details to main table
+document.getElementById('fill-table').addEventListener('click', function () {
+    const selectedRows = document.querySelectorAll('.modal-content .row-check:checked');
+    const mainTableBody = document.querySelector('#main-table tbody');
 
-// Save updated consignment details in hidden field
-document.getElementById('consignmentDetails').value = JSON.stringify(consignmentDetails);
+    let consignmentDetails = [];
+    const existingConsignments = document.getElementById('consignmentDetails').value;
+    if (existingConsignments) {
+        consignmentDetails = JSON.parse(existingConsignments);
+    }
 
-// Close the modal
-document.getElementById('modal').style.display = 'none';
+    let totalPackages = parseInt(document.getElementById('totalPackages').value) || 0;
+    let totalVolume = parseFloat(document.getElementById('volume').value) || 0;
+    let totalGrossWeight = parseFloat(document.getElementById('grossWeight').value) || 0;
+
+    if (selectedRows.length === 0) {
+        alert("Please select at least one consignment!");
+        return;
+    }
+
+    selectedRows.forEach((checkbox) => {
+        const row = checkbox.closest('tr');
+        const cells = row.querySelectorAll('td');
+
+        const packages = parseInt(cells[5].textContent.replace(/[^0-9]/g, ''), 10) || 0;
+        const grossWeight = parseFloat(cells[6].textContent.replace(/[^0-9.]/g, '')) || 0;
+        const volume = parseFloat(cells[7]?.textContent?.replace(/[^0-9.]/g, '') || 0);
+
+        const consignment = {
+            consignor: cells[1].textContent.trim(),
+            consignee: cells[2].textContent.trim(),
+            description: cells[3].textContent.trim(),
+            marksNos: cells[4].textContent.trim(),
+            packages: packages,
+            gross_weight: grossWeight.toFixed(2), // Ensure correct decimal formatting
+            volume: volume.toFixed(2)
+        };
+        // Always add the new consignment
+        consignmentDetails.push(consignment);
+
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${cells[1].textContent.trim()}</td>
+            <td>${cells[2].textContent.trim()}</td>
+            <td>${cells[3].textContent.trim()}</td>
+            <td>${cells[4].textContent.trim()}</td>
+            <td>${packages}</td>
+            <td>${grossWeight.toFixed(2)}</td>
+            <td>${volume.toFixed(2)}</td>
+        `;
+
+        mainTableBody.appendChild(newRow);
+
+        totalPackages += packages;
+        totalGrossWeight += grossWeight;
+        totalVolume += volume;
+    });
+
+    document.getElementById('totalPackages').value = totalPackages;
+    document.getElementById('grossWeight').value = totalGrossWeight.toFixed(2);
+    document.getElementById('volume').value = totalVolume.toFixed(2);
+
+    document.getElementById('consignmentDetails').value = JSON.stringify(consignmentDetails);
+    document.getElementById('modal').style.display = 'none';
 });
+
+
 
 
 // Fetch certificate number on page load
 document.addEventListener("DOMContentLoaded", function () {
-fetch("/get_number")
-    .then(response => response.json())
-    .then(data => {
-        // Correctly access the certificateNumber from the response
-        document.getElementById("CertificateNumber").value = data.certificateNumber;
-    })
-    .catch(error => console.error("Error fetching certificate number:", error));
+    fetch("/get_number")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("CertificateNumber").value = data.certificateNumber;
+        })
+        .catch(error => console.error("Error fetching certificate number:", error));
 });
 
-// Set today's date as the default value for the date field
+// Set today's date as default
 const today = new Date();
 const year = today.getFullYear();
 const month = ('0' + (today.getMonth() + 1)).slice(-2);
@@ -721,8 +723,7 @@ const day = ('0' + today.getDate()).slice(-2);
 const formattedDate = `${year}-${month}-${day}`;
 document.getElementById('date').value = formattedDate;
 
-
-</script>
+</script>    
     
 </body>
 </html>
