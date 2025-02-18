@@ -110,7 +110,7 @@
       <div class="text-center">
                   <!-- Navigation Bar -->
       <div class="nav-bar">
-          <a href="{{ url_for('forms') }}" 
+          <a href="{{ url_for('admindash') }}" 
           style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
           onmouseover="this.style.backgroundColor='#0056b3'"
           onmouseout="this.style.backgroundColor='#007bff'">
@@ -314,33 +314,15 @@
   </div>  
   <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Generate CertificateNumber
-    function generateCertificateNumber() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = ('0' + (today.getMonth() + 1)).slice(-2); // Ensure two digits
-        const currentYearMonth = `${year}${month}`;
-
-        // Retrieve the last used number from localStorage or initialize to 0
-        let lastNumber = localStorage.getItem('lastCertificateNumber') || 0;
-        lastNumber = parseInt(lastNumber, 10);
-
-        // Increment the number
-        const nextNumber = lastNumber + 1;
-
-        // Save the new number to localStorage
-        localStorage.setItem('lastCertificateNumber', nextNumber);
-
-        // Format the number to 6 digits
-        const formattedNumber = String(nextNumber).padStart(6, '0');
-
-        // Combine year, month, and sequential number
-        return `${currentYearMonth}${formattedNumber}`;
-    }
-
-    // Set the generated CertificateNumber in the input field
-    const certificateNumberInput = document.getElementById('CertificateNumber');
-    certificateNumberInput.value = generateCertificateNumber();
+fetch("/get_numbers")
+    .then(response => response.json())
+    .then(data => {
+        // Correctly access the certificateNumber from the response
+        document.getElementById("CertificateNumber").value = data.certificateNumber;
+    })
+    .catch(error => console.error("Error fetching certificate number:", error));
+});
+document.addEventListener("DOMContentLoaded", function () {
 
     // Set current date in the date input field
     const today = new Date();
@@ -378,35 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
     tareWeightInput.addEventListener("input", updateMaxGrossWeight);
     payloadCapacityInput.addEventListener("input", updateMaxGrossWeight);
 
-    // Auto-update Remarks when "Yes" is selected
-    const radioButtons = document.querySelectorAll("input[type='radio']");
-    const remarksMessages = {
-        rear_end: "1. Holes found in the rear end.",
-        right_panel: "2. Doors are not closing properly.",
-        left_panel: "3. Patches found in the container.",
-        front_panel: "4. Stickers or marks found in the container.",
-        roof_panel: "5. Floor is not clean or has damages.",
-        floor_board: "6. Objectionable odor persists.",
-        understructure: "7. Contamination or infestation found.",
-        interior: "8. Toxic chemical residues found.",
-        exterior: "9. High rust formation inside the container."
-    };
 
-    function updateRemarks() {
-        let remarks = [];
-
-        radioButtons.forEach(radio => {
-            if (radio.checked && radio.value === "Yes") {
-                remarks.push(remarksMessages[radio.name]);
-            }
-        });
-
-        remarksTextArea.value = remarks.join("\n");
-    }
-
-    radioButtons.forEach(radio => {
-        radio.addEventListener("change", updateRemarks);
-    });
 });
 </script>
 
