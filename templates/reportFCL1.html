@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Survey Report</title>
+    <title>FCL Survey Report</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <style>
@@ -159,6 +159,8 @@
                     <th class="border border-gray-300 p-2 text-left">Marks & Nos.</th>
                     <th class="border border-gray-300 p-2 text-left">No. of Packages</th>
                     <th class="border border-gray-300 p-2 text-left">Gross Weight (Kgs)</th>
+                    <th class="border border-gray-300 p-2 text-left">Volume</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -169,23 +171,28 @@
                     <td class="border border-gray-300 p-2">{{ item['description'] | default('N/A') }}</td>
                     <td class="border border-gray-300 p-2">{{ item['marksNos'] | default('N/A') }}</td>
                     <td class="border border-gray-300 p-2">{{ item['packages'] | default('N/A') }}</td>
-                    <td class="border border-gray-300 p-2">{{ item['weight'] | default('N/A') }}</td>
+                    <td class="border border-gray-300 p-2">{{ item['gross_weight'] | default('N/A') }}</td>
+                    <td class="border border-gray-300 p-2">{{ item['volume'] | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-            <!-- SI Unit Box for CBM and Total Packages -->
-            <div class="flex justify-between bg-gray-200 p-4 rounded-lg border border-gray-300 mb-4">
-                <div class="w-1/2 text-center">
-                    <h3 class="text-lg font-semibold">Volume</h3>
-                    <p class="text-xl font-bold">{{ form['cbm'] | default('N/A') }} CBM</p>
-                </div>
-                <div class="w-1/2 text-center">
-                    <h3 class="text-lg font-semibold">Total No. of Packages</h3>
-                    <p class="text-xl font-bold">{{ form['totalPackages'] | default('N/A') }} Pkgs</p>
-                </div>
-            </div>
+           <!-- SI Unit Box for CBM, Total Packages, and Gross Weight -->
+<div class="flex justify-between bg-gray-200 p-4 rounded-lg border border-gray-300 mb-4">
+    <div class="w-1/3 text-center">
+        <h3 class="text-lg font-semibold">CBM</h3>
+        <p class="text-xl font-bold">{{ form['cbm'] | default('N/A') }} CBM</p>
+    </div>
+    <div class="w-1/3 text-center">
+        <h3 class="text-lg font-semibold">Total No. of Packages</h3>
+        <p class="text-xl font-bold">{{ form['totalPackages'] | default('N/A') }} Pkgs</p>
+    </div>
+    <div class="w-1/3 text-center">
+        <h3 class="text-lg font-semibold">Total Gross Weight</h3>
+        <p class="text-xl font-bold">{{ form['total_gross_weight'] | default('N/A') }} Kgs</p>
+    </div>
+</div>
 
 
         <!-- Remarks Section -->
