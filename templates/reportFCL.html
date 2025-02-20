@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FCL Stuffing Survey Report Form</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -174,6 +174,118 @@
                 font-size: 0.8em;
             }
         }
+
+        /*Global Search bar*/
+#searchInput {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: #7d2ae8;
+    box-shadow: 0 0 8px rgba(125, 42, 232, 0.2);
+}
+
+#searchInput::placeholder {
+    color: #999;
+}
+
+
+/* Pagination Styles */
+.pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px 0;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#rowCounter {
+    color: #666;
+    font-size: 0.9em;
+}
+
+
+
+/* Hamburger Menu Styles */
+.hamburger {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 10px;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -75%;
+        top: 0;
+        height: 100%;
+        width: 75%;
+        background-color: #282525;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        padding-top: 20px;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li {
+        padding: 15px 20px;
+        border-bottom: 1px solid #444;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 999;
+        display: none;
+    }
+
+    .sidebar-backdrop.active {
+        display: block;
+    }
+
+    @media (max-width: 1200px) {
+        .nav-links {
+            display: none;
+        }
+        
+        .hamburger {
+            display: block;
+        }
+    }
     </style>
 </head>
 <body>
@@ -184,6 +296,10 @@
                 <a href="{{ url_for('certificatert') }}" class="btn">
                     Back
                 </a>
+                <!-- Hamburger Button -->
+        <button class="hamburger">
+            <i class="fa fa-bars"></i>
+        </button>
                 <nav class="nav-links">
                     <ul>
                         <li><a href="{{ url_for('admindash') }}">Home</a></li>
@@ -193,6 +309,21 @@
                     </ul>
                 </nav>
             </div>
+
+              <!-- Sidebar -->
+       <div class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="{{ url_for('admindash') }}">Home</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="{{ url_for('forms') }}">Forms</a></li>
+            <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+
+
+    <!-- Backdrop -->
+    <div class="sidebar-backdrop"></div>
             
             <div>
                 <h1>VIKING MARINE INC.</h1>
@@ -200,6 +331,13 @@
                 <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
             </div>
             <h1>FCL STUFFING SURVEY REPORT</h1>
+        </div>
+
+        <!--Global Search bar-->
+        <div class="search-container" style="margin: 20px 0;">
+            <label for="searchInput">Enter Applicant Name:</label>
+            <input type="text" id="searchInput" placeholder="Search reports..." 
+                   style="width: 70%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: 'Poppins', sans-serif;">
         </div>
 
         <div class="table-wrapper">
@@ -229,9 +367,106 @@
             </table>
         </div>
 
+                <!-- Pagination Controls -->
+<div class="pagination-controls">
+    <div id="rowCounter"></div>
+    <div class="pagination-buttons">
+        <button id="prevBtn" class="btn" disabled>Previous</button>
+        <button id="nextBtn" class="btn" disabled>Next</button>
+    </div>
+</div>
+
+
         <footer class="footer">
             &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
         </footer>
     </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const rows = document.querySelectorAll('.custom-table tbody tr');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const rowCounter = document.getElementById('rowCounter');
+            
+            let currentPage = 1;
+            const rowsPerPage = 10;
+        
+            function updatePagination() {
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+                const totalVisible = visibleRows.length;
+                const totalPages = Math.ceil(totalVisible / rowsPerPage);
+                
+                // Update counter
+                const startRow = (currentPage - 1) * rowsPerPage + 1;
+                const endRow = Math.min(currentPage * rowsPerPage, totalVisible);
+                rowCounter.textContent = `${startRow}-${endRow} of ${totalVisible}`;
+                
+                // Toggle buttons
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+        
+                // Show/hide rows
+                rows.forEach(row => row.style.display = 'none');
+                for (let i = (currentPage - 1) * rowsPerPage; i < currentPage * rowsPerPage && i < totalVisible; i++) {
+                    visibleRows[i].style.display = '';
+                }
+            }
+        
+            // Search functionality (searches Applicant Name column)
+            searchInput.addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                rows.forEach(row => {
+                    const applicant = row.cells[2].textContent.toLowerCase(); // Applicant Name is 3rd column (index 2)
+                    row.style.display = applicant.includes(filter) ? '' : 'none';
+                });
+                currentPage = 1;
+                updatePagination();
+            });
+        
+            // Pagination controls
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePagination();
+                }
+            });
+        
+            nextBtn.addEventListener('click', () => {
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+                const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updatePagination();
+                }
+            });
+        
+            // Initial setup
+            updatePagination();
+        });
+
+
+        // Hamburger Menu Toggle
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-backdrop').classList.toggle('active');
+        });
+
+        // Close sidebar when clicking backdrop
+        document.querySelector('.sidebar-backdrop').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('active');
+            this.classList.remove('active');
+        });
+
+        // Close sidebar when clicking a link
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('active');
+                document.querySelector('.sidebar-backdrop').classList.remove('active');
+            });
+        });
+        </script>
 </body>
 </html>
