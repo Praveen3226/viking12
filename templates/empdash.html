@@ -251,15 +251,22 @@
         </nav>
     </div>
 
-    <button class="hamburger">☰</button>
-<div class="sidebar" id="sidebar">
-    <ul>
-        <li><a href="{{ url_for('empdash') }}">Home</a></li>
-        <li><a href="{{ url_for('empforms') }}">Forms</a></li>
-        <li><a href="{{ url_for('logout') }}">Logout</a></li>
-    </ul>
-</div>
-<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+       <!-- Hamburger Menu Button -->
+         <button class="hamburger" id="hamburger">
+            <i class="fa fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="{{ url_for('admindash') }}">Home</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="{{ url_for('forms') }}">Forms</a></li>
+            <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
 
 <!-- Dashboard Content -->
 <div class="container-fluid">
