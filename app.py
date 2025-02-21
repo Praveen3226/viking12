@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, json, session
 import pymysql
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
+
 from mysql.connector import Error
 from datetime import datetime, timedelta
 
@@ -55,20 +58,42 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        if username in users and users[username]['password'] == password:
-            session['username'] = username
-            session['role'] = users[username]['role']
-            flash('Login successful!', 'success')
 
-            # Redirect based on role
-            if users[username]['role'] == 'admin':
-                return redirect(url_for('admindash'))
-            elif users[username]['role'] == 'emp':
-                return redirect(url_for('empdash'))
-        
-        flash('Invalid username or password. Please try again.', 'error')
-    
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor(pymysql.cursors.DictCursor)
+
+            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+
+            if user:
+                stored_password = user['password']
+
+                # Check hashed password
+                if check_password_hash(stored_password, password):
+                    session.permanent = True
+                    session['user_id'] = user['id']
+                    session['username'] = user['username']
+
+                    flash('Login successful!', 'success')
+
+                    if 'role' in user and user['role'] == 'Admin':
+                        return redirect(url_for('admindash'))
+                    return redirect(url_for('empdash'))
+
+                else:
+                    flash('Invalid username or password', 'error')
+            else:
+                flash('Invalid username or password', 'error')
+
+        except Exception as e:
+            flash('An error occurred while logging in', 'error')
+            print(f"Error: {e}")
+
+        finally:
+            cursor.close()
+            connection.close()
+
     return render_template('login.html')
 
 @app.route('/logout')
@@ -275,13 +300,32 @@ def cont():
 def contrpt():
     return render_template('contrpt.html')
 
+@app.route('/empcertificate')
+@login_required
+def empcertificate():
+    return render_template('empcertificate.html')
 
+@app.route('/empforms')
+@login_required
+def empforms():
+    return render_template('empforms.html')
     
 
 @app.route('/empdash')
 @login_required
 def empdash():
     return render_template('empdash.html')
+
+@app.route('/empemp')
+@login_required
+def empemp():
+    return render_template('empemp.html')
+
+
+@app.route('/empcontainer')
+@login_required
+def empcontainer():
+    return render_template('empcontainer.html')
 
 @app.route('/certificate')
 @login_required
@@ -365,7 +409,7 @@ def add_survey():
         for field, value in required_fields.items():
             if not value:
                 flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
-                return redirect(url_for('forms'))  # Redirect if a field is missing
+                return redirect(url_for('container'))  # Redirect if a field is missing
 
         # ✅ Check for duplicate CertificateNumber
         cursor.execute("SELECT COUNT(*) AS count FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
@@ -398,7 +442,7 @@ def add_survey():
     except Exception as e:
         print(f"❌ Error: {type(e).__name__} - {e}")  # Log error
         flash(f'Error: {e}', 'error')
-        return redirect(url_for('forms'))  # ✅ Redirect on error
+        return redirect(url_for('container'))  # ✅ Redirect on error
 
     finally:
         if cursor:
@@ -757,7 +801,6 @@ def submit_cer():
         return redirect(url_for('forms'))  # Redirect to show error flash message
 
 @app.route('/empadd')
-@login_required
 def empadd():
     return render_template('empadd.html')
 
@@ -775,29 +818,73 @@ def get_employees():
     return jsonify(employees)  # Returns JSON data
 
 # Route to add a new employee
+
 @app.route('/add_employee', methods=['POST'])
 def add_employee():
-    try:
-        data = request.get_json()
-        empId = data['empId']
-        name = data['name']
-        phone = data['phone']
-        address = data['address']
-        username = data['username']
-        password = data['password']
+    conn = None
+    cursor = None
 
+    try:
+        print("Form Data Received:", request.form)  # Debugging: Print all form data
+
+        # Extract form data
+        empId = request.form.get('empId')
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        role = request.form.get('role')  # Ensure this matches the name attribute in the form
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        # Debugging: Print individual form fields
+        print("empId:", empId)
+        print("name:", name)
+        print("phone:", phone)
+        print("address:", address)
+        print("role:", role)
+        print("username:", username)
+        print("password:", password)
+
+        # Validate all fields
+        if not all([empId, name, phone, address, role, username, password]):
+            return jsonify({'error': 'Missing form fields!'}), 400
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
+        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO employees (empId, name, phone, address, username, password)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        ''', (empId, name, phone, address, username, password))
-        conn.commit()
-        conn.close()
+        conn.begin()
 
+        # Insert into employees table
+        cursor.execute('''
+            INSERT INTO employees (empId, name, phone, address, role, username, password)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ''', (empId, name, phone, address, role, username, hashed_password))
+
+        # Insert into users table
+        cursor.execute('''
+            INSERT INTO users (username, password, role)
+            VALUES (%s, %s, %s)
+        ''', (username, hashed_password, role))
+
+        # Commit the transaction
+        conn.commit()
         return jsonify({'message': 'Employee added successfully!'}), 201
+
     except Exception as e:
+        # Rollback in case of error
+        if conn:
+            conn.rollback()
         return jsonify({'error': str(e)}), 500
+
+    finally:
+        # Close the cursor and connection
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # Route to edit employees (bulk update)
 @app.route('/edit_employee', methods=['POST'])
