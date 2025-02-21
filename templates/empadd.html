@@ -262,23 +262,6 @@
         .btn-secondary:hover {
             background-color: #5a6268;
         }
-
-
-           /* Table Scorallable */
-           .table-wrapper {
-            overflow-x: auto;
-            margin-bottom: 1rem;
-        }
-        
-        .table-wrapper table {
-            min-width: 100%;
-            width: auto;
-        }
-
-        .table-wrapper th,
-        .table-wrapper td {
-            white-space: nowrap;
-        }
     </style>
 </head>
 <body>
@@ -299,11 +282,11 @@
             <button class="btn">Search</button>
         </div>
 
-        <div class="table-wrapper">
         <table class="employee-table">
             <thead>
                 <tr>
                     <th>Employee ID</th>
+                    <th>Role</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Address</th>
@@ -312,33 +295,9 @@
                 </tr>
             </thead>
             <tbody id="employeeTableBody">
-                <tr>
-                    <td contenteditable="false">123</td>
-                    <td contenteditable="false">Praveen</td>
-                    <td contenteditable="false">123456789</td>
-                    <td contenteditable="false">Basaveshwaranagar</td>
-                    <td contenteditable="false">abc</td>
-                    <td contenteditable="false">abc</td>
-                </tr>
-                <tr>
-                    <td contenteditable="false">456</td>
-                    <td contenteditable="false">Prajwal</td>
-                    <td contenteditable="false">123456789</td>
-                    <td contenteditable="false">Basaveshwaranagar</td>
-                    <td contenteditable="false">abc</td>
-                    <td contenteditable="false">abc</td>
-                </tr>
-                <tr>
-                    <td contenteditable="false">789</td>
-                    <td contenteditable="false">Likith</td>
-                    <td contenteditable="false">123456789</td>
-                    <td contenteditable="false">Basaveshwaranagar</td>
-                    <td contenteditable="false">abc</td>
-                    <td contenteditable="false">abc</td>
-                </tr>
             </tbody>
         </table>
-</div>
+
         <div class="delete-controls" id="deleteControls">
             <button class="btn btn-danger" id="confirmDeleteBtn">Confirm Delete</button>
             <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
@@ -352,10 +311,19 @@
     <div class="modal" id="addEmployeeModal">
         <div class="modal-content">
             <div class="modal-header">Add Employee</div>
-            <form method="POST" action="/add_employee" id="employeeForm">
+            <form method="POST" action="/add_employee" id="employeeForm" enctype="application/x-www-form-urlencoded">
                 <div class="form-group">
                     <label for="empId">Employee ID</label>
                     <input type="text" id="empId" name="empId" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <div>
+                        <input type="radio" id="adminRole" name="role" value="Admin" required>
+                        <label for="adminRole">Admin</label>
+                        <input type="radio" id="employeeRole" name="role" value="Employee" required>
+                        <label for="employeeRole">Employee</label>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="name">Name</label>
@@ -532,6 +500,7 @@
                 address: document.getElementById('address').value,
                 username: document.getElementById('username').value,
                 password: document.getElementById('password').value,
+                role: document.getElementById('role').value,
             };
 
             try {
@@ -581,6 +550,31 @@
                 console.error("Error fetching employees:", error);
             }
         }
+        
+    document.getElementById('employeeForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    // Gather form data
+    const formData = new FormData(this);
+
+    // Send the form data to the server
+    fetch('/add_employee', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            alert(data.message);
+            closeModal('addEmployeeModal');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
     </script>
 </body>
 </html>
