@@ -666,42 +666,49 @@ def submit():
 @login_required
 def get_numbercer():
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)  # Ensuring dictionary cursor
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                
+                # Fetch the last Certificate Number
+                cursor.execute("SELECT CertificateNumber FROM cer ORDER BY id DESC LIMIT 1")
+                last_record = cursor.fetchone()
 
-        cursor.execute("SELECT CertificateNumber FROM cer ORDER BY id DESC LIMIT 1")
-        last_record = cursor.fetchone()
+                print("Database fetched record:", last_record)  # Debugging log
 
-        print("Database fetched record:", last_record)  # Debugging log
+                # Get the current Year-Month (YYYYMM)
+                current_year_month = datetime.now().strftime("%Y%m")
 
-        current_year_month = datetime.now().strftime("%Y%m")
+                if last_record and last_record["CertificateNumber"]:
+                    last_certificate = last_record["CertificateNumber"]
+                    last_year_month = last_certificate[:6]  # Extract YYYYMM
 
-        if last_record and last_record["CertificateNumber"]:
-            last_certificate = last_record["CertificateNumber"]
-            last_year_month = last_certificate[:6]  # Extract YYYYMM
+                    if last_year_month == current_year_month:
+                        last_number = int(last_certificate[6:])  # Extract numeric part
+                        next_number = last_number + 1
+                    else:
+                        next_number = 1  # Reset for new month/year
+                else:
+                    next_number = 1  # Start fresh if no records exist
 
-            if last_year_month == current_year_month:
-                last_number = int(last_certificate[6:])  # Extract number part
-                next_number = last_number + 1
-            else:
-                next_number = 1  # Reset count for new month/year
-        else:
-            next_number = 1  # Start fresh if no record exists
+                # Generate new Certificate Number
+                new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
 
-        new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
+                print("Generated Certificate Number:", new_certificate_number)  # Debugging log
 
-        print("Generated Certificate Number:", new_certificate_number)  # Debugging log
+                # Reserve this certificate number by inserting into 'cer' table with status 'Open'
+                insert_query = """
+                    INSERT INTO cer (CertificateNumber, status) 
+                    VALUES (%s, %s) 
+                    ON DUPLICATE KEY UPDATE status = VALUES(status)
+                """
+                cursor.execute(insert_query, (new_certificate_number, "Open"))
+                conn.commit()
 
-        return jsonify({"certificateNumber": new_certificate_number})
+                return jsonify({"certificateNumber": new_certificate_number, "status": "Open"})
 
     except Exception as e:
-        print(f"Error fetching certificate number: {e}")
-        return jsonify({"error": str(e)})
-
-    finally:
-        if conn:
-            conn.close()
-
+        print(f"Error fetching and reserving certificate number: {e}")
+        return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
 
 @app.route('/submit_cer', methods=['POST'])
 @login_required
