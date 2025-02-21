@@ -717,37 +717,36 @@ def submit_cer():
         port_of_discharge = request.form['portOfDischarge']
         sb_number = request.form['sb_number']
 
-        # Safely parse numerical fields (handle missing or invalid data)
+        # Safely parse numerical fields
         def safe_float(value):
             try:
-                return float(value) if value.strip() else "" # Return None if value is empty
+                return float(value) if value.strip() else None
             except ValueError:
-                return ""  # Return None if conversion fails
+                return None
 
         quantity = safe_float(request.form['quantity'])
         gross_weight = safe_float(request.form['gross_weight'])
-        
         cf_agent = request.form['cf_agent']
         container_number = request.form['container_number']
 
         # Process checkbox values (survey measure data)
         survey_data = []
-        rows = len(request.form.getlist('marksNos[]'))  # Getting the number of rows submitted
+        rows = len(request.form.getlist('marksNos[]'))
         for i in range(rows):
-            marks_no = request.form.getlist('marksNos[]')[i] if request.form.getlist('marksNos[]')[i].strip() else ""
-            no_of_pkgs = int(request.form.getlist('noOfPkgs[]')[i]) if request.form.getlist('noOfPkgs[]')[i].strip() else ""
+            marks_no = request.form.getlist('marksNos[]')[i].strip() if request.form.getlist('marksNos[]')[i].strip() else None
+            no_of_pkgs = int(request.form.getlist('noOfPkgs[]')[i]) if request.form.getlist('noOfPkgs[]')[i].strip() else None
             length = safe_float(request.form.getlist('length[]')[i])
             breadth = safe_float(request.form.getlist('breadth[]')[i])
             height = safe_float(request.form.getlist('height[]')[i])
             volume_unit = safe_float(request.form.getlist('volumeUnit[]')[i])
 
-            # Calculate volume and volume in cubic meters
-            volume = length * breadth * height if all([length, breadth, height]) else ""
-            volume_cum = volume_unit * volume if volume and volume_unit else ""
+            # Calculate volume
+            volume = length * breadth * height if all([length, breadth, height]) else None
+            volume_cum = volume_unit * volume if volume and volume_unit else None
 
             # Append survey data
             survey_data.append({
-                'marks_no': marks_no,  # Blank if empty
+                'marks_no': marks_no,
                 'no_of_pkgs': no_of_pkgs,
                 'length': length,
                 'breadth': breadth,
@@ -758,47 +757,44 @@ def submit_cer():
             })
 
         # Calculate total volume and total packages
-        total_volume = sum([row['volume'] for row in survey_data if row['volume'] is not ""])
-        total_pkgs = sum([row['no_of_pkgs'] for row in survey_data if row['no_of_pkgs'] is not ""])
+        total_volume = sum(row['volume'] for row in survey_data if row['volume'] is not None)
+        total_pkgs = sum(row['no_of_pkgs'] for row in survey_data if row['no_of_pkgs'] is not None)
 
         # Database insertion logic
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Insert data into the cer table
+        # Insert data into the cer table, setting status to "Open"
         insert_query = """
             INSERT INTO cer (
                 CertificateNumber, date, applicant_name, shipper, consignee, commodity, 
                 port_of_discharge, sb_number, quantity, gross_weight, cf_agent, container_number,
-                total_volume, total_pkgs, survey_data
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                total_volume, total_pkgs, survey_data, status
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
-        # Serialize survey data as a string for storage in a single column
         import json
         survey_data_json = json.dumps(survey_data)
 
         # Execute the insert query
         cursor.execute(insert_query, (
             certificate_number, date, applicant_name, shipper, consignee, commodity, 
-            port_of_discharge, sb_number, quantity if quantity is not "" else "",
-            gross_weight if gross_weight is not "" else "", cf_agent, container_number,
-            total_volume if total_volume is not "" else "",
-            total_pkgs if total_pkgs is not "" else "",
-            survey_data_json
+            port_of_discharge, sb_number, quantity, gross_weight, cf_agent, container_number,
+            total_volume, total_pkgs, survey_data_json, "Open"  # Default status
         ))
 
-        conn.commit()  # Commit the transaction
+        conn.commit()
         cursor.close()
         conn.close()
 
         flash('Form submitted successfully!', 'success')
-        return redirect(url_for('forms'))  # Redirect to the forms page after successful submission
+        return redirect(url_for('forms'))  
 
     except Exception as e:
         print(f"Error: {e}")
         flash(f'An error occurred while submitting the form. Error: {e}', 'error')
-        return redirect(url_for('forms'))  # Redirect to show error flash message
+        return redirect(url_for('forms'))  
+
 
 @app.route('/empadd')
 def empadd():
