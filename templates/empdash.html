@@ -161,7 +161,7 @@
 
 /* Hamburger Menu Styles */
 .hamburger {
-        display: none;
+       display: none; /* Keep it hidden by default */
         background: none;
         border: none;
         color: white;
@@ -223,17 +223,16 @@
 
     @media (max-width: 768px) {
         .nav-links {
-            display: none;
+            display: none; /* Hide nav links on small screens */
         }
         .hamburger {
-            display: block;
+            display: block; /* Show hamburger menu on small screens */
         }
         .nav-bar {
             padding-right: 60px;
             position: relative;
         }
     }
-
     </style>
 </head>
 
@@ -257,7 +256,7 @@
         <nav class="nav-links">
             <ul>
                 <li><a href="{{ url_for('empdash') }}">Home</a></li>
-                <li><a href="">Profile</a></li>
+                <li><a href="{{ url_for('empforms') }}">Forms</a></li>
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
             </ul>
         </nav>
@@ -317,20 +316,26 @@
         }, 2000); 
 
 
-        // Hamburger Menu functionality
+       // Hamburger Menu functionality
     const hamburger = document.querySelector('.hamburger');
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebarBackdrop');
+
+    function toggleHamburger() {
+        hamburger.style.display = sidebar.classList.contains('active') ? 'none' : 'block';
+    }
 
     hamburger.addEventListener('click', function(e) {
         e.stopPropagation();
         sidebar.classList.add('active');
         backdrop.classList.add('active');
+        toggleHamburger(); // Hide hamburger when sidebar is active
     });
 
     backdrop.addEventListener('click', function() {
         sidebar.classList.remove('active');
         backdrop.classList.remove('active');
+        toggleHamburger(); // Show hamburger when sidebar is inactive
     });
 
     // Close sidebar when clicking outside
@@ -338,6 +343,7 @@
         if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
             sidebar.classList.remove('active');
             backdrop.classList.remove('active');
+            toggleHamburger(); // Show hamburger when sidebar is inactive
         }
     });
 
@@ -346,6 +352,7 @@
         link.addEventListener('click', () => {
             sidebar.classList.remove('active');
             backdrop.classList.remove('active');
+            toggleHamburger(); // Show hamburger when sidebar is inactive
         });
     });
 </script>
