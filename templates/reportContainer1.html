@@ -161,7 +161,28 @@
       display: inline-block;
       background-color: currentColor;
   }
+
+
+  @media print {
+    .nav-bar, .sidebar, .hamburger, .status-indicator, button {
+        display: none !important;
+    }
+    
+    .max-w-4xl {
+        width: 210mm !important;
+        margin: 0 auto !important;
+        box-shadow: none !important;
+    }
+    
+    body {
+        background-color: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body class="bg-gray-100 p-4">
   <div class="max-w-4xl mx-auto bg-white p-6 border border-gray-300">
@@ -312,6 +333,13 @@
       </div>
     </div>
   </div>
+
+
+  <button onclick="generatePDF()" class="fixed bottom-8 right-8 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 z-50">
+    <i class="fas fa-print mr-2"></i>Print
+</button>
+
+
     <footer class="footer">
       &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
   </footer>
@@ -342,6 +370,60 @@
             document.getElementById('sidebar').classList.remove('active');
         });
     });
+
+
+    //print functionality
+    async function generatePDF() {
+    // Hide elements that shouldn't be in the PDF
+    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .hamburger, .status-indicator, button');
+    const originalStyles = [];
+    elementsToHide.forEach(el => {
+        originalStyles.push(el.style.display);
+        el.style.display = 'none';
+    });
+
+    // Capture the main content
+    const element = document.querySelector('.max-w-4xl');
+    
+    // Use html2canvas with better scaling
+    const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: true,
+        backgroundColor: '#ffffff'
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    
+    // Create PDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Calculate image dimensions to fit PDF page
+    const imgWidth = pageWidth - 20; // 10mm margins
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    // Add content to PDF
+    doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+
+    // Add footer text
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Crafted with care, protected with pride - © 2025 Bitsmart", 
+        pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+    // Restore hidden elements
+    elementsToHide.forEach((el, index) => {
+        el.style.display = originalStyles[index];
+    });
+
+    // Save PDF
+    const certNo = "{{ container.CertificateNumber }}";
+    doc.save(`Container_Report_${certNo}.pdf`);
+}
+
 </script>
 </body>
 </html>
