@@ -114,7 +114,7 @@ def reportFCL():
         cursor = conn.cursor(pymysql.cursors.DictCursor)
 
         # Fetch relevant data from the `form` table
-        cursor.execute("SELECT CertificateNumber, date, applicant_name, container_number FROM form")
+        cursor.execute("SELECT CertificateNumber, date, applicant_name, container_number ,status FROM form")
         form = cursor.fetchall()
 
         conn.close()
@@ -179,7 +179,7 @@ def reportCER():
         cursor = conn.cursor(pymysql.cursors.DictCursor)
 
         # Fetch all reports
-        cursor.execute("SELECT CertificateNumber, date, applicant_name, shipper, consignee, total_pkgs FROM cer")
+        cursor.execute("SELECT CertificateNumber, date, applicant_name, shipper, consignee, total_pkgs ,status FROM cer")
         cer_data = cursor.fetchall()
 
         conn.close()
@@ -230,7 +230,7 @@ def reportContainer():
         cursor = conn.cursor(pymysql.cursors.DictCursor)
 
         # Fetch all container records
-        cursor.execute("SELECT CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no FROM container")
+        cursor.execute("SELECT CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no ,status FROM container")
         container_data = cursor.fetchall()
 
         conn.close()
