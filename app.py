@@ -283,7 +283,7 @@ def reportContainer1(CertificateNumber):
 @app.route('/admindash')
 @login_required
 def admindash():
-    if session.get('role') != 'admin':
+    if session.get('role') != 'Admin':
         flash("Unauthorized access!", "error")
         
     return render_template('admindash.html')
@@ -300,10 +300,27 @@ def cont():
 def contrpt():
     return render_template('contrpt.html')
 
+
 @app.route('/empcertificate')
 @login_required
 def empcertificate():
-    return render_template('empcertificate.html')
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+
+                # Fetch the latest certificate
+                cursor.execute("SELECT * FROM cer ORDER BY id DESC LIMIT 1")
+                certificate_data = cursor.fetchone()
+
+                # If no certificate exists, set a default placeholder
+                if not certificate_data:
+                    certificate_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+
+        return render_template('empcertificate.html', certificate=certificate_data)
+
+    except Exception as e:
+        print(f"Error fetching certificate: {e}")
+        return "Error fetching certificate", 500
 
 @app.route('/empforms')
 @login_required
@@ -316,16 +333,51 @@ def empforms():
 def empdash():
     return render_template('empdash.html')
 
+
 @app.route('/empemp')
 @login_required
 def empemp():
-    return render_template('empemp.html')
+    form_data = None  # Ensure form_data is defined
+
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                # Fetch the latest CertificateNumber and status from 'form' table
+                cursor.execute("SELECT CertificateNumber, status FROM form ORDER BY id DESC LIMIT 1")
+                form_data = cursor.fetchone()
+
+        if not form_data:  # If no record exists, return default values
+            form_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+
+    except Exception as e:
+        print(f"Error fetching form data: {e}")
+        form_data = {"CertificateNumber": "Error", "status": "Error"}
+
+    print("Fetched Form Data:", form_data)  # ✅ Debugging log
+
+    return render_template('empemp.html', form=form_data)
+
 
 
 @app.route('/empcontainer')
 @login_required
 def empcontainer():
-    return render_template('empcontainer.html')
+    container_data = None  # Ensure container_data is defined
+    
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute("SELECT * FROM container ORDER BY id DESC LIMIT 1")
+                container_data = cursor.fetchone()
+
+        if not container_data:  # If no container exists, define an empty dictionary
+            container_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+
+    except Exception as e:
+        print(f"Error fetching container data: {e}")
+        container_data = {"CertificateNumber": "Error", "status": "Error"}
+
+    return render_template('empcontainer.html', container=container_data)
 
 @app.route('/certificate')
 @login_required
@@ -370,6 +422,8 @@ def container():
 
     return render_template('container.html', container=container_data)
 
+
+
 @app.route('/get_numbers')
 @login_required
 def get_numbers():
@@ -377,37 +431,37 @@ def get_numbers():
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
                 
-                # 1️⃣ Lock row to prevent race conditions
-                cursor.execute("SELECT CertificateNumber FROM container WHERE status = 'Open' ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                # 1️⃣ Check if an existing "Open" certificate number exists
+                cursor.execute("SELECT CertificateNumber FROM container WHERE status = 'Open' ORDER BY id DESC LIMIT 1")
                 last_record = cursor.fetchone()
 
                 print("Fetched existing open certificate:", last_record)  # Debug log
 
                 if last_record and last_record["CertificateNumber"]:
-                    new_certificate_number = last_record["CertificateNumber"]  # ✅ Reuse open certificate
+                    new_certificate_number = last_record["CertificateNumber"]  # ✅ Reuse existing number
                 else:
                     # 2️⃣ Fetch the last issued certificate number
-                    cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                    cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1")
                     last_record = cursor.fetchone()
 
-                    if last_record and last_record["CertificateNumber"].isdigit():
+                    if last_record and last_record["CertificateNumber"] and last_record["CertificateNumber"].isdigit():
                         next_number = int(last_record["CertificateNumber"]) + 1
                     else:
                         next_number = 1  # Start fresh if no records exist
 
+                    # 3️⃣ Generate new Certificate Number
                     new_certificate_number = str(next_number)
 
-                    # 3️⃣ Insert new certificate number with status "Open"
-                    cursor.execute("INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)", 
-                                   (new_certificate_number, "Open"))
+                    # Insert new certificate number with status "Open"
+                    insert_query = "INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)"
+                    cursor.execute(insert_query, (new_certificate_number, "Open"))
                     conn.commit()
 
                 print("Returning Certificate Number:", new_certificate_number)  # Debugging log
                 return jsonify({"certificateNumber": new_certificate_number, "status": "Open"})
 
     except Exception as e:
-        conn.rollback()  # Rollback in case of error
-        print(f"Error fetching certificate number: {e}")
+        print(f"Error fetching certificate number: {e}")  # Log error details
         return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
 
 
