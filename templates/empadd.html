@@ -160,8 +160,12 @@
             background: #fff;
             padding: 20px;
             border-radius: 8px;
-            width: 400px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .modal-header {
@@ -365,6 +369,11 @@
             .nav-bar {
                 flex-wrap: wrap;
             }
+
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+            }
         }
 
         .footer {
@@ -377,12 +386,12 @@
             width: 100%;
         }
 
-                   /* Table Scorallable */
-                   .table-wrapper {
+        /* Table Scrollable */
+        .table-wrapper {
             overflow-x: auto;
             margin-bottom: 1rem;
         }
-        
+
         .table-wrapper table {
             min-width: 100%;
             width: auto;
@@ -407,8 +416,8 @@
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
             </ul>
         </nav>
-          <!-- Hamburger Menu Button -->
-          <button class="hamburger" id="hamburger">
+        <!-- Hamburger Menu Button -->
+        <button class="hamburger" id="hamburger">
             <i class="fa fa-bars"></i>
         </button>
     </div>
@@ -440,23 +449,23 @@
         </div>
 
         <div class="table-wrapper">
-        <table class="employee-table">
-            <thead>
-                <tr>
-                    <th>Employee ID</th>
-                    <th>Role</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                </tr>
-            </thead>
-            <tbody id="employeeTableBody">
- 
-            </tbody>
-        </table>
-    </div>
+            <table class="employee-table">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Role</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    <!-- Employee rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
 
         <div class="delete-controls" id="deleteControls">
             <button class="btn btn-danger" id="confirmDeleteBtn">Confirm Delete</button>
