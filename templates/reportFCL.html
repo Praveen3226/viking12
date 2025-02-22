@@ -526,13 +526,13 @@
         const searchTerm = e.target.value.toLowerCase().trim();
         
         filteredRows = allRows.filter(row => {
-            const applicantName = row.cells[2].textContent.toLowerCase();
+            const applicantName = row.cells[3].textContent.toLowerCase();
             return applicantName.includes(searchTerm);
         });
 
         filteredRows.sort((a, b) => {
-            const nameA = a.cells[2].textContent.toLowerCase();
-            const nameB = b.cells[2].textContent.toLowerCase();
+            const nameA = a.cells[3].textContent.toLowerCase();
+            const nameB = b.cells[3].textContent.toLowerCase();
             return nameA.localeCompare(nameB);
         });
 
