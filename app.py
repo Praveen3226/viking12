@@ -378,21 +378,19 @@ def get_numbers():
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                
-                # 1️⃣ Check if an existing "Open" certificate number exists
-                cursor.execute("SELECT CertificateNumber FROM container WHERE status = 'Open' ORDER BY id DESC LIMIT 1")
+
+                # 1️⃣ Lock table for update to avoid race conditions
+                cursor.execute("SELECT CertificateNumber FROM container WHERE status = 'Open' ORDER BY id DESC LIMIT 1 FOR UPDATE")
                 last_record = cursor.fetchone()
 
-                print("Fetched existing open certificate:", last_record)  # Debug log
-
                 if last_record and last_record["CertificateNumber"]:
-                    new_certificate_number = last_record["CertificateNumber"]  # ✅ Reuse existing number
+                    new_certificate_number = last_record["CertificateNumber"]  # ✅ Reuse open certificate
                 else:
-                    # 2️⃣ Fetch the last issued certificate number
-                    cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1")
+                    # 2️⃣ Fetch the last issued certificate number (ensuring it's not open)
+                    cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1 FOR UPDATE")
                     last_record = cursor.fetchone()
 
-                    if last_record and last_record["CertificateNumber"] and last_record["CertificateNumber"].isdigit():
+                    if last_record and last_record["CertificateNumber"].isdigit():
                         next_number = int(last_record["CertificateNumber"]) + 1
                     else:
                         next_number = 1  # Start fresh if no records exist
@@ -401,16 +399,16 @@ def get_numbers():
                     new_certificate_number = str(next_number)
 
                     # Insert new certificate number with status "Open"
-                    insert_query = "INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)"
-                    cursor.execute(insert_query, (new_certificate_number, "Open"))
+                    cursor.execute("INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)", 
+                                   (new_certificate_number, "Open"))
                     conn.commit()
 
-                print("Returning Certificate Number:", new_certificate_number)  # Debugging log
                 return jsonify({"certificateNumber": new_certificate_number, "status": "Open"})
 
     except Exception as e:
         print(f"Error fetching certificate number: {e}")  # Log error details
-        return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
+        return jsonify({"error": str(e)}), 500
+
 
 
 
