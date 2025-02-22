@@ -408,7 +408,7 @@ def get_numbers():
 
     except Exception as e:
         print(f"Error fetching certificate number: {e}")  # Log error details
-        return jsonify({"error": str(e)}), 500  # Return HTTP 500
+        return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
 
 
 
