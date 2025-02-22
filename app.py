@@ -370,8 +370,6 @@ def container():
 
     return render_template('container.html', container=container_data)
 
-
-
 @app.route('/get_numbers')
 @login_required
 def get_numbers():
@@ -408,7 +406,6 @@ def get_numbers():
     except Exception as e:
         print(f"Error fetching certificate number: {e}")  # Log error details
         return jsonify({"error": str(e)}), 500
-
 
 
 
