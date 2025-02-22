@@ -94,38 +94,35 @@
     .btn:hover {
         background-color: #5c1bb7;
     }
-    #flash-message {
-    width: 80%; 
-    max-width: 600px;
-    padding: 20px;
-    font-size: 1.5rem;
+    .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border-radius: 50px;  /* ✅ Rounded */
+    font-weight: bold;
     text-align: center;
-    background-color: #10f85d; /* Your preferred color */
-    color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    
-    position: fixed; /* Ensure it stays in place */
-    top: 50%; /* Position vertically at the center */
-    left: 50%; /* Position horizontally at the center */
-    transform: translate(-50%, -50%); /* Offset it by 50% of its own size */
-    z-index: 9999; /* Ensure it stays on top of other elements */
+    min-width: 150px;
+}
+
+/* ✅ Status Colors */
+.status-open { background-color: rgb(0, 203, 0); color: white; }
+.status-in-progress { background-color: yellow; color: black; }
+.status-completed { background-color: red; color: white; }
+.status-unknown { background-color: gray; color: white; }
+
+/* ✅ Small Status Circle */
+.status-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: currentColor;
 }
 
     </style>
 </head>
 <body class="bg-gray-100 p-4">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div id="flash-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 max-w-4xl w-full text-white text-center p-8 rounded-lg shadow-lg">
-            {% for category, message in messages %}
-                <div class="bg-{{ 'green-500' if category == 'success' else 'red-500' }} p-6 rounded-lg text-2xl font-semibold">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-    {% endwith %}
     <div class="max-w-4xl mx-auto bg-white p-6 shadow-md">
         <div class="text-center">
                     <!-- Navigation Bar -->
@@ -151,7 +148,24 @@
             <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
             <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
         </div>
-
+        {% if certificate %}
+        <p><strong>Certificate Number:</strong> {{ certificate.CertificateNumber }}</p>
+        <p><strong>Status:</strong> 
+            <span class="status-indicator 
+                {% if certificate.status == 'Open' %} status-open
+                {% elif certificate.status == 'In Progress' %} status-in-progress
+                {% elif certificate.status == 'Completed' %} status-completed
+                {% else %} status-unknown
+                {% endif %}">
+                <span class="status-circle"></span> <!-- Small round indicator -->
+                {{ certificate.status }}
+            </span>
+        </p>
+    {% else %}
+        <p>No certificate data available.</p>
+    {% endif %}
+    
+        </p>
         <div class="text-center my-4">
             <span class="bg-red-700 text-white px-4 py-1 rounded">CERTIFICATE OF MEASUREMENT</span>
         </div>
@@ -168,7 +182,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div >
                 
                 <div>
                     <label class="text-sm">Name of the applicant</label>
