@@ -258,6 +258,32 @@
     padding: 12px;
   }
 }
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border-radius: 50px;  /* ✅ Rounded */
+    font-weight: bold;
+    text-align: center;
+    min-width: 150px;
+}
+
+/* ✅ Status Colors */
+.status-open { background-color: rgb(0, 203, 0); color: white; }
+.status-in-progress { background-color: yellow; color: black; }
+.status-completed { background-color: red; color: white; }
+.status-unknown { background-color: gray; color: white; }
+
+/* ✅ Small Status Circle */
+.status-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: currentColor;
+}
+
 </style>
 </head>
 <body class="bg-gray-100 p-4">
@@ -314,13 +340,32 @@
           <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
           <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
       </div>
-
+      {% if container %}
+      <p><strong>Report No.:</strong> {{ container.CertificateNumber }}</p>
+      <p><strong>Status:</strong> 
+          <span class="status-indicator 
+              {% if container.status == 'Open' %} status-open
+              {% elif container.status == 'In Progress' %} status-in-progress
+              {% elif container.status == 'Completed' %} status-completed
+              {% else %} status-unknown
+              {% endif %}">
+              <span class="status-circle"></span> 
+              {{ container.status }}
+          </span>
+      </p>
+  {% else %}
+      <p>No container data available.</p>
+  {% endif %}
+  
+    <hr class="my-4"/>
+    <h2 class="text-lg font-semibold text-center">EMPTY CONTAINER CONDITION SURVEY REPORT</h2>    
+    
     <form method="POST" action="{{ url_for('add_survey') }}" class="p-4 border border-gray-300">     
        <div class="border-t border-b border-gray-300 py-2 mb-4">
         <div class="flex justify-between">
           <div>
             <label class="block text-sm font-semibold">Report No.:</label>
-            <input type="text" name="CertificateNumber" id="CertificateNumber" required class="border border-gray-300 p-1 w-full"/>
+            <input type="text" id="CertificateNumber" readonly name="CertificateNumber" class="border border-gray-300 p-1 w-full"/>
           </div>
           <div>
             <label class="block text-sm font-semibold">Date:</label>
