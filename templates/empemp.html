@@ -391,6 +391,32 @@ overflow-y: auto;
         .table-wrapper td {
             white-space: nowrap;
         }
+        .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border-radius: 50px;  /* ✅ Rounded */
+    font-weight: bold;
+    text-align: center;
+    min-width: 150px;
+}
+
+/* ✅ Status Colors */
+.status-open { background-color: rgb(0, 203, 0); color: white; }
+.status-in-progress { background-color: yellow; color: black; }
+.status-completed { background-color: red; color: white; }
+.status-unknown { background-color: gray; color: white; }
+
+/* ✅ Small Status Circle */
+.status-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: currentColor;
+}
+
 </style>
 </head>
 <body>
@@ -418,7 +444,6 @@ overflow-y: auto;
             <div class="sidebar" id="sidebar">
                 <ul>
                     <li><a href="{{ url_for('empdash') }}">Home</a></li>
-                    <li><a href="#">Profile</a></li>
                     <li><a href="{{ url_for('empforms') }}">Forms</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 </ul>
@@ -431,6 +456,23 @@ overflow-y: auto;
             <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
             <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
         </div>
+        {% if form %}
+        <p><strong>Report Number:</strong> {{ form.CertificateNumber }}</p>
+        <p><strong>Status:</strong> 
+            <span class="status-indicator 
+                {% if form.status == 'Open' %}status-open
+                {% elif form.status == 'In Progress' %}status-in-progress
+                {% elif form.status == 'Completed' %}status-completed
+                {% else %}status-unknown{% endif %}">
+                <span class="status-circle"></span> 
+                {{ form.status }}
+            </span>
+        </p>
+    {% else %}
+        <p>No record found.</p>
+    {% endif %}
+    
+
         <div class="text-center bg-red-600 text-white py-2 mb-4">
             <h2 class="text-lg font-semibold">FCL STUFFING SURVEY REPORT FORM</h2>
         </div>
@@ -464,6 +506,7 @@ overflow-y: auto;
                                 <th>Tare Weight (in Kgs)</th>
                                 <th>Payload Capacity (in Kgs)</th>
                                 <th>Declared Total Weight of the Container (in Kgs)</th>
+                                <th>status</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -486,14 +529,19 @@ overflow-y: auto;
                     <table class="custom-table">
                         <thead>
                             <tr>
-                                <th>Select</th>
-                                <th>Consignor</th>
-                                <th>Consignee</th>
-                                <th>Description of Cargo</th>
-                                <th>Marks & Nos.</th>
-                                <th>No. of Packages</th>
-                                <th>Gross Weight (Kgs)</th>
-                                <th>Volume (CBM)</th>
+                            <!-- Modal Table -->
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>ID</th>              <!-- ✅ Matches JavaScript -->
+                                    <th>Shipper</th>         <!-- ✅ Matches JavaScript -->
+                                    <th>Consignee</th>
+                                    <th>Description of Cargo</th>
+                                    <th>Marks & Nos.</th>
+                                    <th>No. of Packages</th>
+                                    <th>Gross Weight (Kgs)</th>
+                                    <th>Volume (CBM)</th>
+                                    <th>Status</th>          <!-- ✅ Status included -->
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -591,15 +639,19 @@ overflow-y: auto;
                 <table class="custom-table1" id="main-table">
                     <thead>
                         <tr>
-                            <th>Consignor</th>
-                            <th>Consignee</th>
-                            <th>Description of Cargo</th>
-                            <th>Marks & Nos.</th>
-                            <th>No. of Packages</th>
-                            <th>Gross Weight (Kgs)</th>
-                            <th>Volume (CBM)</th>
-                        </tr>
-                    </thead>
+<!-- Main Table -->
+                        <thead>
+                            <tr>
+                                <th>ID</th>              <!-- ✅ Matches JavaScript -->
+                                <th>Shipper</th>
+                                <th>Consignee</th>
+                                <th>Description of Cargo</th>
+                                <th>Marks & Nos.</th>
+                                <th>No. of Packages</th>
+                                <th>Gross Weight (Kgs)</th>
+                                <th>Volume (CBM)</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         <!-- Add consignment details here -->
                     </tbody>
@@ -666,7 +718,7 @@ document.getElementById("add-container-btn").addEventListener("click", function 
             tbody.innerHTML = ''; // Clear existing rows
 
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8">No containers available</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9">No containers available</td></tr>';
                 return;
             }
 
@@ -680,7 +732,7 @@ document.getElementById("add-container-btn").addEventListener("click", function 
                     <td>${container.tare_weight}</td>
                     <td>${container.payload_capacity}</td>
                     <td>${container.max_gross_weight}</td>
-                    
+                    <td>${container.status}</td>  <!-- ✅ Added Status Column -->
                 `;
                 tbody.appendChild(row);
             });
@@ -690,6 +742,7 @@ document.getElementById("add-container-btn").addEventListener("click", function 
     document.getElementById('add-container-modal').style.display = 'flex';
 });
 
+
 document.getElementById("open-modal").addEventListener("click", function () {
     fetch('/get_consignment_details')
         .then(response => response.json())
@@ -698,29 +751,33 @@ document.getElementById("open-modal").addEventListener("click", function () {
             tbody.innerHTML = ''; // Clear existing rows
 
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8">No consignments available</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9">No consignments available</td></tr>';
                 return;
             }
 
             data.forEach(consignment => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><input type="checkbox" class="row-check" data-row="${consignment.id}"></td>
-                    <td>${consignment.shipper}</td>
-                    <td>${consignment.consignee}</td>
-                    <td>${consignment.commodity}</td>
-                    <td>${consignment.sb_number}</td>
-                    <td>${consignment.total_pkgs}</td>
-                    <td>${consignment.gross_weight}</td>
-                    <td>${consignment.total_volume}</td> 
-                `;
-                tbody.appendChild(row);
-            });
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox" class="row-check" data-row="${consignment.id}"></td>
+                        <td>${consignment.id}</td>  <!-- ✅ ID Correct -->
+                        <td>${consignment.shipper}</td>
+                        <td>${consignment.consignee}</td>
+                        <td>${consignment.commodity}</td>  <!-- ✅ Matches "Description of Cargo" -->
+                        <td>${consignment.sb_number}</td>  <!-- ✅ Matches "Marks & Nos." -->
+                        <td>${consignment.total_pkgs}</td>
+                        <td>${consignment.gross_weight}</td>
+                        <td>${consignment.total_volume}</td>
+                        <td>${consignment.status}</td>  <!-- ✅ Matches "Status" -->
+                    `;
+                    tbody.appendChild(row);
+                });
+
         })
         .catch(error => console.error('Error fetching consignment details:', error));
 
     document.getElementById('modal').style.display = 'flex';
 });
+
 
 // Close modals
 document.getElementById("close-container-modal").addEventListener("click", function() {
@@ -752,7 +809,6 @@ document.getElementById("add-container-to-main").addEventListener("click", funct
     }
 });
 
-// Add selected consignment details to main table
 document.getElementById('fill-table').addEventListener('click', function () {
     const selectedRows = document.querySelectorAll('.modal-content .row-check:checked');
     const mainTableBody = document.querySelector('#main-table tbody');
@@ -773,37 +829,41 @@ document.getElementById('fill-table').addEventListener('click', function () {
     }
 
     selectedRows.forEach((checkbox) => {
-        const row = checkbox.closest('tr');
-        const cells = row.querySelectorAll('td');
+    const row = checkbox.closest('tr');
+    const cells = row.querySelectorAll('td');
 
-        const packages = parseInt(cells[5].textContent.replace(/[^0-9]/g, ''), 10) || 0;
-        const grossWeight = parseFloat(cells[6].textContent.replace(/[^0-9.]/g, '')) || 0;
-        const volume = parseFloat(cells[7]?.textContent?.replace(/[^0-9.]/g, '') || 0);
+    const consignmentId = checkbox.getAttribute('data-row'); // ✅ Get the ID from checkbox
+    const packages = parseInt(cells[6].textContent.replace(/[^0-9]/g, ''), 10) || 0;
+    const grossWeight = parseFloat(cells[7].textContent.replace(/[^0-9.]/g, '')) || 0;
+    const volume = parseFloat(cells[8]?.textContent?.replace(/[^0-9.]/g, '') || 0);
 
-        const consignment = {
-            consignor: cells[1].textContent.trim(),
-            consignee: cells[2].textContent.trim(),
-            description: cells[3].textContent.trim(),
-            marksNos: cells[4].textContent.trim(),
-            packages: packages,
-            gross_weight: grossWeight.toFixed(2), // Ensure correct decimal formatting
-            volume: volume.toFixed(2)
-        };
-        // Always add the new consignment
-        consignmentDetails.push(consignment);
+    const consignment = {
+        id: consignmentId,
+        consignor: cells[2].textContent.trim(),  // ✅ Ensure this is "shipper"
+        consignee: cells[3].textContent.trim(),
+        description: cells[4].textContent.trim(), // ✅ "commodity"
+        marksNos: cells[5].textContent.trim(),
+        packages: packages,
+        gross_weight: grossWeight.toFixed(2),
+        volume: volume.toFixed(2)
+    };
 
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td>${cells[1].textContent.trim()}</td>
-            <td>${cells[2].textContent.trim()}</td>
-            <td>${cells[3].textContent.trim()}</td>
-            <td>${cells[4].textContent.trim()}</td>
-            <td>${packages}</td>
-            <td>${grossWeight.toFixed(2)}</td>
-            <td>${volume.toFixed(2)}</td>
-        `;
+    consignmentDetails.push(consignment);
 
-        mainTableBody.appendChild(newRow);
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>${consignmentId}</td>  <!-- ✅ Display ID -->
+        <td>${cells[2].textContent.trim()}</td>  <!-- Consignor (Shipper) -->
+        <td>${cells[3].textContent.trim()}</td>  <!-- Consignee -->
+        <td>${cells[4].textContent.trim()}</td>  <!-- Description -->
+        <td>${cells[5].textContent.trim()}</td>  <!-- Marks & Nos -->
+        <td>${packages}</td>
+        <td>${grossWeight.toFixed(2)}</td>
+        <td>${volume.toFixed(2)}</td>
+    `;
+
+    mainTableBody.appendChild(newRow);
+
 
         totalPackages += packages;
         totalGrossWeight += grossWeight;
