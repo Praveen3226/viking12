@@ -190,6 +190,33 @@
                 transform: rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0);
             }
         }
+                /* Responsive Design */
+                @media (max-width: 768px) {
+            .nav-links {
+                display: flex;
+            }
+
+            .navbar {
+                justify-content: center;
+            }
+
+            .projects {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-message {
+                font-size: 1.5em;
+            }
+            .navbar {
+                flex-direction:row;
+                align-items:flex-end;
+                padding: 10px;
+            }
+            .nav-links {
+                flex-direction: row;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -221,6 +248,12 @@
                 VIKING MARINE INC.
                 <div class="project-description">
                     <a href="{{ url_for('login') }}" target="_blank" class="visit-button">Visit Website</a>
+                </div>
+            </div>
+            <div class="project-box">
+                AI CHAT BOT   
+             <div class="project-description">
+<a href="https://bitsmart-chat-bot-lstgfmm6pixe3f5zhsfhap.streamlit.app/" target="_blank" class="visit-button">Visit Website</a>
                 </div>
             </div>
         </div>
