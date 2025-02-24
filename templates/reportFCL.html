@@ -359,6 +359,24 @@
             background-color: red;
         }
 
+        /*Sort function style */
+.status-filters {
+    margin: 10px 0;
+    display: flex;
+    gap: 15px;
+}
+
+.status-filters label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.status-filters input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -411,6 +429,14 @@
         <div id="noResults" style="display: none; text-align: center; padding: 20px; color: #666; font-style: italic;">
             No matching records found
         </div>
+
+
+        <!--Sort Checkboxes-->
+ <div class="status-filters">
+    <label><input type="checkbox" class="status-checkbox" value="Open" unchecked> Open</label>
+    <label><input type="checkbox" class="status-checkbox" value="In Progress" unchecked> In Progress</label>
+    <label><input type="checkbox" class="status-checkbox" value="Completed" unchecked> Completed</label>
+</div>
 
 
         <div class="table-wrapper">
@@ -557,6 +583,101 @@
 
     // Initial setup
     updateTable();
+
+
+      //Sorting status functionality
+    // Initialize variables
+ currentPage = 1;
+entriesPerPage = parseInt(document.getElementById('entriesPerPage').value);
+allRows = Array.from(document.querySelectorAll('.custom-table tbody tr'));
+filteredRows = [];
+
+// Initial sorting by certificate number
+function initialSort() {
+    allRows.sort((a, b) => {
+        const certA = a.cells[1].textContent;
+        const certB = b.cells[1].textContent;
+        return certA.localeCompare(certB);
+    });
+    filteredRows = [...allRows];
+}
+
+// Status filter functionality
+const statusCheckboxes = document.querySelectorAll('.status-checkbox');
+
+function applyFilters() {
+    const searchTerm = document.getElementById('globalSearch').value.toLowerCase().trim();
+    const selectedStatuses = Array.from(statusCheckboxes)
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => checkbox.value.toLowerCase());
+
+    filteredRows = allRows.filter(row => {
+        const applicantName = row.cells[3].textContent.toLowerCase();
+        const status = row.cells[1].textContent.trim().toLowerCase();
+        
+        // Only apply status filter if checkboxes are selected
+        const matchesStatus = selectedStatuses.length === 0 ? true : 
+                            selectedStatuses.includes(status);
+
+        return applicantName.includes(searchTerm) && matchesStatus;
+    });
+
+    document.getElementById('noResults').style.display = 
+        filteredRows.length === 0 ? 'block' : 'none';
+    
+    currentPage = 1;
+    updateTable();
+}
+
+// Table update function
+function updateTable() {
+    const start = (currentPage - 1) * entriesPerPage;
+    const end = start + entriesPerPage;
+
+    allRows.forEach(row => row.style.display = 'none');
+    filteredRows.forEach((row, index) => {
+        row.style.display = (index >= start && index < end) ? '' : 'none';
+    });
+
+    const totalPages = Math.ceil(filteredRows.length / entriesPerPage);
+    document.getElementById('pageInfo').textContent = 
+        `Page ${currentPage} of ${totalPages}`;
+    
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages;
+}
+
+// Event listeners
+document.getElementById('globalSearch').addEventListener('input', applyFilters);
+document.getElementById('entriesPerPage').addEventListener('change', function(e) {
+    entriesPerPage = parseInt(e.target.value);
+    currentPage = 1;
+    updateTable();
+});
+
+document.getElementById('prevPage').addEventListener('click', () => {
+    if(currentPage > 1) {
+        currentPage--;
+        updateTable();
+    }
+});
+
+document.getElementById('nextPage').addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredRows.length / entriesPerPage);
+    if(currentPage < totalPages) {
+        currentPage++;
+        updateTable();
+    }
+});
+
+statusCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', applyFilters);
+});
+
+// Initial setup
+initialSort();
+applyFilters();  // Initial filter call shows all records
+updateTable();
     </script>
 </body>
 </html>
