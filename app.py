@@ -274,8 +274,7 @@ def reportContainer1(CertificateNumber):
 @app.route('/admindash')
 @login_required
 def admindash():
-    if session.get('role') != 'role':
-        flash("Unauthorized access!", "error")
+
         
     return render_template('admindash.html')
 
