@@ -316,6 +316,25 @@
     background-color: currentColor;
 }
 
+/*Sort function style */
+.status-filters {
+    margin: 10px 0;
+    display: flex;
+    gap: 15px;
+}
+
+.status-filters label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.status-filters input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -376,6 +395,14 @@
         <div id="noResults" style="display: none; text-align: center; padding: 20px; color: #666; font-style: italic;">
             No matching records found for the specified applicant name
         </div>
+
+        <!--Sort Checkboxes-->
+        <div class="status-filters">
+            <label><input type="checkbox" class="status-checkbox" value="Open" checked> Open</label>
+            <label><input type="checkbox" class="status-checkbox" value="In Progress" checked> In Progress</label>
+            <label><input type="checkbox" class="status-checkbox" value="Completed" checked> Completed</label>
+        </div>
+
             <table class="custom-table">
                 <thead>
                     <tr>
@@ -627,7 +654,39 @@ function updateTable() {
     const filename = `Certificate_${cells[1].textContent}.pdf`;
     doc.save(filename);
 }
-        </script>
+
+
+    //Sorting status functionality
+    const statusCheckboxes = document.querySelectorAll('.status-checkbox');
+
+statusCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', applyFilters);
+});
+
+function applyFilters() {
+    const searchTerm = document.getElementById('globalSearch').value.toLowerCase().trim();
+    const selectedStatuses = Array.from(document.querySelectorAll('.status-checkbox:checked')).map(cb => cb.value.toLowerCase());
+
+    filteredRows = allRows.filter(row => {
+        const applicantName = row.cells[4].textContent.toLowerCase();
+        const status = row.cells[1].textContent.trim().toLowerCase(); // Assuming status is in cell 1
+
+        const matchesSearch = applicantName.includes(searchTerm);
+        const matchesStatus = selectedStatuses.includes(status);
+
+        return matchesSearch && matchesStatus;
+    });
+
+    // Update no results message
+    document.getElementById('noResults').style.display = filteredRows.length === 0 ? 'block' : 'none';
+    currentPage = 1;
+    updateTable();
+}
+
+// Initial setup
+applyFilters();
+
+</script>
         
 </body>
 </html>
