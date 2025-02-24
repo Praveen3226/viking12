@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, json, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, json, session , send_file ,Response 
 import pymysql
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
-
 from mysql.connector import Error
 from datetime import datetime, timedelta
 
@@ -42,7 +41,7 @@ def role_required(role):
     def decorator(f):
         def wrap(*args, **kwargs):
             if session.get('role') != role:
-                flash("⛔ Unauthorized access!", "error")
+                flash("")
                 return redirect(url_for('login'))
             return f(*args, **kwargs)
         wrap.__name__ = f.__name__
@@ -52,6 +51,8 @@ def role_required(role):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -837,8 +838,7 @@ def submit():
             conn.close()
 
 
-from datetime import datetime
-import pymysql
+
 
 @app.route('/get_numbercer')
 @login_required
@@ -846,29 +846,34 @@ def get_numbercer():
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-
+                
                 # Get the current Year-Month (YYYYMM)
                 current_year_month = datetime.now().strftime("%Y%m")
 
-                # 1️⃣ Check for an existing "Open" certificate
-                cursor.execute("SELECT CertificateNumber FROM cer WHERE status = 'Open' FOR UPDATE")
+                # 1️⃣ Lock row to prevent race conditions
+                cursor.execute("SELECT CertificateNumber FROM cer WHERE status = 'Open' ORDER BY id DESC LIMIT 1 FOR UPDATE")
                 last_record = cursor.fetchone()
 
-                print("Fetched existing open certificate:", last_record)  # Debugging log
+                print("Fetched existing open certificate:", last_record)  # Debug log
 
-                if last_record and last_record["CertificateNumber"].startswith(current_year_month):
+                if last_record and last_record["CertificateNumber"]:
                     new_certificate_number = last_record["CertificateNumber"]  # ✅ Reuse existing open certificate
                 else:
-                    # 2️⃣ Fetch the highest certificate number for the current YYYYMM
-                    cursor.execute("SELECT MAX(CertificateNumber) AS max_cert FROM cer WHERE CertificateNumber LIKE %s", (f"{current_year_month}%",))
+                    # 2️⃣ Fetch the last issued certificate number
+                    cursor.execute("SELECT CertificateNumber FROM cer ORDER BY id DESC LIMIT 1 FOR UPDATE")
                     last_record = cursor.fetchone()
 
-                    if last_record and last_record["max_cert"]:
-                        last_certificate = last_record["max_cert"]
-                        last_number = int(last_certificate[6:])  # Extract numeric part
-                        next_number = last_number + 1
+                    if last_record and last_record["CertificateNumber"]:
+                        last_certificate = last_record["CertificateNumber"]
+                        last_year_month = last_certificate[:6]  # Extract YYYYMM
+
+                        if last_year_month == current_year_month:
+                            last_number = int(last_certificate[6:])  # Extract numeric part
+                            next_number = last_number + 1
+                        else:
+                            next_number = 1  # Reset numbering for new month/year
                     else:
-                        next_number = 1  # Start fresh if no records exist for the current YYYYMM
+                        next_number = 1  # Start fresh if no records exist
 
                     # 3️⃣ Generate new Certificate Number
                     new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
@@ -885,8 +890,6 @@ def get_numbercer():
         conn.rollback()  # Rollback in case of error
         print(f"Error fetching certificate number: {e}")
         return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
-
-
 
 @app.route('/submit_cer', methods=['POST'])
 @login_required
