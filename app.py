@@ -36,17 +36,7 @@ def login_required(f):
     wrap.__name__ = f.__name__
     return wrap
 
-# 🔹 Role-Based Access Control Decorator
-def role_required(role):
-    def decorator(f):
-        def wrap(*args, **kwargs):
-            if session.get('role') != role:
-                flash("")
-                return redirect(url_for('login'))
-            return f(*args, **kwargs)
-        wrap.__name__ = f.__name__
-        return wrap
-    return decorator
+
 
 @app.route('/')
 def index():
@@ -284,7 +274,7 @@ def reportContainer1(CertificateNumber):
 @app.route('/admindash')
 @login_required
 def admindash():
-    if session.get('role') != 'Admin':
+    if session.get('role') != 'role':
         flash("Unauthorized access!", "error")
         
     return render_template('admindash.html')
