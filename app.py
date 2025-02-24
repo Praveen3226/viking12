@@ -837,8 +837,6 @@ def submit():
             conn.close()
 
 
-
-
 @app.route('/get_numbercer')
 @login_required
 def get_numbercer():
