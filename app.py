@@ -270,7 +270,75 @@ def reportContainer1(CertificateNumber):
         flash("An error occurred while fetching the container report.", "error")
         return redirect(url_for("reportContainer"))
 
+
+@app.route('/empcontaineredit')
+@login_required
+def empcontaineredit():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch all container records for editing
+        cursor.execute("""
+            SELECT CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no, status 
+            FROM container
+        """)
+        container_data = cursor.fetchall()
+
+        conn.close()
+
+        return render_template('empcontaineredit.html', container_data=container_data)
     
+    except Exception as e:
+        print(f"Error fetching container records for editing: {e}")
+        flash("An error occurred while fetching the container records.", "error")
+        return redirect(url_for("empcontaineredit"))
+
+
+@app.route('/empcertificateedit')
+@login_required
+def empcertificateedit():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch all certificate records for editing
+        cursor.execute("SELECT CertificateNumber, date, applicant_name, shipper, consignee, total_pkgs ,status FROM cer")
+        cer_data = cursor.fetchall()
+
+        conn.close()
+
+        return render_template('empcertificateedit.html', cer_data=cer_data)
+    
+    except Exception as e:
+        print(f"Error fetching certificate records for editing: {e}")
+        flash("An error occurred while fetching the certificate records.", "error")
+        return redirect(url_for("empcertificateedit"))
+
+
+@app.route('/empempedit')
+@login_required
+def empempedit():
+    try:
+        # Connect to the database
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch employee records for editing
+        cursor.execute("SELECT CertificateNumber, date, applicant_name, container_number ,status FROM form")
+        form = cursor.fetchall()
+
+        conn.close()
+
+        # Pass the data to empempedit.html
+        return render_template('empempedit.html', form=form)
+
+    except Exception as e:
+        print(f"Error fetching employee records for editing: {e}")
+        flash('An error occurred while fetching the employee records.', 'error')
+        return redirect(url_for('empempedit'))
+
+
 @app.route('/admindash')
 @login_required
 def admindash():
@@ -290,6 +358,11 @@ def cont():
 def contrpt():
     return render_template('contrpt.html')
 
+@app.route('/empformsonm')
+@login_required
+def empformsonm():
+    return render_template('empformsonm.html')
+
 
 @app.route('/empcertificate')
 @login_required
@@ -297,20 +370,44 @@ def empcertificate():
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                conn.begin()
 
-                # Fetch the latest certificate
-                cursor.execute("SELECT * FROM cer ORDER BY id DESC LIMIT 1")
-                certificate_data = cursor.fetchone()
+                # Get the current Year-Month (YYYYMM)
+                current_year_month = datetime.now().strftime("%Y%m")
 
-                # If no certificate exists, set a default placeholder
-                if not certificate_data:
-                    certificate_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+                # 🔹 Fetch the latest certificate
+                cursor.execute("SELECT CertificateNumber FROM cer ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                last_record = cursor.fetchone()
+
+                if last_record and last_record["CertificateNumber"]:
+                    last_certificate = last_record["CertificateNumber"]
+                    last_year_month = last_certificate[:6]  # Extract YYYYMM
+
+                    if last_year_month == current_year_month:
+                        last_number = int(last_certificate[6:])  # Extract numeric part
+                        next_number = last_number + 1
+                    else:
+                        next_number = 1  # Reset numbering for new month/year
+                else:
+                    next_number = 1  # Start fresh if no records exist
+
+                # 🔹 Generate new Certificate Number
+                new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
+
+                # Insert new certificate with status "Open"
+                cursor.execute("INSERT INTO cer (CertificateNumber, status) VALUES (%s, %s)", 
+                               (new_certificate_number, "Open"))
+                conn.commit()
+
+                # Prepare data to send to template
+                certificate_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
 
         return render_template('empcertificate.html', certificate=certificate_data)
 
     except Exception as e:
-        print(f"Error fetching certificate: {e}")
-        return "Error fetching certificate", 500
+        conn.rollback()  # Rollback if there's an error
+        print(f"Error generating certificate: {e}")
+        return "Error generating certificate", 500
 
 @app.route('/empforms')
 @login_required
@@ -327,20 +424,34 @@ def empdash():
 @app.route('/empemp')
 @login_required
 def empemp():
-    form_data = None  # Ensure form_data is defined
-
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                # Fetch the latest CertificateNumber and status from 'form' table
-                cursor.execute("SELECT CertificateNumber, status FROM form ORDER BY id DESC LIMIT 1")
-                form_data = cursor.fetchone()
+                conn.begin()
 
-        if not form_data:  # If no record exists, return default values
-            form_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+                # 🔹 Fetch the latest CertificateNumber and status
+                cursor.execute("SELECT CertificateNumber FROM form ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                last_record = cursor.fetchone()
+
+                if last_record and last_record["CertificateNumber"].isdigit():
+                    next_number = int(last_record["CertificateNumber"]) + 1
+                else:
+                    next_number = 1  # Start from 1 if no records exist
+
+                # 🔹 Generate new Certificate Number
+                new_certificate_number = str(next_number)
+
+                # Insert new certificate with status "Open"
+                cursor.execute("INSERT INTO form (CertificateNumber, status) VALUES (%s, %s)", 
+                               (new_certificate_number, "Open"))
+                conn.commit()
+
+                # Prepare data for template
+                form_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
 
     except Exception as e:
-        print(f"Error fetching form data: {e}")
+        conn.rollback()  # Rollback if there's an error
+        print(f"Error generating form data: {e}")
         form_data = {"CertificateNumber": "Error", "status": "Error"}
 
     print("Fetched Form Data:", form_data)  # ✅ Debugging log
@@ -352,111 +463,90 @@ def empemp():
 @app.route('/empcontainer')
 @login_required
 def empcontainer():
-    container_data = None  # Ensure container_data is defined
-    
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("SELECT * FROM container ORDER BY id DESC LIMIT 1")
-                container_data = cursor.fetchone()
+                conn.begin()
 
-        if not container_data:  # If no container exists, define an empty dictionary
-            container_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+                # Get the last certificate number
+                cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                last_record = cursor.fetchone()
+
+                if last_record and last_record["CertificateNumber"].isdigit():
+                    next_number = int(last_record["CertificateNumber"]) + 1
+                else:
+                    next_number = 1  # Start from 1 if no records exist
+
+                new_certificate_number = str(next_number)
+
+                # Insert new certificate
+                insert_query = "INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)"
+                cursor.execute(insert_query, (new_certificate_number, "Open"))
+                conn.commit()
+
+                container_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
 
     except Exception as e:
-        print(f"Error fetching container data: {e}")
+        print(f"Error generating new certificate: {e}")
         container_data = {"CertificateNumber": "Error", "status": "Error"}
 
-    return render_template('empcontainer.html', container=container_data)
+    # Pass the data to the template instead of returning JSON
+    return render_template('empcontainer.html', container_data=container_data)
 
-@app.route('/certificate')
+
+
+ 
+@app.route('/get_latest_certificate122')
 @login_required
-def certificate():
+def get_latest_certificate122():
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-
-                # Fetch the latest certificate
-                cursor.execute("SELECT * FROM cer ORDER BY id DESC LIMIT 1")
+                cursor.execute("SELECT CertificateNumber, status FROM container ORDER BY id DESC LIMIT 1")
                 certificate_data = cursor.fetchone()
 
-                # If no certificate exists, set a default placeholder
-                if not certificate_data:
-                    certificate_data = {"CertificateNumber": "N/A", "status": "Unknown"}
-
-        return render_template('certificate.html', certificate=certificate_data)
+        if not certificate_data:
+            certificate_data = {"CertificateNumber": "N/A", "status": "Unknown"}
 
     except Exception as e:
-        print(f"Error fetching certificate: {e}")
-        return "Error fetching certificate", 500
+        print(f"Error fetching latest certificate: {e}")
+        certificate_data = {"CertificateNumber": "Error", "status": "Error"}
 
+    return jsonify(certificate_data)
 
 
 @app.route('/container')
 @login_required
 def container():
-    container_data = None  # Ensure container_data is defined
-    
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("SELECT * FROM container ORDER BY id DESC LIMIT 1")
-                container_data = cursor.fetchone()
+                conn.begin()
 
-        if not container_data:  # If no container exists, define an empty dictionary
-            container_data = {"CertificateNumber": "N/A", "status": "Unknown"}
-
-    except Exception as e:
-        print(f"Error fetching container data: {e}")
-        container_data = {"CertificateNumber": "Error", "status": "Error"}
-
-    return render_template('container.html', container=container_data)
-
-
-
-@app.route('/get_numbers')
-@login_required
-def get_numbers():
-    try:
-        with get_db_connection() as conn:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                
-                # 1️⃣ Check if an existing "Open" certificate number exists
-                cursor.execute("SELECT CertificateNumber FROM container WHERE status = 'Open' ORDER BY id DESC LIMIT 1")
+                # Get the last certificate number
+                cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1 FOR UPDATE")
                 last_record = cursor.fetchone()
 
-                print("Fetched existing open certificate:", last_record)  # Debug log
-
-                if last_record and last_record["CertificateNumber"]:
-                    new_certificate_number = last_record["CertificateNumber"]  # ✅ Reuse existing number
+                if last_record and last_record["CertificateNumber"].isdigit():
+                    next_number = int(last_record["CertificateNumber"]) + 1
                 else:
-                    # 2️⃣ Fetch the last issued certificate number
-                    cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1")
-                    last_record = cursor.fetchone()
+                    next_number = 1  # Start from 1 if no records exist
 
-                    if last_record and last_record["CertificateNumber"] and last_record["CertificateNumber"].isdigit():
-                        next_number = int(last_record["CertificateNumber"]) + 1
-                    else:
-                        next_number = 1  # Start fresh if no records exist
+                new_certificate_number = str(next_number)
 
-                    # 3️⃣ Generate new Certificate Number
-                    new_certificate_number = str(next_number)
+                # Insert new certificate
+                insert_query = "INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)"
+                cursor.execute(insert_query, (new_certificate_number, "Open"))
+                conn.commit()
 
-                    # Insert new certificate number with status "Open"
-                    insert_query = "INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)"
-                    cursor.execute(insert_query, (new_certificate_number, "Open"))
-                    conn.commit()
-
-                print("Returning Certificate Number:", new_certificate_number)  # Debugging log
-                return jsonify({"certificateNumber": new_certificate_number, "status": "Open"})
+                container_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
 
     except Exception as e:
-        print(f"Error fetching certificate number: {e}")  # Log error details
-        return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
+        print(f"Error generating new certificate: {e}")
+        container_data = {"CertificateNumber": "Error", "status": "Error"}
 
-
-
-
+    # Pass the data to the template instead of returning JSON
+    return render_template('container.html', container_data=container_data)
 
 @app.route('/add_survey', methods=['POST'])
 @login_required
@@ -538,26 +628,58 @@ def add_survey():
 @app.route('/emp')
 @login_required
 def emp():
-    form_data = None  # Ensure form_data is defined
-
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                # Fetch the latest CertificateNumber and status from 'form' table
-                cursor.execute("SELECT CertificateNumber, status FROM form ORDER BY id DESC LIMIT 1")
-                form_data = cursor.fetchone()
+                conn.begin()
 
-        if not form_data:  # If no record exists, return default values
-            form_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+                # 🔹 Fetch the latest CertificateNumber and status
+                cursor.execute("SELECT CertificateNumber FROM form ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                last_record = cursor.fetchone()
+
+                if last_record and last_record["CertificateNumber"].isdigit():
+                    next_number = int(last_record["CertificateNumber"]) + 1
+                else:
+                    next_number = 1  # Start from 1 if no records exist
+
+                # 🔹 Generate new Certificate Number
+                new_certificate_number = str(next_number)
+
+                # Insert new certificate with status "Open"
+                cursor.execute("INSERT INTO form (CertificateNumber, status) VALUES (%s, %s)", 
+                               (new_certificate_number, "Open"))
+                conn.commit()
+
+                # Prepare data for template
+                form_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
 
     except Exception as e:
-        print(f"Error fetching form data: {e}")
+        conn.rollback()  # Rollback if there's an error
+        print(f"Error generating form data: {e}")
         form_data = {"CertificateNumber": "Error", "status": "Error"}
 
     print("Fetched Form Data:", form_data)  # ✅ Debugging log
 
     return render_template('emp.html', form=form_data)
 
+
+@app.route('/get_latest_')
+@login_required
+def get_latest_():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute("SELECT CertificateNumber, status FROM form ORDER BY id DESC LIMIT 1")
+                certificate_data = cursor.fetchone()
+
+        if not certificate_data:
+            certificate_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+
+    except Exception as e:
+        print(f"Error fetching latest certificate: {e}")
+        certificate_data = {"CertificateNumber": "Error", "status": "Error"}
+
+    return jsonify(certificate_data)
 
 
 @app.route('/employee')
@@ -589,44 +711,7 @@ def containerrpt():
 # Fetch the latest certificate number
 
 
-@app.route('/get_number')
-@login_required
-def get_number():
-    try:
-        with get_db_connection() as conn:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                
-                # Check if an existing "Open" certificate number exists
-                cursor.execute("SELECT CertificateNumber FROM form WHERE status = 'Open' ORDER BY id DESC LIMIT 1")
-                last_record = cursor.fetchone()
 
-                print("Fetched existing open certificate:", last_record)  # Debugging log
-
-                if last_record:
-                    new_certificate_number = last_record["CertificateNumber"]  # ✅ Return the same number
-                else:
-                    # Fetch the last used certificate number
-                    cursor.execute("SELECT CertificateNumber FROM form ORDER BY id DESC LIMIT 1")
-                    last_record = cursor.fetchone()
-
-                    if last_record and last_record["CertificateNumber"].isdigit():
-                        next_number = int(last_record["CertificateNumber"]) + 1
-                    else:
-                        next_number = 1  # Start from 1 if no record exists
-
-                    new_certificate_number = str(next_number)
-
-                    # Insert new certificate number with status "Open"
-                    insert_query = "INSERT INTO form (CertificateNumber, status) VALUES (%s, %s)"
-                    cursor.execute(insert_query, (new_certificate_number, "Open"))
-                    conn.commit()
-
-                print("Returning Certificate Number:", new_certificate_number)  # Debugging log
-                return jsonify({"certificateNumber": new_certificate_number, "status": "Open"})
-
-    except Exception as e:
-        print(f"Error fetching certificate number: {e}")
-        return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
 
 
 
@@ -828,58 +913,71 @@ def submit():
 
 
 
-
-@app.route('/get_numbercer')
+@app.route('/get_latest_certificate')
 @login_required
-def get_numbercer():
+def get_latest_certificate():
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                
+                cursor.execute("SELECT CertificateNumber, status FROM cer ORDER BY id DESC LIMIT 1")
+                certificate_data = cursor.fetchone()
+
+        if not certificate_data:
+            certificate_data = {"CertificateNumber": "N/A", "status": "Unknown"}
+
+    except Exception as e:
+        print(f"Error fetching latest certificate: {e}")
+        certificate_data = {"CertificateNumber": "Error", "status": "Error"}
+
+    return jsonify(certificate_data)
+
+
+@app.route('/certificate')
+@login_required
+def certificate():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                conn.begin()
+
                 # Get the current Year-Month (YYYYMM)
                 current_year_month = datetime.now().strftime("%Y%m")
 
-                # 1️⃣ Lock row to prevent race conditions
-                cursor.execute("SELECT CertificateNumber FROM cer WHERE status = 'Open' ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                # 🔹 Fetch the latest certificate
+                cursor.execute("SELECT CertificateNumber FROM cer ORDER BY id DESC LIMIT 1 FOR UPDATE")
                 last_record = cursor.fetchone()
 
-                print("Fetched existing open certificate:", last_record)  # Debug log
-
                 if last_record and last_record["CertificateNumber"]:
-                    new_certificate_number = last_record["CertificateNumber"]  # ✅ Reuse existing open certificate
-                else:
-                    # 2️⃣ Fetch the last issued certificate number
-                    cursor.execute("SELECT CertificateNumber FROM cer ORDER BY id DESC LIMIT 1 FOR UPDATE")
-                    last_record = cursor.fetchone()
+                    last_certificate = last_record["CertificateNumber"]
+                    last_year_month = last_certificate[:6]  # Extract YYYYMM
 
-                    if last_record and last_record["CertificateNumber"]:
-                        last_certificate = last_record["CertificateNumber"]
-                        last_year_month = last_certificate[:6]  # Extract YYYYMM
-
-                        if last_year_month == current_year_month:
-                            last_number = int(last_certificate[6:])  # Extract numeric part
-                            next_number = last_number + 1
-                        else:
-                            next_number = 1  # Reset numbering for new month/year
+                    if last_year_month == current_year_month:
+                        last_number = int(last_certificate[6:])  # Extract numeric part
+                        next_number = last_number + 1
                     else:
-                        next_number = 1  # Start fresh if no records exist
+                        next_number = 1  # Reset numbering for new month/year
+                else:
+                    next_number = 1  # Start fresh if no records exist
 
-                    # 3️⃣ Generate new Certificate Number
-                    new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
+                # 🔹 Generate new Certificate Number
+                new_certificate_number = f"{current_year_month}{str(next_number).zfill(6)}"
 
-                    # Insert new certificate number with status "Open"
-                    cursor.execute("INSERT INTO cer (CertificateNumber, status) VALUES (%s, %s)", 
-                                   (new_certificate_number, "Open"))
-                    conn.commit()
+                # Insert new certificate with status "Open"
+                cursor.execute("INSERT INTO cer (CertificateNumber, status) VALUES (%s, %s)", 
+                               (new_certificate_number, "Open"))
+                conn.commit()
 
-                print("Returning Certificate Number:", new_certificate_number)  # Debugging log
-                return jsonify({"certificateNumber": new_certificate_number, "status": "Open"})
+                # Prepare data to send to template
+                certificate_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
+
+        return render_template('certificate.html', certificate=certificate_data)
 
     except Exception as e:
-        conn.rollback()  # Rollback in case of error
-        print(f"Error fetching certificate number: {e}")
-        return jsonify({"error": str(e)}), 500  # Return HTTP 500 for errors
+        conn.rollback()  # Rollback if there's an error
+        print(f"Error generating certificate: {e}")
+        return "Error generating certificate", 500
 
+    
 @app.route('/submit_cer', methods=['POST'])
 @login_required
 def submit_cer():
