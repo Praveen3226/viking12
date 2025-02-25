@@ -297,7 +297,7 @@ h1 {
       <div class="text-center">
                   <!-- Navigation Bar -->
       <div class="nav-bar">
-          <a href="{{ url_for('forms') }}" 
+          <a href="{{ url_for('empcontaineredit') }}" 
           style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
           onmouseover="this.style.backgroundColor='#0056b3'"
           onmouseout="this.style.backgroundColor='#007bff'">
@@ -310,7 +310,7 @@ h1 {
           <nav class="nav-links">
               <ul>
                   <li><a href="{{ url_for('empdash') }}">Home</a></li>
-                  <li><a href="{{ url_for('empforms') }}">Forms</a></li>
+                  <li><a href="{{ url_for('empdash') }}">Forms</a></li>
                   <li><a href="{{ url_for('logout') }}">Logout</a></li>
               </ul>
           </nav>
@@ -326,7 +326,7 @@ h1 {
  <div class="sidebar" id="sidebar">
   <ul>
       <li><a href="{{ url_for('empdash') }}">Home</a></li>
-      <li><a href="{{ url_for('empforms') }}">Forms</a></li>
+      <li><a href="{{ url_for('empdash') }}">Forms</a></li>
       <li><a href="{{ url_for('logout') }}">Logout</a></li>
   </ul>
 </div>
