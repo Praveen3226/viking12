@@ -271,28 +271,7 @@ def reportContainer1(CertificateNumber):
         return redirect(url_for("reportContainer"))
 
 
-@app.route('/empcontaineredit')
-@login_required
-def empcontaineredit():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-        # Fetch all container records for editing
-        cursor.execute("""
-            SELECT CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no, status 
-            FROM container
-        """)
-        container_data = cursor.fetchall()
-
-        conn.close()
-
-        return render_template('empcontaineredit.html', container_data=container_data)
-    
-    except Exception as e:
-        print(f"Error fetching container records for editing: {e}")
-        flash("An error occurred while fetching the container records.", "error")
-        return redirect(url_for("empcontaineredit"))
 
 
 @app.route('/empcertificateedit')
@@ -460,38 +439,7 @@ def empemp():
 
 
 
-@app.route('/empcontainer')
-@login_required
-def empcontainer():
-    try:
-        with get_db_connection() as conn:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                conn.begin()
 
-                # Get the last certificate number
-                cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1 FOR UPDATE")
-                last_record = cursor.fetchone()
-
-                if last_record and last_record["CertificateNumber"].isdigit():
-                    next_number = int(last_record["CertificateNumber"]) + 1
-                else:
-                    next_number = 1  # Start from 1 if no records exist
-
-                new_certificate_number = str(next_number)
-
-                # Insert new certificate
-                insert_query = "INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)"
-                cursor.execute(insert_query, (new_certificate_number, "Open"))
-                conn.commit()
-
-                container_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
-
-    except Exception as e:
-        print(f"Error generating new certificate: {e}")
-        container_data = {"CertificateNumber": "Error", "status": "Error"}
-
-    # Pass the data to the template instead of returning JSON
-    return render_template('empcontainer.html', container_data=container_data)
 
 
 
@@ -622,6 +570,161 @@ def add_survey():
         print(f"Error: {e}")
         flash(f'An error occurred: {e}', 'error')
         return redirect(url_for('container'))
+
+@app.route('/empcontainer')
+@login_required
+def empcontainer():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                conn.begin()
+
+                # Get the last certificate number
+                cursor.execute("SELECT CertificateNumber FROM container ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                last_record = cursor.fetchone()
+
+                if last_record and last_record["CertificateNumber"].isdigit():
+                    next_number = int(last_record["CertificateNumber"]) + 1
+                else:
+                    next_number = 1  # Start from 1 if no records exist
+
+                new_certificate_number = str(next_number)
+
+                # Insert new certificate
+                insert_query = "INSERT INTO container (CertificateNumber, status) VALUES (%s, %s)"
+                cursor.execute(insert_query, (new_certificate_number, "Open"))
+                conn.commit()
+
+                container_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
+
+    except Exception as e:
+        print(f"Error generating new certificate: {e}")
+        container_data = {"CertificateNumber": "Error", "status": "Error"}
+
+    # Pass the data to the template instead of returning JSON
+    return render_template('empcontainer.html', container_data=container_data)
+
+@app.route('/empcontaineredit')
+@login_required
+def empcontaineredit():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch all container records for editing
+        cursor.execute("""
+            SELECT CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no, status 
+            FROM container
+        """)
+        container_data = cursor.fetchall()
+
+        conn.close()
+
+        return render_template('empcontaineredit.html', container_data=container_data)
+    
+    except Exception as e:
+        print(f"Error fetching container records for editing: {e}")
+        flash("An error occurred while fetching the container records.", "error")
+        return redirect(url_for("empcontaineredit"))
+    
+
+@app.route('/empcontaineredit1/<int:CertificateNumber>')
+@login_required
+def empcontaineredit1(CertificateNumber):
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                
+                # Fetch the container details
+                cursor.execute("SELECT * FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
+                container_details = cursor.fetchone()
+
+                if not container_details:
+                    flash("No record found for the given Certificate Number.", "error")
+                    return redirect(url_for("empcontainer"))  # Redirect if no data
+
+                # Handle survey checkboxes (if stored as JSON)
+                survey_data = {}
+                if container_details.get('survey_checkboxes'):
+                    try:
+                        survey_data = json.loads(container_details['survey_checkboxes'])
+                    except json.JSONDecodeError:
+                        flash("Error processing survey checkboxes.", "error")
+
+                return render_template('empcontaineredit1.html', container=container_details, survey_data=survey_data)
+
+    except Exception as e:
+        print(f"Error fetching container details: {e}")
+        flash("An error occurred while fetching container details.", "error")
+        return redirect(url_for("empcontainer"))
+
+
+
+
+@app.route('/update_survey/<int:CertificateNumber>', methods=['POST'])
+@login_required
+def update_survey(CertificateNumber):
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                
+                # Extract form data
+                date = request.form.get('date', '').strip()
+                applicant_for_survey = request.form.get('applicant_for_survey', '').strip()
+                date_of_inspection = request.form.get('date_of_inspection', '').strip()
+                container_no = request.form.get('container_no', '').strip()
+                place_of_inspection = request.form.get('place_of_inspection', '').strip()
+                container_type = request.form.get('type', '').strip()
+                size = request.form.get('size', '').strip()
+                tare_weight = request.form.get('tare_weight', '').strip()
+                csc_no = request.form.get('csc_no', '').strip()
+                payload_capacity = request.form.get('payload_capacity', '').strip()
+                year_of_manufacture = request.form.get('year_of_manufacture', '').strip()
+                max_gross_weight = request.form.get('max_gross_weight', '').strip()
+                remarks = request.form.get('remarks', '').strip()
+                surveyor = request.form.get('surveyor', '').strip()
+
+                # Validate required fields
+                required_fields = {
+                    "date": date,
+                    "applicant_for_survey": applicant_for_survey,
+                    "date_of_inspection": date_of_inspection,
+                    "container_no": container_no,
+                    "place_of_inspection": place_of_inspection,
+                    "surveyor": surveyor,
+                }
+
+                for field, value in required_fields.items():
+                    if not value:
+                        flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
+                        return redirect(url_for('empcontaineredit1', CertificateNumber=CertificateNumber))
+
+                # ✅ Update existing survey record
+                update_query = """
+                    UPDATE container
+                    SET 
+                        date = %s, applicant_for_survey = %s, date_of_inspection = %s, container_no = %s,
+                        place_of_inspection = %s, type = %s, size = %s, tare_weight = %s, csc_no = %s,
+                        payload_capacity = %s, year_of_manufacture = %s, max_gross_weight = %s, 
+                        remarks = %s, surveyor = %s, status = 'In Progress'
+                    WHERE CertificateNumber = %s
+                """
+                values = (
+                    date, applicant_for_survey, date_of_inspection, container_no, place_of_inspection,
+                    container_type, size, tare_weight, csc_no, payload_capacity, year_of_manufacture,
+                    max_gross_weight, remarks, surveyor, CertificateNumber
+                )
+
+                cursor.execute(update_query, values)
+                conn.commit()
+
+                flash('Survey updated successfully!', 'success')
+                return redirect(url_for('empdash'))  # Redirect to container list
+
+    except Exception as e:
+        print(f"Error: {e}")
+        flash(f'An error occurred: {e}', 'error')
+        return redirect(url_for('empadsh'))
 
 
 
