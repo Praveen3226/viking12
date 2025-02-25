@@ -519,22 +519,29 @@ def add_survey():
                 max_gross_weight = request.form.get('max_gross_weight', '').strip()
                 remarks = request.form.get('remarks', '').strip()
                 surveyor = request.form.get('surveyor', '').strip()
+                
+                action = request.form.get('action')  # Get which button was clicked
 
-                # ✅ Validate required fields
-                required_fields = {
-                    "CertificateNumber": CertificateNumber,
-                    "date": date,
-                    "applicant_for_survey": applicant_for_survey,
-                    "date_of_inspection": date_of_inspection,
-                    "container_no": container_no,
-                    "place_of_inspection": place_of_inspection,
-                    "surveyor": surveyor,
-                }
+                # ✅ Determine status based on action
+                if action == "Save as Draft":
+                    status = "Draft"
+                else:
+                    status = "In Progress"
+                    # ✅ Validate required fields only for "Submit"
+                    required_fields = {
+                        "CertificateNumber": CertificateNumber,
+                        "date": date,
+                        "applicant_for_survey": applicant_for_survey,
+                        "date_of_inspection": date_of_inspection,
+                        "container_no": container_no,
+                        "place_of_inspection": place_of_inspection,
+                        "surveyor": surveyor,
+                    }
 
-                for field, value in required_fields.items():
-                    if not value:
-                        flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
-                        return redirect(url_for('container'))  # Redirect if a field is missing
+                    for field, value in required_fields.items():
+                        if not value:
+                            flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
+                            return redirect(url_for('container'))  # Redirect if a field is missing
 
                 # ✅ Check if CertificateNumber exists
                 cursor.execute("SELECT COUNT(*) AS count FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
@@ -544,32 +551,34 @@ def add_survey():
                     flash(f"Error: Certificate Number {CertificateNumber} not found!", "error")
                     return redirect(url_for('forms'))  # Redirect if record does not exist
 
-                # ✅ Update existing survey record
+                # ✅ Update survey record
                 update_query = """
                     UPDATE container
                     SET 
                         date = %s, applicant_for_survey = %s, date_of_inspection = %s, container_no = %s,
                         place_of_inspection = %s, type = %s, size = %s, tare_weight = %s, csc_no = %s,
                         payload_capacity = %s, year_of_manufacture = %s, max_gross_weight = %s, 
-                        remarks = %s, surveyor = %s, status = 'In Progress'
+                        remarks = %s, surveyor = %s, status = %s
                     WHERE CertificateNumber = %s
                 """
                 values = (
-                    date, applicant_for_survey, date_of_inspection, container_no, place_of_inspection,
-                    container_type, size, tare_weight, csc_no, payload_capacity, year_of_manufacture,
-                    max_gross_weight, remarks, surveyor, CertificateNumber
+                    date or None, applicant_for_survey or None, date_of_inspection or None, container_no or None,
+                    place_of_inspection or None, container_type or None, size or None, tare_weight or None, 
+                    csc_no or None, payload_capacity or None, year_of_manufacture or None, max_gross_weight or None,
+                    remarks or None, surveyor or None, status, CertificateNumber
                 )
 
                 cursor.execute(update_query, values)
                 conn.commit()
 
-                flash('Survey updated successfully!', 'success')
+                flash('Survey saved as draft!' if status == "Draft" else 'Survey submitted successfully!', 'success')
                 return redirect(url_for('forms'))  # ✅ Redirect on success
 
     except Exception as e:
         print(f"Error: {e}")
         flash(f'An error occurred: {e}', 'error')
         return redirect(url_for('container'))
+
 
 @app.route('/empcontainer')
 @login_required
@@ -635,20 +644,26 @@ def empcontaineredit1(CertificateNumber):
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
                 
-                # Fetch the container details
+                # Fetch container details
                 cursor.execute("SELECT * FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
                 container_details = cursor.fetchone()
 
                 if not container_details:
                     flash("No record found for the given Certificate Number.", "error")
-                    return redirect(url_for("empcontainer"))  # Redirect if no data
+                    return redirect(url_for("empcontainer"))
 
-                # Handle survey checkboxes (if stored as JSON)
+                # ✅ Debugging: Check if data is retrieved correctly
+                print("Container Details:", container_details)
+
+                # Handle survey checkboxes
                 survey_data = {}
-                if container_details.get('survey_checkboxes'):
+                survey_checkboxes = container_details.get('survey_checkboxes', '')
+
+                if survey_checkboxes:
                     try:
-                        survey_data = json.loads(container_details['survey_checkboxes'])
+                        survey_data = json.loads(survey_checkboxes)
                     except json.JSONDecodeError:
+                        survey_data = {}  # Default to empty dict
                         flash("Error processing survey checkboxes.", "error")
 
                 return render_template('empcontaineredit1.html', container=container_details, survey_data=survey_data)
@@ -657,6 +672,7 @@ def empcontaineredit1(CertificateNumber):
         print(f"Error fetching container details: {e}")
         flash("An error occurred while fetching container details.", "error")
         return redirect(url_for("empcontainer"))
+
 
 
 
@@ -717,6 +733,7 @@ def update_survey(CertificateNumber):
 
                 cursor.execute(update_query, values)
                 conn.commit()
+                print(f"Received data: {request.form.to_dict()}")
 
                 flash('Survey updated successfully!', 'success')
                 return redirect(url_for('empdash'))  # Redirect to container list
