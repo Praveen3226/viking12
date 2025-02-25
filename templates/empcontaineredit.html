@@ -384,7 +384,7 @@ h1 {
                 <button class="hamburger">☰</button>
                 
                 <!-- Existing Back link -->
-                <a href="{{ url_for('empforms') }}" class="btn">
+                <a href="{{ url_for('empformsonm') }}" class="btn">
                     Back
                 </a>
                 
@@ -392,7 +392,7 @@ h1 {
                 <div class="dropdown-menu">
                     <ul>
                         <li><a href="{{ url_for('empdash') }}">Home</a></li>
-                        <li><a href="{{ url_for('empforms') }}">Forms</a></li>
+                        <li><a href="{{ url_for('empdash') }}">Forms</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     </ul>
                 </div>
@@ -401,7 +401,7 @@ h1 {
                 <nav class="nav-links">
                     <ul>
                         <li><a href="{{ url_for('empdash') }}">Home</a></li>
-                        <li><a href="{{ url_for('empforms') }}">Forms</a></li>
+                        <li><a href="{{ url_for('empdash') }}">Forms</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     </ul>
                 </nav>
@@ -446,7 +446,7 @@ h1 {
                     {% for container in container_data %}
                     <tr>
                         <td><a href="{{ url_for('empcontaineredit1', CertificateNumber=container.CertificateNumber) }}" class="btn">View</a></td>
-                        <td><a href="{{ url_for('empcontaineredit1', CertificateNumber=container.CertificateNumber) }}">Edit</a>
+                        <td><a href="{{ url_for('empcontaineredit1', CertificateNumber=container.CertificateNumber) }}" class="btn">Edit</a>
                         </td>
                         <td>
                             <span class="status-indicator 
