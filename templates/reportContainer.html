@@ -691,7 +691,7 @@ function applyFilters() {
 
     filteredRows = allRows.filter(row => {
         const applicantName = row.cells[4].textContent.toLowerCase();
-        const statusElement = row.cells[1].querySelector('.status-indicator');
+        const statusElement = row.cells[2].querySelector('.status-indicator');
         const status = statusElement.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim().toLowerCase();
         
         const matchesStatus = selectedStatuses.length === 0 ? true : 
