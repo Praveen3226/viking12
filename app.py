@@ -382,22 +382,22 @@ def submit_cer():
             breadth = safe_float(request.form.getlist('breadth[]')[i])
             height = safe_float(request.form.getlist('height[]')[i])
             volume_unit = safe_float(request.form.getlist('volumeUnit[]')[i])
-            volume = length * breadth * height if all([length, breadth, height]) else None
-            volume_cum = volume_unit * volume if volume and volume_unit else None
-
+            volume_cum = safe_float(request.form.getlist('volumePerUnit[]')[i])
             survey_data.append({
                 'marks_no': marks_no,
                 'no_of_pkgs': no_of_pkgs,
                 'length': length,
                 'breadth': breadth,
                 'height': height,
-                'volume': volume,
-                'volume_unit': volume_unit,
-                'volume_cum': volume_cum
+                 'volume_unit': volume_unit,
+                'volumePerUnit' : volume_cum,
+               
             })
 
-        total_volume = sum(row['volume'] for row in survey_data if row['volume'] is not None)
-        total_pkgs = sum(row['no_of_pkgs'] for row in survey_data if row['no_of_pkgs'] is not None)
+        # Get total volume and total packages from frontend (instead of calculating)
+        total_volume = safe_float(request.form.get('totalVolume', ''))
+        total_pkgs = safe_float(request.form.get('totalPkgs', ''))
+
         survey_data_json = json.dumps(survey_data)
 
         status = "Draft" if action == "Save as Draft" else "In Progress"
@@ -452,6 +452,7 @@ def submit_cer():
         print(f"Error: {e}")
         flash(f'An error occurred while processing the form. Error: {e}', 'error')
         return redirect(url_for('forms'))
+
 
 @app.route('/certificateedit')
 @login_required
