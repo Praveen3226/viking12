@@ -487,11 +487,12 @@
         
 
         <!--Sort Checkboxes-->
- <div class="status-filters">
-    <label><input type="checkbox" class="status-checkbox" value="Open" unchecked> Open</label>
-    <label><input type="checkbox" class="status-checkbox" value="In Progress" unchecked> In Progress</label>
-    <label><input type="checkbox" class="status-checkbox" value="Completed" unchecked> Completed</label>
-</div>
+        <div class="status-filters">
+            <label><input type="checkbox" class="status-checkbox" value="Draft"> Draft</label>
+            <label><input type="checkbox" class="status-checkbox" value="Open"> Open</label>
+            <label><input type="checkbox" class="status-checkbox" value="In Progress"> In Progress</label>
+            <label><input type="checkbox" class="status-checkbox" value="Completed"> Completed</label>
+        </div>
 
 
         <div class="table-wrapper">
@@ -671,8 +672,8 @@ filteredRows = [];
 // Initial sorting by certificate number
 function initialSort() {
     allRows.sort((a, b) => {
-        const certA = a.cells[1].textContent;
-        const certB = b.cells[1].textContent;
+        const certA = a.cells[2].textContent;
+        const certB = b.cells[2].textContent;
         return certA.localeCompare(certB);
     });
     filteredRows = [...allRows];
@@ -689,18 +690,14 @@ function applyFilters() {
 
     filteredRows = allRows.filter(row => {
         const applicantName = row.cells[3].textContent.toLowerCase();
-        const status = row.cells[1].textContent.trim().toLowerCase();
+        const status = row.cells[2].textContent.trim().toLowerCase(); // Note: changed to cells[2]
         
-        // Only apply status filter if checkboxes are selected
         const matchesStatus = selectedStatuses.length === 0 ? true : 
                             selectedStatuses.includes(status);
 
         return applicantName.includes(searchTerm) && matchesStatus;
     });
 
-    document.getElementById('noResults').style.display = 
-        filteredRows.length === 0 ? 'block' : 'none';
-    
     currentPage = 1;
     updateTable();
 }
