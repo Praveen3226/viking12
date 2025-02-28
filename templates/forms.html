@@ -165,31 +165,46 @@
     z-index: 9999; /* Ensure it stays on top of other elements */
 }
 
-/* Hamburger Menu Styles */
-    .hamburger {
+/* Updated Hamburger Menu Styles */
+.hamburger {
             display: none;
             background: none;
             border: none;
             color: white;
             font-size: 24px;
             cursor: pointer;
-            margin-left: auto;
+            padding: 15px;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            z-index: 1001;
         }
 
         .mobile-menu {
             position: fixed;
             top: 0;
-            right: -50%;
-            width: 50%;
+            right: -100%;
+            width: 250px;
             height: 100%;
             background-color: #282525;
             transition: right 0.3s ease;
             z-index: 1000;
-            padding: 60px 20px 20px;
+            padding: 80px 20px 20px;
         }
 
         .mobile-menu.active {
             right: 0;
+        }
+
+        .mobile-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
         }
 
         .mobile-menu ul {
@@ -207,10 +222,13 @@
             text-decoration: none;
             font-size: 18px;
             display: block;
-            padding: 10px;
+            padding: 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
         }
 
         .mobile-menu a:hover {
+            background-color: #333;
             color: #007bff;
         }
 
@@ -218,13 +236,12 @@
             .nav-links {
                 display: none;
             }
-
             .hamburger {
                 display: block;
             }
-
             .nav-bar {
-                flex-wrap: wrap;
+                position: relative;
+                padding-right: 80px;
             }
         }
 
@@ -264,15 +281,19 @@
         </button>
     </div>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <ul>
-            <li><a href="{{ url_for('admindash') }}">Home</a></li>
-            <li><a href="{{ url_for('forms') }}">Forms</a></li>
-            <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        </ul>
-    </div>
+<!-- Add backdrop element -->
+<div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+<!-- Updated Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+    <ul>
+        <li><a href="{{ url_for('admindash') }}">Home</a></li>
+        <li><a href="{{ url_for('forms') }}">Forms</a></li>
+        <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+    </ul>
+</div>
+
 
 <!-- Dashboard Content -->
 <div class="container-fluid">
@@ -318,45 +339,44 @@
         }, 2000); 
 
 
-       // Hamburger Menu functionality
-    const hamburger = document.querySelector('.hamburger');
-    const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('sidebarBackdrop');
+       // Hamburger Menu Functionality
+       const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileBackdrop = document.getElementById('mobileBackdrop');
 
-    function toggleHamburger() {
-        hamburger.style.display = sidebar.classList.contains('active') ? 'none' : 'block';
-    }
-
-    hamburger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        sidebar.classList.add('active');
-        backdrop.classList.add('active');
-        toggleHamburger(); // Hide hamburger when sidebar is active
-    });
-
-    backdrop.addEventListener('click', function() {
-        sidebar.classList.remove('active');
-        backdrop.classList.remove('active');
-        toggleHamburger(); // Show hamburger when sidebar is inactive
-    });
-
-    // Close sidebar when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
-            sidebar.classList.remove('active');
-            backdrop.classList.remove('active');
-            toggleHamburger(); // Show hamburger when sidebar is inactive
+        // Toggle mobile menu
+        function toggleMenu() {
+            mobileMenu.classList.toggle('active');
+            mobileBackdrop.style.display = mobileMenu.classList.contains('active') 
+                ? 'block' 
+                : 'none';
         }
-    });
 
-    // Close sidebar when clicking links
-    document.querySelectorAll('.sidebar a').forEach(link => {
-        link.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            backdrop.classList.remove('active');
-            toggleHamburger(); // Show hamburger when sidebar is inactive
+        // Event Listeners
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleMenu();
         });
-    });
+
+        mobileBackdrop.addEventListener('click', function() {
+            toggleMenu();
+        });
+
+        // Close menu when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+                mobileBackdrop.style.display = 'none';
+            }
+        });
+
+        // Close menu when clicking links
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                toggleMenu();
+            });
+        });
+
 </script>
 </body>
 </html>
