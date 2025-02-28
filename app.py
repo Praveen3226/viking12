@@ -121,6 +121,25 @@ def reportFCL():
         flash('An error occurred while fetching the reports. Please try again.', 'error')
         return redirect(url_for('reportFCL'))
 
+@app.route('/delete_fcl/<int:certificate_number>', methods=['POST'])
+@login_required
+def delete_fcl(certificate_number):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete the record from the 'form' table
+        cursor.execute("DELETE FROM form WHERE CertificateNumber = %s", (certificate_number,))
+        conn.commit()
+
+        conn.close()
+        flash('FCL report deleted successfully.', 'success')
+    except Exception as e:
+        print(f"Error: {e}")
+        flash('An error occurred while deleting the FCL report.', 'error')
+
+    return redirect(url_for('reportFCL'))
+
 
 @app.route('/reportFCL1/<int:CertificateNumber>')
 @login_required
@@ -184,6 +203,25 @@ def reportCER():
         print(f"Error: {e}")
         flash('An error occurred while fetching the reports.', 'error')
         return redirect(url_for('reportCER'))
+    
+@app.route('/delete_cer/<int:certificate_number>', methods=['POST'])
+@login_required
+def delete_cer(certificate_number):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete the record
+        cursor.execute("DELETE FROM cer WHERE CertificateNumber = %s", (certificate_number,))
+        conn.commit()
+
+        conn.close()
+        flash('Certificate deleted successfully.', 'success')
+    except Exception as e:
+        print(f"Error: {e}")
+        flash('An error occurred while deleting the certificate.', 'error')
+
+    return redirect(url_for('reportCER'))
 
 @app.route('/reportCER1/<int:CertificateNumber>')
 @login_required
@@ -236,6 +274,25 @@ def reportContainer():
         flash('An error occurred while fetching the container records.', 'error')
         return redirect(url_for('reportContainer'))
     
+@app.route('/delete_container/<int:certificate_number>', methods=['POST'])
+@login_required
+def delete_container(certificate_number):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete the record from the 'container' table
+        cursor.execute("DELETE FROM container WHERE CertificateNumber = %s", (certificate_number,))
+        conn.commit()
+
+        conn.close()
+        flash('Container record deleted successfully.', 'success')
+    except Exception as e:
+        print(f"Error: {e}")
+        flash('An error occurred while deleting the container record.', 'error')
+
+    return redirect(url_for('reportContainer'))
+
 
 @app.route('/reportContainer1/<int:CertificateNumber>')
 @login_required
