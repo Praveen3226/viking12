@@ -454,9 +454,7 @@ h1 {
         </div>
         <!-- Search Bar -->
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search employees...">
-            <button class="btn" id="searchBtn">Search</button>
-            <button class="btn" id="clearSearchBtn" style="display: none;">Clear Search</button>
+            <input type="text" id="searchInput" placeholder="Search by employee name...">
         </div>
 
         <div class="table-wrapper">
@@ -479,7 +477,7 @@ h1 {
                 </tbody>
             </table>
         </div>
-
+  <div id="searchMessage" style="text-align: center; margin-top: 10px; color: #dc3545; display: none;"></div>
         <div class="delete-controls" id="deleteControls">
             <button class="btn btn-danger" id="confirmDeleteBtn">Confirm Delete</button>
             <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
@@ -701,22 +699,34 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    document.getElementById("searchInput").addEventListener("input", function () {
-        const searchText = this.value.trim().toLowerCase();
-        const rows = document.querySelectorAll("#employeeTableBody tr");
-        document.getElementById("clearSearchBtn").style.display = searchText ? "block" : "none";
+ // Global Search Functionality
+ document.getElementById('searchInput').addEventListener('input', function () {
+    const searchText = this.value.trim().toLowerCase();
+    const rows = document.querySelectorAll('#employeeTableBody tr');
+    const messageElement = document.getElementById('searchMessage');
+    let hasMatches = false;
+    let visibleCount = 0;
 
-        rows.forEach(row => {
-            const matchFound = Array.from(row.querySelectorAll("td")).some(cell => cell.textContent.toLowerCase().includes(searchText));
-            row.style.display = matchFound ? "" : "none";
-        });
+    rows.forEach(row => {
+        const nameCell = row.querySelector('td:nth-child(3)');
+        const name = nameCell.textContent.toLowerCase();
+        const isVisible = name.includes(searchText);
+        
+        row.style.display = isVisible ? '' : 'none';
+        if (isVisible) {
+            visibleCount++;
+            hasMatches = true;
+        }
     });
 
-    document.getElementById("clearSearchBtn").addEventListener("click", function () {
-        document.getElementById("searchInput").value = "";
-        document.getElementById("clearSearchBtn").style.display = "none";
-        document.querySelectorAll("#employeeTableBody tr").forEach(row => row.style.display = "");
-    });
+    // Show/hide no data message
+    if (visibleCount === 0 && searchText.length > 0) {
+        messageElement.textContent = 'No data found';
+        messageElement.style.display = 'block';
+    } else {
+        messageElement.style.display = 'none';
+    }
+});
 
     document.getElementById("hamburger").addEventListener("click", function (e) {
         e.stopPropagation();
