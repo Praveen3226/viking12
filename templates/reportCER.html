@@ -344,6 +344,28 @@
     cursor: pointer;
 }
 
+
+.selection-column {
+        width: 30px;
+        text-align: center;
+    }
+    .delete-header {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 15px;
+    }
+    .bulk-actions {
+        display: none;
+        gap: 10px;
+        align-items: center;
+    }
+    .bulk-actions.active {
+        display: flex;
+    }
+    .checkbox-column {
+        width: 30px;
+        text-align: center;
+    }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -400,6 +422,29 @@
         <div class="search-container">
             <input type="text" id="globalSearch" placeholder="Search by applicant name...">
         </div>
+
+        <!-- Add this HTML below the search container -->
+<div class="delete-header">
+    <div class="bulk-actions" id="bulkActions">
+        <span id="selectedCount">0 selected</span>
+        <button class="btn btn-danger" id="deleteSelected">Delete Selected</button>
+        <button class="btn" id="cancelSelection">Cancel</button>
+    </div>
+    <button class="btn btn-danger" id="enableSelection">
+        <i class="fas fa-trash"></i> Delete Certificates
+    </button>
+</div>
+<!-- Add confirmation modal -->
+<div id="confirmationModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000;">
+    <p>Are you sure you want to delete the selected certificates?</p>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn btn-danger" id="confirmDelete">Delete</button>
+        <button class="btn" id="modalCancel">Cancel</button>
+    </div>
+</div>
+<div id="modalBackdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
+
+
         <!-- Add no results message here -->
         <div id="noResults" style="display: none; text-align: center; padding: 20px; color: #666; font-style: italic;">
             No matching records found for the specified applicant name
@@ -417,6 +462,9 @@
             <table class="custom-table">
                 <thead>
                     <tr>
+                        <th class="checkbox-column">
+                            <input type="checkbox" id="selectAll" style="display: none;">
+                        </th>
                         <th>View Report</th>
                         <th>Status</th>
                         <th>Certificate Number</th>
@@ -432,6 +480,10 @@
                 <tbody>
                     {% for cer in cer_data %}
                     <tr>
+                        <td class="checkbox-column">
+                            <input type="checkbox" class="row-checkbox" style="display: none;" 
+                                   data-id="{{ cer.CertificateNumber }}">
+                        </td>
                         <td><a href="{{ url_for('reportCER1', CertificateNumber=cer.CertificateNumber) }}" class="btn">View</a></td>
                         <td>
                             <div class="status-indicator 
@@ -790,6 +842,8 @@ statusCheckboxes.forEach(checkbox => {
 initialSort();
 applyFilters();  // Initial filter call shows all records
 updateTable();
+
+//AJAX Delete
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -800,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => {
                     if (response.ok) {
-                        location.reload();  // 🔄 Refresh the table automatically
+                        this.closest('tr').remove();  // Remove row from table
                     } else {
                         alert('Error deleting certificate.');
                     }
@@ -808,6 +862,110 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+});
+
+
+// global Delete functionality
+let selectedCertificates = new Set();
+
+function updateSelectionDisplay() {
+    document.getElementById('selectedCount').textContent = `${selectedCertificates.size} selected`;
+    document.getElementById('deleteSelected').disabled = selectedCertificates.size === 0;
+}
+
+function toggleSelectionMode(enable) {
+    document.getElementById('enableSelection').style.display = enable ? 'none' : 'block';
+    document.getElementById('bulkActions').classList.toggle('active', enable);
+    document.querySelectorAll('.row-checkbox, #selectAll').forEach(checkbox => {
+        checkbox.style.display = enable ? 'block' : 'none';
+    });
+    if (!enable) {
+        selectedCertificates.clear();
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateSelectionDisplay();
+    }
+}
+
+// Event listeners
+document.getElementById('enableSelection').addEventListener('click', () => {
+    toggleSelectionMode(true);
+});
+
+document.getElementById('cancelSelection').addEventListener('click', () => {
+    toggleSelectionMode(false);
+});
+
+document.getElementById('selectAll').addEventListener('change', (e) => {
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = e.target.checked;
+        const certId = checkbox.dataset.id;
+        e.target.checked ? selectedCertificates.add(certId) : selectedCertificates.delete(certId);
+    });
+    updateSelectionDisplay();
+});
+
+document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+        const certId = e.target.dataset.id;
+        e.target.checked ? selectedCertificates.add(certId) : selectedCertificates.delete(certId);
+        updateSelectionDisplay();
+    });
+});
+
+// Delete confirmation
+function showConfirmationModal(show) {
+    document.getElementById('confirmationModal').style.display = show ? 'block' : 'none';
+    document.getElementById('modalBackdrop').style.display = show ? 'block' : 'none';
+}
+
+document.getElementById('deleteSelected').addEventListener('click', () => {
+    if (selectedCertificates.size > 0) {
+        showConfirmationModal(true);
+    }
+});
+
+document.getElementById('modalCancel').addEventListener('click', () => {
+    showConfirmationModal(false);
+});
+
+document.getElementById('confirmDelete').addEventListener('click', () => {
+    if (selectedCertificates.size === 0) return;
+
+    fetch('/delete-certificates', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ids: Array.from(selectedCertificates) })
+    })
+    .then(response => {
+        if (response.ok) {
+            // Remove deleted rows from table
+            document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.closest('tr').remove();
+                }
+            });
+            // Update pagination and filters
+            allRows = Array.from(document.querySelectorAll('.custom-table tbody tr'));
+            applyFilters();
+        }
+        showConfirmationModal(false);
+        toggleSelectionMode(false);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting certificates');
+        showConfirmationModal(false);
+    });
+});
+
+// Close modal when clicking backdrop
+document.getElementById('modalBackdrop').addEventListener('click', () => {
+    showConfirmationModal(false);
 });
 </script>
         
