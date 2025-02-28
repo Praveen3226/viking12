@@ -140,6 +140,35 @@ def delete_fcl(certificate_number):
 
     return redirect(url_for('reportFCL'))
 
+@app.route('/delete-certificates', methods=['POST'])  # Removed <int:certificate_ids> from URL
+@login_required
+def delete_certificates():
+    try:
+        data = request.get_json()
+        certificate_ids = data.get('ids', [])
+
+        if not certificate_ids:
+            return jsonify({"error": "No certificate IDs provided"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Ensure there are IDs to delete
+        if certificate_ids:
+            format_strings = ','.join(['%s'] * len(certificate_ids))
+            query = f"DELETE FROM cer WHERE CertificateNumber IN ({format_strings})"
+            cursor.execute(query, tuple(certificate_ids))
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Certificates deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "An error occurred while deleting certificates"}), 500
+
+
 
 @app.route('/reportFCL1/<int:CertificateNumber>')
 @login_required
