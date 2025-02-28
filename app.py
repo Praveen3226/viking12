@@ -100,46 +100,27 @@ def logout():
 
 
 
-@app.route('/reportFCL')
+
+    
+@app.route('/reportCER')
 @login_required
-def reportFCL():
+def reportCER():
     try:
-        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-        # Fetch relevant data from the `form` table
-        cursor.execute("SELECT CertificateNumber, date, applicant_name, container_number ,status FROM form")
-        form = cursor.fetchall()
+        # Fetch all reports
+        cursor.execute("SELECT CertificateNumber, date, applicant_name, shipper, consignee, total_pkgs ,status FROM cer")
+        cer_data = cursor.fetchall()
 
         conn.close()
 
-        # Pass the data to the report.html template
-        return render_template('reportFCL.html', form=form)
-    except Error as e:
-        print(f"Error: {e}")
-        flash('An error occurred while fetching the reports. Please try again.', 'error')
-        return redirect(url_for('reportFCL'))
-
-@app.route('/delete_fcl/<int:certificate_number>', methods=['POST'])
-@login_required
-def delete_fcl(certificate_number):
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Delete the record from the 'form' table
-        cursor.execute("DELETE FROM form WHERE CertificateNumber = %s", (certificate_number,))
-        conn.commit()
-
-        conn.close()
-        flash('FCL report deleted successfully.', 'success')
+        return render_template('reportCER.html', cer_data=cer_data)
     except Exception as e:
         print(f"Error: {e}")
-        flash('An error occurred while deleting the FCL report.', 'error')
-
-    return redirect(url_for('reportFCL'))
-
+        flash('An error occurred while fetching the reports.', 'error')
+        return redirect(url_for('reportCER'))
+    
 @app.route('/delete-certificates', methods=['POST'])  # Removed <int:certificate_ids> from URL
 @login_required
 def delete_certificates():
@@ -167,72 +148,7 @@ def delete_certificates():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "An error occurred while deleting certificates"}), 500
-
-
-
-@app.route('/reportFCL1/<int:CertificateNumber>')
-@login_required
-def reportFCL1(CertificateNumber):
-    conn = None
-    cursor = None
-    try:
-        # Connect to the database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Fetch the report from the `form` table
-        cursor.execute("SELECT * FROM form WHERE CertificateNumber = %s", (CertificateNumber,))
-        form = cursor.fetchone()  # Fetch a single row
-
-        # Handle case where no data is found
-        if not form:
-            flash('No report found for the given Certificate Number.', 'error')
-            return redirect(url_for('reportFCL'))
-
-        # Parse the `consignment_details` JSON string into a Python object
-        if 'consignment_details' in form and form['consignment_details']:
-            try:
-                form['consignment_details'] = json.loads(form['consignment_details'])
-            except json.JSONDecodeError:
-                form['consignment_details'] = []  # Default to an empty list if JSON is invalid
-        else:
-            form['consignment_details'] = []
-
-        # Render the template with the fetched data
-        return render_template('reportFCL1.html', form=form)
-
-    except pymysql.Error as e:
-        print(f"Database Error: {e}")
-        flash('An error occurred while fetching the reports. Please try again.', 'error')
-        return redirect(url_for('reportFCL'))
-
-    finally:
-        # Close cursor and connection
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-    
-@app.route('/reportCER')
-@login_required
-def reportCER():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-
-        # Fetch all reports
-        cursor.execute("SELECT CertificateNumber, date, applicant_name, shipper, consignee, total_pkgs ,status FROM cer")
-        cer_data = cursor.fetchall()
-
-        conn.close()
-
-        return render_template('reportCER.html', cer_data=cer_data)
-    except Exception as e:
-        print(f"Error: {e}")
-        flash('An error occurred while fetching the reports.', 'error')
-        return redirect(url_for('reportCER'))
-    
+       
 @app.route('/delete_cer/<int:certificate_number>', methods=['POST'])
 @login_required
 def delete_cer(certificate_number):
@@ -284,89 +200,15 @@ def reportCER1(CertificateNumber):  # This must match url_for('reportCER1')
         flash("An error occurred while fetching the report.", "error")
         return redirect(url_for("reportCER"))
 
-@app.route('/reportContainer')
-@login_required
-def reportContainer():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-        # Fetch all container records
-        cursor.execute("SELECT CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no ,status FROM container")
-        container_data = cursor.fetchall()
-
-        conn.close()
-
-        return render_template('reportContainer.html', container_data=container_data)
-    except Exception as e:
-        print(f"Error: {e}")
-        flash('An error occurred while fetching the container records.', 'error')
-        return redirect(url_for('reportContainer'))
-    
-@app.route('/delete_container/<int:certificate_number>', methods=['POST'])
-@login_required
-def delete_container(certificate_number):
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Delete the record from the 'container' table
-        cursor.execute("DELETE FROM container WHERE CertificateNumber = %s", (certificate_number,))
-        conn.commit()
-
-        conn.close()
-        flash('Container record deleted successfully.', 'success')
-    except Exception as e:
-        print(f"Error: {e}")
-        flash('An error occurred while deleting the container record.', 'error')
-
-    return redirect(url_for('reportContainer'))
-
-
-@app.route('/reportContainer1/<int:CertificateNumber>')
-@login_required
-def reportContainer1(CertificateNumber):
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-
-        # Fetch the container details based on CertificateNumber
-        cursor.execute("""
-            SELECT * FROM container WHERE CertificateNumber = %s
-        """, (CertificateNumber,))
-        container_details = cursor.fetchone()
-
-        # Debug: print the fetched data
-        print(container_details)  # This will print all fields of container_details
-
-        conn.close()
-
-        if not container_details:
-            flash("No record found for the given Certificate Number.", "error")
-            return redirect(url_for("reportContainer"))
-
-        # Optionally handle any survey data or survey checkboxes if needed
-        survey_data = {}
-        if container_details.get('survey_checkboxes'):
-            try:
-                survey_data = json.loads(container_details['survey_checkboxes'])
-            except json.JSONDecodeError:
-                flash("Error processing survey checkboxes.", "error")
-
-        return render_template('reportContainer1.html', container=container_details, survey_data=survey_data)
-
-    except Exception as e:
-        print(f"Error fetching container report: {e}")
-        flash("An error occurred while fetching the container report.", "error")
-        return redirect(url_for("reportContainer"))
     
 
 #####################################################################
-#                          <--- Admin Certificate --->              #
+#                 <--- Admin Certificate --->                       #
 #  This section handles form submission, updates database records,  #
 #  and ensures data integrity. Admins should review any changes     #
 #  carefully before modifying this section.                         #
-#####################################################################
+##########################START######################################
 
 @app.route('/get_latest_certificate')
 @login_required
@@ -967,13 +809,17 @@ def empemp():
     print("Fetched Form Data:", form_data)  # ✅ Debugging log
 
     return render_template('empemp.html', form=form_data)
+
 #####################################################################
 #                 <--- Admin Container--->                          #
 #  This section handles form submission, updates database records,  #
 #  and ensures data integrity. Admins should review any changes     #
 #  carefully before modifying this section.                         #
-#####################################################################
+#########################START#######################################
 
+#####################################################################
+#                <--- Admin Container Rpt.no --->                   #
+#####################################################################
 @app.route('/get_latest_certificate122')
 @login_required
 def get_latest_certificate122():
@@ -991,6 +837,7 @@ def get_latest_certificate122():
         certificate_data = {"CertificateNumber": "Error", "status": "Error"}
 
     return jsonify(certificate_data)
+
 
 
 @app.route('/container')
@@ -1025,6 +872,10 @@ def container():
 
     # Pass the data to the template instead of returning JSON
     return render_template('container.html', container_data=container_data)
+
+#####################################################################
+#                <--- Admin Container Form --->                     #
+#####################################################################
 
 @app.route('/add_survey', methods=['POST'])
 @login_required
@@ -1108,6 +959,10 @@ def add_survey():
         print(f"Error: {e}")
         flash(f'An error occurred: {e}', 'error')
         return redirect(url_for('container'))
+    
+#####################################################################
+#                <--- Admin Container Edit --->                     #
+#####################################################################
 
 @app.route('/containeredit')
 @login_required
@@ -1131,7 +986,7 @@ def containeredit():
         print(f"Error fetching container records for editing: {e}")
         flash("An error occurred while fetching the container records.", "error")
         return redirect(url_for("containeredit"))
-    
+     
 @app.route('/containeredit1/<int:CertificateNumber>')
 @login_required
 def containeredit1(CertificateNumber):
@@ -1167,7 +1022,11 @@ def containeredit1(CertificateNumber):
         print(f"Error fetching container details: {e}")
         flash("An error occurred while fetching container details.", "error")
         return redirect(url_for("container"))   
-    
+
+#####################################################################
+#                <--- Admin Container Edit --->                     #
+#####################################################################
+
 @app.route('/update_surveyad/<int:CertificateNumber>', methods=['POST'])
 @login_required
 def update_surveyad(CertificateNumber):
@@ -1236,18 +1095,219 @@ def update_surveyad(CertificateNumber):
         flash(f'An error occurred: {e}', 'error')
         return redirect(url_for('admindash'))
 #####################################################################
+#                <--- Admin Container Report --->                   #
+#####################################################################
+@app.route('/reportContainer')
+@login_required
+def reportContainer():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch all container records
+        cursor.execute("SELECT CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no ,status FROM container")
+        container_data = cursor.fetchall()
+
+        conn.close()
+
+        return render_template('reportContainer.html', container_data=container_data)
+    except Exception as e:
+        print(f"Error: {e}")
+        flash('An error occurred while fetching the container records.', 'error')
+        return redirect(url_for('reportContainer'))
+
+#####################################################################
+#         <--- Admin Container Report Delete (Id) --->              #
+#####################################################################
+@app.route('/delete_container/<int:certificate_number>', methods=['POST'])
+@login_required
+def delete_container(certificate_number):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete the record from the 'container' table
+        cursor.execute("DELETE FROM container WHERE CertificateNumber = %s", (certificate_number,))
+        conn.commit()
+
+        conn.close()
+        flash('Container record deleted successfully.', 'success')
+    except Exception as e:
+        print(f"Error: {e}")
+        flash('An error occurred while deleting the container record.', 'error')
+
+    return redirect(url_for('reportContainer'))
+
+#####################################################################
+#     <--- Admin Container Report Global Delete --->                #
+#####################################################################
+
+@app.route('/delete-certificate', methods=['POST']) 
+@login_required
+def delete_certificate():
+    try:
+        data = request.get_json()
+        certificate_ids = data.get('ids', [])
+
+        if not certificate_ids:
+            return jsonify({"error": "No certificate IDs provided"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Ensure there are IDs to delete
+        if certificate_ids:
+            format_strings = ','.join(['%s'] * len(certificate_ids))
+            query = f"DELETE FROM container WHERE CertificateNumber IN ({format_strings})"
+            cursor.execute(query, tuple(certificate_ids))
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Certificates deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "An error occurred while deleting certificates"}), 500
+
+#####################################################################
+#            <--- Admin Container Report (ID)--->                   #
+#####################################################################
+
+@app.route('/reportContainer1/<int:CertificateNumber>')
+@login_required
+def reportContainer1(CertificateNumber):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch the container details based on CertificateNumber
+        cursor.execute("""
+            SELECT * FROM container WHERE CertificateNumber = %s
+        """, (CertificateNumber,))
+        container_details = cursor.fetchone()
+
+        # Debug: print the fetched data
+        print(container_details)  # This will print all fields of container_details
+
+        conn.close()
+
+        if not container_details:
+            flash("No record found for the given Certificate Number.", "error")
+            return redirect(url_for("reportContainer"))
+
+        # Optionally handle any survey data or survey checkboxes if needed
+        survey_data = {}
+        if container_details.get('survey_checkboxes'):
+            try:
+                survey_data = json.loads(container_details['survey_checkboxes'])
+            except json.JSONDecodeError:
+                flash("Error processing survey checkboxes.", "error")
+
+        return render_template('reportContainer1.html', container=container_details, survey_data=survey_data)
+
+    except Exception as e:
+        print(f"Error fetching container report: {e}")
+        flash("An error occurred while fetching the container report.", "error")
+        return redirect(url_for("reportContainer"))
+    
+#####################################################################
 #                 <--- Admin Container--->                          #
 #  This section handles form submission, updates database records,  #
 #  and ensures data integrity. Admins should review any changes     #
 #  carefully before modifying this section.                         #
-#####################################################################
+#########################END#########################################
 
 #####################################################################
 #              <--- Employee Container--->                          #
 #  This section handles form submission, updates database records,  #
 #  and ensures data integrity. Admins should review any changes     #
 #  carefully before modifying this section.                         #
-#####################################################################
+########################START########################################
+
+@app.route('/add_surveyem,', methods=['POST'])
+@login_required
+def add_surveyem():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                
+                # Extract form data
+                CertificateNumber = request.form.get('CertificateNumber', '').strip()
+                date = request.form.get('date', '').strip()
+                applicant_for_survey = request.form.get('applicant_for_survey', '').strip()
+                date_of_inspection = request.form.get('date_of_inspection', '').strip()
+                container_no = request.form.get('container_no', '').strip()
+                place_of_inspection = request.form.get('place_of_inspection', '').strip()
+                container_type = request.form.get('type', '').strip()
+                size = request.form.get('size', '').strip()
+                tare_weight = request.form.get('tare_weight', '').strip()
+                csc_no = request.form.get('csc_no', '').strip()
+                payload_capacity = request.form.get('payload_capacity', '').strip()
+                year_of_manufacture = request.form.get('year_of_manufacture', '').strip()
+                max_gross_weight = request.form.get('max_gross_weight', '').strip()
+                remarks = request.form.get('remarks', '').strip()
+                surveyor = request.form.get('surveyor', '').strip()
+                
+                action = request.form.get('action')  # Get which button was clicked
+
+                # ✅ Determine status based on action
+                if action == "Save as Draft":
+                    status = "Draft"
+                else:
+                    status = "In Progress"
+                    # ✅ Validate required fields only for "Submit"
+                    required_fields = {
+                        "CertificateNumber": CertificateNumber,
+                        "date": date,
+                        "applicant_for_survey": applicant_for_survey,
+                        "date_of_inspection": date_of_inspection,
+                        "container_no": container_no,
+                        "place_of_inspection": place_of_inspection,
+                        "surveyor": surveyor,
+                    }
+
+                    for field, value in required_fields.items():
+                        if not value:
+                            flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
+                            return redirect(url_for('empcontainer'))  # Redirect if a field is missing
+
+                # ✅ Check if CertificateNumber exists
+                cursor.execute("SELECT COUNT(*) AS count FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
+                result = cursor.fetchone()
+
+                if result and result["count"] == 0:
+                    flash(f"Error: Certificate Number {CertificateNumber} not found!", "error")
+                    return redirect(url_for('empforms'))  # Redirect if record does not exist
+
+                # ✅ Update survey record
+                update_query = """
+                    UPDATE container
+                    SET 
+                        date = %s, applicant_for_survey = %s, date_of_inspection = %s, container_no = %s,
+                        place_of_inspection = %s, type = %s, size = %s, tare_weight = %s, csc_no = %s,
+                        payload_capacity = %s, year_of_manufacture = %s, max_gross_weight = %s, 
+                        remarks = %s, surveyor = %s, status = %s
+                    WHERE CertificateNumber = %s
+                """
+                values = (
+                    date or None, applicant_for_survey or None, date_of_inspection or None, container_no or None,
+                    place_of_inspection or None, container_type or None, size or None, tare_weight or None, 
+                    csc_no or None, payload_capacity or None, year_of_manufacture or None, max_gross_weight or None,
+                    remarks or None, surveyor or None, status, CertificateNumber
+                )
+
+                cursor.execute(update_query, values)
+                conn.commit()
+
+                flash('Survey saved as draft!' if status == "Draft" else 'Survey submitted successfully!', 'success')
+                return redirect(url_for('empforms'))  # ✅ Redirect on success
+
+    except Exception as e:
+        print(f"Error: {e}")
+        flash(f'An error occurred: {e}', 'error')
+        return redirect(url_for('empcontainer'))
+    
 @app.route('/empcontainer')
 @login_required
 def empcontainer():
@@ -1415,7 +1475,7 @@ def update_survey(CertificateNumber):
 #  This section handles form submission, updates database records,  #
 #  and ensures data integrity. Admins should review any changes     #
 #  carefully before modifying this section.                         #
-#####################################################################
+##########################END########################################
 
 
 
@@ -1900,12 +1960,129 @@ def update_formad(CertificateNumber):
                 # ✅ Commit changes
                 conn.commit()
                 flash(f"Form saved as draft!" if status == "Draft" else f"Form submitted successfully!", "success")
-                return redirect(url_for("admindash"))  # Redirect to dashboard
+                return redirect(url_for("empdash"))  # Redirect to dashboard
 
     except Exception as e:
         print(f"Error updating form: {e}")
         flash(f"An error occurred: {e}", "error")
         return redirect(url_for("empedit1", CertificateNumber=CertificateNumber))
+
+#####################################################################
+#                   <--- Admin FCL Report--->                       #
+##############################START##################################
+@app.route('/reportFCL')
+@login_required
+def reportFCL():
+    try:
+        # Connect to the database
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch relevant data from the `form` table
+        cursor.execute("SELECT CertificateNumber, date, applicant_name, container_number ,status FROM form")
+        form = cursor.fetchall()
+
+        conn.close()
+
+        # Pass the data to the report.html template
+        return render_template('reportFCL.html', form=form)
+    except Error as e:
+        print(f"Error: {e}")
+        flash('An error occurred while fetching the reports. Please try again.', 'error')
+        return redirect(url_for('reportFCL'))
+
+@app.route('/delete_fcl/<int:certificate_number>', methods=['POST'])
+@login_required
+def delete_fcl(certificate_number):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete the record from the 'form' table
+        cursor.execute("DELETE FROM form WHERE CertificateNumber = %s", (certificate_number,))
+        conn.commit()
+
+        conn.close()
+        flash('FCL report deleted successfully.', 'success')
+    except Exception as e:
+        print(f"Error: {e}")
+        flash('An error occurred while deleting the FCL report.', 'error')
+
+    return redirect(url_for('reportFCL'))
+
+@app.route('/delete-fcl1', methods=['POST'])  # Removed <int:certificate_ids> from URL
+@login_required
+def delete_fcl1():
+    try:
+        data = request.get_json()
+        certificate_ids = data.get('ids', [])
+
+        if not certificate_ids:
+            return jsonify({"error": "No certificate IDs provided"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Ensure there are IDs to delete
+        if certificate_ids:
+            format_strings = ','.join(['%s'] * len(certificate_ids))
+            query = f"DELETE FROM form WHERE CertificateNumber IN ({format_strings})"
+            cursor.execute(query, tuple(certificate_ids))
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Certificates deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "An error occurred while deleting certificates"}), 500
+
+
+
+@app.route('/reportFCL1/<int:CertificateNumber>')
+@login_required
+def reportFCL1(CertificateNumber):
+    conn = None
+    cursor = None
+    try:
+        # Connect to the database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Fetch the report from the `form` table
+        cursor.execute("SELECT * FROM form WHERE CertificateNumber = %s", (CertificateNumber,))
+        form = cursor.fetchone()  # Fetch a single row
+
+        # Handle case where no data is found
+        if not form:
+            flash('No report found for the given Certificate Number.', 'error')
+            return redirect(url_for('reportFCL'))
+
+        # Parse the `consignment_details` JSON string into a Python object
+        if 'consignment_details' in form and form['consignment_details']:
+            try:
+                form['consignment_details'] = json.loads(form['consignment_details'])
+            except json.JSONDecodeError:
+                form['consignment_details'] = []  # Default to an empty list if JSON is invalid
+        else:
+            form['consignment_details'] = []
+
+        # Render the template with the fetched data
+        return render_template('reportFCL1.html', form=form)
+
+    except pymysql.Error as e:
+        print(f"Database Error: {e}")
+        flash('An error occurred while fetching the reports. Please try again.', 'error')
+        return redirect(url_for('reportFCL'))
+
+    finally:
+        # Close cursor and connection
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 #####################################################################
 #                       <--- Admin FCL--->                          #
@@ -2185,35 +2362,7 @@ def add_employee():
         if conn:
             conn.close()
 
-# Route to edit employees (bulk update)
-@app.route('/edit_employee', methods=['POST'])
-def edit_employee():
-    try:
-        data = request.get_json()  # Expecting a list of employees
-        conn = get_db_connection()
-        cursor = conn.cursor()
 
-        for emp in data:
-            empId = emp['empId']
-            name = emp['name']
-            phone = emp['phone']
-            address = emp['address']
-            username = emp['username']
-            password = emp['password']
-
-            cursor.execute('''
-                UPDATE employees
-                SET name = %s, phone = %s, address = %s, username = %s, password = %s
-                WHERE empId = %s
-            ''', (name, phone, address, username, password, empId))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({'message': 'Employees updated successfully!'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 # Route to delete employees
 @app.route('/delete_employees', methods=['POST'])
@@ -2222,23 +2371,29 @@ def delete_employees():
         data = request.get_json()
         employee_ids = data.get('ids', [])
 
+        # Ensure all IDs are valid integers
+        employee_ids = [emp_id for emp_id in employee_ids if emp_id.strip().isdigit()]
+
         if not employee_ids:
-            return jsonify({'error': 'No employees selected'}), 400
+            return jsonify({'error': 'No valid employees selected'}), 400
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Correct SQL query using tuple formatting
+        # Execute the delete query safely
         query = 'DELETE FROM employees WHERE empId IN ({})'.format(','.join(['%s'] * len(employee_ids)))
-        cursor.execute(query, tuple(employee_ids))
+        cursor.execute(query, tuple(map(int, employee_ids)))  # Convert IDs to integers before executing
 
         conn.commit()
         cursor.close()
         conn.close()
 
         return jsonify({'message': 'Employees deleted successfully!'}), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
