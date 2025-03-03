@@ -289,7 +289,6 @@ def submit_cer():
         port_of_discharge = request.form.get('portOfDischarge', '').strip()
         sb_number = request.form.get('sb_number', '').strip()
         cf_agent = request.form.get('cf_agent', '').strip()
-        container_number = request.form.get('container_number', '').strip()
         action = request.form.get('action')  # Determine if saving as draft or submitting
 
         def safe_float(value):
@@ -341,7 +340,6 @@ def submit_cer():
                 "Commodity": commodity,
                 "Port of Discharge": port_of_discharge,
                 "Surveyor": cf_agent,
-                "Container Number": container_number
             }
             for field, value in required_fields.items():
                 if not value:
@@ -358,13 +356,13 @@ def submit_cer():
                         UPDATE cer SET 
                             date = %s, applicant_name = %s, shipper = %s, consignee = %s, 
                             commodity = %s, port_of_discharge = %s, sb_number = %s, quantity = %s, 
-                            gross_weight = %s, cf_agent = %s, container_number = %s, 
+                            gross_weight = %s, cf_agent = %s, 
                             total_volume = %s, total_pkgs = %s, survey_data = %s, status = %s
                         WHERE CertificateNumber = %s
                     """
                     cursor.execute(update_query, (
                         date, applicant_name, shipper, consignee, commodity, port_of_discharge,
-                        sb_number, quantity, gross_weight, cf_agent, container_number,
+                        sb_number, quantity, gross_weight, cf_agent,
                         total_volume, total_pkgs, survey_data_json, status, certificate_number
                     ))
                 else:
@@ -908,7 +906,7 @@ def add_survey():
                     status = "Draft"
                 else:
                     status = "In Progress"
-                    # ✅ Validate required fields only for "Submit"
+                    # ✅ Validate required fields only for "Submit" and "Submit and New"
                     required_fields = {
                         "CertificateNumber": CertificateNumber,
                         "date": date,
@@ -924,11 +922,11 @@ def add_survey():
                             flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
                             return redirect(url_for('container'))  # Redirect if a field is missing
 
-                # ✅ Check if CertificateNumber exists
+                # ✅ Check if CertificateNumber exists before updating
                 cursor.execute("SELECT COUNT(*) AS count FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
                 result = cursor.fetchone()
 
-                if result and result["count"] == 0:
+                if not result or result["count"] == 0:
                     flash(f"Error: Certificate Number {CertificateNumber} not found!", "error")
                     return redirect(url_for('forms'))  # Redirect if record does not exist
 
@@ -953,12 +951,20 @@ def add_survey():
                 conn.commit()
 
                 flash('Survey saved as draft!' if status == "Draft" else 'Survey submitted successfully!', 'success')
-                return redirect(url_for('forms'))  # ✅ Redirect on success
+
+                # ✅ Redirect based on action
+                if action == "Submit and New":
+                    return redirect(url_for('container'))  # Redirect to form for new entry
+                return redirect(url_for('forms'))  # Default redirect to forms page
 
     except Exception as e:
-        print(f"Error: {e}")
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in add_survey: {e}")
+
         flash(f'An error occurred: {e}', 'error')
-        return redirect(url_for('container'))
+        return redirect(url_for('container'))  # Redirect to avoid data loss
+
     
 #####################################################################
 #                <--- Admin Container Edit --->                     #
