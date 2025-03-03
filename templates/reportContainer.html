@@ -662,6 +662,23 @@ h1 {
         document.getElementById('nextPage').disabled = currentPage === totalPages;
     }
 
+
+    //prev page
+document.getElementById('prevPage').addEventListener('click', () => {
+    currentPage--;
+    updateTable();
+});
+
+//nextpage
+document.getElementById('nextPage').addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredRows.length / entriesPerPage);
+    
+    if (currentPage < totalPages) {
+        currentPage++; // Increment by 1 only
+        updateTable();
+    }
+});
+
     // Search functionality
     document.getElementById('globalSearch').addEventListener('input', function(e) {
     applyFilters(); // This will handle the search through the applyFilters function
