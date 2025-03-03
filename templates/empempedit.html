@@ -461,9 +461,8 @@
                 <!-- Dropdown Menu -->
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a href="{{ url_for('admindash') }}">Home</a></li>
-                        <li><a href="{{ url_for('forms') }}">Forms</a></li>
-                        <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+                        <li><a href="{{ url_for('empdash') }}">Home</a></li>
+                        <li><a href="{{ url_for('empforms') }}">Forms</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     </ul>
                 </div>
@@ -471,9 +470,8 @@
                 <!-- Original Navigation Links -->
                 <nav class="nav-links">
                     <ul>
-                        <li><a href="{{ url_for('admindash') }}">Home</a></li>
-                        <li><a href="{{ url_for('forms') }}">Forms</a></li>
-                        <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+                        <li><a href="{{ url_for('empdash') }}">Home</a></li>
+                        <li><a href="{{ url_for('empforms') }}">Forms</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     </ul>
                 </nav>
@@ -670,6 +668,24 @@
         document.getElementById('prevPage').disabled = currentPage === 1;
         document.getElementById('nextPage').disabled = currentPage === totalPages;
     }
+
+    //nextpage
+document.getElementById('nextPage').addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredRows.length / entriesPerPage);
+    
+    if (currentPage < totalPages) {
+        currentPage++; // Increment by 1 only
+        updateTable();
+    }
+});
+
+    //prev page
+    document.getElementById('prevPage').addEventListener('click', () => {
+    currentPage--;
+    updateTable();
+});
+
+
 
     document.getElementById('globalSearch').addEventListener('input', function(e) {
             applyFilters(); // This will handle the search through the applyFilters function
