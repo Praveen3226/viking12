@@ -564,6 +564,18 @@ h1 {
 
   </div>  
   <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        function updateApplicantName() {
+            const title = document.getElementById("applicantTitle").value;
+            const name = document.getElementById("applicantNameInput").value.trim();
+            document.getElementById("applicant_for_survey").value = title + " " + name;
+        }
+
+        // Update hidden field on change
+        document.getElementById("applicantTitle").addEventListener("change", updateApplicantName);
+        document.getElementById("applicantNameInput").addEventListener("input", updateApplicantName);
+    });
+
     document.addEventListener("DOMContentLoaded", function () {
     fetch("/get_latest_certificate122", { headers: { "X-Requested-With": "XMLHttpRequest" } })  
         .then(response => response.json())  
