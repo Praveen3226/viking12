@@ -426,14 +426,17 @@ h1 {
         <div>
           <label class="block text-sm font-semibold">Applicant for Survey:</label>
           <div class="flex gap-2">
-            <select class="border border-gray-300 p-1" name="applicant_title">
-                <option value="Mr">Mr</option>
-                <option value="Mrs">Mrs</option>
-            </select>
-            <input type="text" name="applicant_for_survey" id="applicantNameInput"  class="border border-gray-300 p-1 w-full"/>
-        </div>
-        <input type="hidden" name="applicant_for_survey" id="applicantName" />
-    </div>
+              <select id="applicantTitle" class="border border-gray-300 p-1">
+                  <option value="Mr">Mr.</option>
+                  <option value="Mrs">M/s</option>
+              </select>
+              <input type="text" id="applicantNameInput" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <!-- Hidden input field to store the full name -->
+          <input type="hidden" name="applicant_for_survey" id="applicant_for_survey" />
+      </div>
+
+    
     <div>
         <label class="block text-sm font-semibold">Date of Inspection:</label>
         <input type="date" name="date_of_inspection" class="border border-gray-300 p-1 w-full"/>
@@ -605,13 +608,13 @@ h1 {
   <script>
             document.addEventListener("DOMContentLoaded", function() {
         function updateApplicantName() {
-            const title = document.getElementById("applicant_title").value;
+            const title = document.getElementById("applicantTitle").value;
             const name = document.getElementById("applicantNameInput").value.trim();
-            document.getElementById("applicantNameInput").value = title + " " + name;
+            document.getElementById("applicant_for_survey").value = title + " " + name;
         }
 
         // Update hidden field on change
-        document.getElementById("applicant_title").addEventListener("change", updateApplicantName);
+        document.getElementById("applicantTitle").addEventListener("change", updateApplicantName);
         document.getElementById("applicantNameInput").addEventListener("input", updateApplicantName);
     });
 
