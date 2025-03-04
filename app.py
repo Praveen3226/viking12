@@ -18,7 +18,7 @@ def get_db_connection():
     return pymysql.connect(
         host="localhost",
         user="root",
-        password="Money2035",
+        password="codesql",
         database="leads",
         cursorclass=pymysql.cursors.DictCursor  # Ensures dictionary output
 
@@ -35,7 +35,7 @@ def login_required(f):
     def wrap(*args, **kwargs):
         if 'username' not in session:
             flash("⚠️ You must log in first!", "error")
-            return redirect(url_for('login'))
+            return redirect(url_for('Viking'))
         return f(*args, **kwargs)
     wrap.__name__ = f.__name__
     return wrap
@@ -48,8 +48,8 @@ def index():
 
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/Viking', methods=['GET', 'POST'])
+def Viking():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -89,13 +89,13 @@ def login():
             cursor.close()
             connection.close()
 
-    return render_template('login.html')
+    return render_template('Viking.html')
 
 @app.route('/logout')
 def logout():
     session.clear()  # Clear session data
     flash("Logged out successfully!", "success")
-    return redirect(url_for('login'))
+    return redirect(url_for('Viking'))
 
 
 
@@ -275,6 +275,7 @@ def certificate():
         return "Error generating certificate", 500
 
     
+#CER    
 @app.route('/submit_cer', methods=['POST'])
 @login_required
 def submit_cer():
@@ -304,22 +305,27 @@ def submit_cer():
         rows = len(request.form.getlist('marksNos[]'))
         for i in range(rows):
             marks_no = request.form.getlist('marksNos[]')[i].strip() or None
-            no_of_pkgs = int(request.form.getlist('noOfPkgs[]')[i]) if request.form.getlist('noOfPkgs[]')[i].strip() else None
+            no_of_pkgs = (
+                int(request.form.getlist('noOfPkgs[]')[i])
+                if request.form.getlist('noOfPkgs[]')[i].strip()
+                else None
+            )
             length = safe_float(request.form.getlist('length[]')[i])
             breadth = safe_float(request.form.getlist('breadth[]')[i])
             height = safe_float(request.form.getlist('height[]')[i])
             volume_unit = safe_float(request.form.getlist('volumeUnit[]')[i])
             volume_cum = safe_float(request.form.getlist('volumePerUnit[]')[i])
-            survey_data.append({
-                'marks_no': marks_no,
-                'no_of_pkgs': no_of_pkgs,
-                'length': length,
-                'breadth': breadth,
-                'height': height,
-                 'volume_unit': volume_unit,
-                'volumePerUnit' : volume_cum,
-               
-            })
+            survey_data.append(
+                {
+                    'marks_no': marks_no,
+                    'no_of_pkgs': no_of_pkgs,
+                    'length': length,
+                    'breadth': breadth,
+                    'height': height,
+                    'volume_unit': volume_unit,
+                    'volumePerUnit': volume_cum,
+                }
+            )
 
         # Get total volume and total packages from frontend (instead of calculating)
         total_volume = safe_float(request.form.get('totalVolume', ''))
@@ -348,7 +354,10 @@ def submit_cer():
 
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT CertificateNumber FROM cer WHERE CertificateNumber = %s", (certificate_number,))
+                cursor.execute(
+                    "SELECT CertificateNumber FROM cer WHERE CertificateNumber = %s",
+                    (certificate_number,),
+                )
                 exists = cursor.fetchone()
 
                 if exists:
@@ -360,24 +369,48 @@ def submit_cer():
                             total_volume = %s, total_pkgs = %s, survey_data = %s, status = %s
                         WHERE CertificateNumber = %s
                     """
-                    cursor.execute(update_query, (
-                        date, applicant_name, shipper, consignee, commodity, port_of_discharge,
-                        sb_number, quantity, gross_weight, cf_agent,
-                        total_volume, total_pkgs, survey_data_json, status, certificate_number
-                    ))
+                    cursor.execute(
+                        update_query,
+                        (
+                            date,
+                            applicant_name,
+                            shipper,
+                            consignee,
+                            commodity,
+                            port_of_discharge,
+                            sb_number,
+                            quantity,
+                            gross_weight,
+                            cf_agent,
+                            total_volume,
+                            total_pkgs,
+                            survey_data_json,
+                            status,
+                            certificate_number,
+                        ),
+                    )
                 else:
                     flash("Error: Certificate number not found in database.", "error")
                     return redirect(url_for('forms'))
 
                 conn.commit()
 
-        flash('Form saved as draft!' if status == "Draft" else 'Form submitted successfully!', 'success')
-        return redirect(url_for('forms'))
+        flash(
+            'Form saved as draft!' if status == "Draft" else 'Form submitted successfully!',
+            'success',
+        )
+
+        # ✅ Redirect based on action
+        if action == "Submit and New":
+            return redirect(url_for('certificate'))  # Redirect to form for new entry
+        
+        return redirect(url_for('forms'))  # Default redirect to forms page
 
     except Exception as e:
         print(f"Error: {e}")
         flash(f'An error occurred while processing the form. Error: {e}', 'error')
         return redirect(url_for('forms'))
+    
 
 
 @app.route('/certificateedit')
@@ -1681,9 +1714,12 @@ def get_containers():
 
 
 
+#FCL FORM in app.py 
 @app.route('/submit', methods=['POST'])
 @login_required
 def submit():
+    conn = None
+    cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -1713,39 +1749,40 @@ def submit():
         gross_weight = request.form.get('grossWeight', '').strip()
 
         # Get button action
-        action = request.form.get('action')
+        action = request.form.get('action', '')
 
         # ✅ Determine status based on action
-        if action == "Save as Draft":
-            status = "Draft"
-        else:
-            status = "Completed"
-            # ✅ Validate required fields only for "Submit"
+        status = "Draft" if action == "Save as Draft" else "Completed"
+
+        # ✅ Validate required fields only for "Submit"
+        if status == "Completed":
             required_fields = {
-                "CertificateNumber": CertificateNumber,
-                "date": date,
-                "applicant_name": applicant_name,
-                "container_number": container_number,
-                "surveyor_name": surveyor_name
+                "Certificate Number": CertificateNumber,
+                "Date": date,
+                "Applicant Name": applicant_name,
+                "Container Number": container_number,
+                "Surveyor Name": surveyor_name
             }
 
             for field, value in required_fields.items():
                 if not value:
-                    flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
+                    flash(f"Error: {field} is required!", "error")
                     return redirect(url_for("forms"))
 
         # ✅ Parse and validate consignment details safely
         consignment_details = request.form.get('consignmentDetails', '[]').strip()
+        try:
+            consignment_details = json.loads(consignment_details)
+            if not isinstance(consignment_details, list):
+                consignment_details = []  # Ensure it's always a list
+        except json.JSONDecodeError:
+            consignment_details = []  # Default to empty list if invalid
 
-        if not consignment_details:  # If empty, set to an empty list
-            consignment_details = []
-        else:
-            try:
-                consignment_details = json.loads(consignment_details)
-                if not isinstance(consignment_details, list):
-                    consignment_details = []  # Ensure it's always a list
-            except json.JSONDecodeError:
-                consignment_details = []  # Default to empty list if invalid
+        # ✅ Check if Certificate Number exists before updating
+        cursor.execute("SELECT 1 FROM form WHERE CertificateNumber = %s", (CertificateNumber,))
+        if not cursor.fetchone():
+            flash("Error: Certificate Number not found in the database.", "error")
+            return redirect(url_for("forms"))
 
         # ✅ Update the form entry
         update_form_query = """
@@ -1759,49 +1796,45 @@ def submit():
             WHERE CertificateNumber = %s
         """
 
-        values = (
-            date or None, applicant_name or None, container_number or None, size_type or None, 
-            tare_weight or None, payload_capacity or None, declared_total_weight or None, 
-            stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None, 
-            port_of_discharge or None, place_of_stuffing or None, cbm or None, gross_weight or None, 
-            loading_condition or None, lashing or None, others or None, weather_condition or None, 
-            surveyor_name or None, signature or None, totalPackages or None, json.dumps(consignment_details), 
+        cursor.execute(update_form_query, (
+            date or None, applicant_name or None, container_number or None, size_type or None,
+            tare_weight or None, payload_capacity or None, declared_total_weight or None,
+            stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None,
+            port_of_discharge or None, place_of_stuffing or None, cbm or None, gross_weight or None,
+            loading_condition or None, lashing or None, others or None, weather_condition or None,
+            surveyor_name or None, signature or None, totalPackages or None, json.dumps(consignment_details),
             status, CertificateNumber
-        )
-
-        cursor.execute(update_form_query, values)
+        ))
 
         # ✅ If submitting, update container and consignment status
         if status == "Completed":
-            update_container_query = """
-                UPDATE container
-                SET status = 'Completed'
-                WHERE container_no = %s AND status = 'In Progress'
-            """
-            cursor.execute(update_container_query, (container_number,))
+            cursor.execute(
+                "UPDATE container SET status = 'Completed' WHERE container_no = %s AND status = 'In Progress'",
+                (container_number,)
+            )
 
             # ✅ Update related consignments
             consignment_ids = [item["id"] for item in consignment_details if "id" in item]
             if consignment_ids:
                 format_strings = ",".join(["%s"] * len(consignment_ids))
-                update_consignment_query = f"""
-                    UPDATE cer
-                    SET status = 'Completed'
-                    WHERE id IN ({format_strings})
-                """
-                cursor.execute(update_consignment_query, tuple(consignment_ids))
+                cursor.execute(
+                    f"UPDATE cer SET status = 'Completed' WHERE id IN ({format_strings})",
+                    tuple(consignment_ids)
+                )
 
         # ✅ Commit changes
         conn.commit()
 
         flash("Form saved as draft!" if status == "Draft" else "Form submitted successfully!", "success")
-        return redirect(url_for("forms"))
+
+        # ✅ Redirect based on action
+        return redirect(url_for('emp')) if action == "Submit and New" else redirect(url_for("forms"))
 
     except Exception as e:
         print(f"Error: {e}")
-        flash(f"An error occurred: {e}", "error")
-        return redirect(url_for("forms"))
-
+        flash(f'An error occurred while processing the form. Error: {e}', 'error')
+        return redirect(url_for('forms'))
+    
     finally:
         if cursor:
             cursor.close()
