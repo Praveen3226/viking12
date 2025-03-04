@@ -392,21 +392,17 @@ h1 {
 
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-            <label class="block text-sm font-semibold">Applicant for Survey:</label>
-            <div class="flex gap-2">
-                <select class="border border-gray-300 p-1" name="applicant_title">
-                    <option value="Mr">Mr</option>
-                    <option value="Mrs">Mrs</option>
-                </select>
-                <input type="text" name="applicant_for_survey" class="border border-gray-300 p-1 w-full"/>
-            </div>
-        </div>
-        <div>
-            <label class="block text-sm font-semibold">Date of Inspection:</label>
-            <input type="date" name="date_of_inspection" class="border border-gray-300 p-1 w-full"/>
-        </div>
-        <!-- Other fields remain unchanged -->
-    </div>
+          <label class="block text-sm font-semibold">Applicant for Survey:</label>
+          <div class="flex gap-2">
+              <select id="applicantTitle" class="border border-gray-300 p-1">
+                  <option value="Mr">Mr.</option>
+                  <option value="Mrs">M/s</option>
+              </select>
+              <input type="text" id="applicantNameInput" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <!-- Hidden input field to store the full name -->
+          <input type="hidden" name="applicant_for_survey" id="applicant_for_survey" />
+      </div>
         <div>
           <label class="block text-sm font-semibold">Date of Inspection:</label>
           <input type="date" name="date_of_inspection" class="border border-gray-300 p-1 w-full"/>
