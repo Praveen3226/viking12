@@ -18,7 +18,7 @@ def get_db_connection():
     return pymysql.connect(
         host="localhost",
         user="root",
-        password="codesql",
+        password="Money2035",
         database="leads",
         cursorclass=pymysql.cursors.DictCursor  # Ensures dictionary output
 
@@ -35,7 +35,7 @@ def login_required(f):
     def wrap(*args, **kwargs):
         if 'username' not in session:
             flash("⚠️ You must log in first!", "error")
-            return redirect(url_for('Viking'))
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     wrap.__name__ = f.__name__
     return wrap
@@ -48,8 +48,8 @@ def index():
 
 
 
-@app.route('/Viking', methods=['GET', 'POST'])
-def Viking():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -89,13 +89,13 @@ def Viking():
             cursor.close()
             connection.close()
 
-    return render_template('Viking.html')
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.clear()  # Clear session data
     flash("Logged out successfully!", "success")
-    return redirect(url_for('Viking'))
+    return redirect(url_for('login'))
 
 
 
