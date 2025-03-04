@@ -608,13 +608,16 @@ overflow-y: auto;
                 <tr>
                     <th>Applicant Name</th>
                     <td>
-                        <select id="applicantTitle" name="applicantTitle" style="width: 20%; margin-right: 10px;">
-                            <option value="Mr">Mr</option>
-                            <option value="Mrs">Mrs</option>
-
+                        <select id="applicantTitle" class="border border-gray-300 p-1">
+                            <option value="Mr.">Mr.</option>
+                            <option value="M/s">M/s</option>
                         </select>
-                        <input type="text" id="applicantName" name="applicantName" style="width: 75%;">
+                        <input type="text" id="applicantNameInput" class="border border-gray-300 p-1 w-full"/>
+                        <input type="hidden" name="applicantName" id="applicantName" />
                     </td>
+
+                   
+
                 </tr>
                 <tr>
                     <th>Container Number</th>
@@ -774,6 +777,18 @@ overflow-y: auto;
     </footer>
     </div>
     <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function updateApplicantName() {
+            const title = document.getElementById("applicantTitle").value;
+            const name = document.getElementById("applicantNameInput").value.trim();
+            document.getElementById("applicantName").value = title + " " + name;
+        }
+
+        // Update hidden field when dropdown or input changes
+        document.getElementById("applicantTitle").addEventListener("change", updateApplicantName);
+        document.getElementById("applicantNameInput").addEventListener("input", updateApplicantName);
+    });
+
 
                 //flash message
                 setTimeout(() => {
