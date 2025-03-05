@@ -446,7 +446,7 @@ h1 {
         </div>
 
       <!-- Radio Box Questions in Table Format -->
-      </div>
+    </div>
       <div class="table-container overflow-x-auto">
 <table class="w-full mb-4 light-border">
   <tbody>
@@ -553,7 +553,10 @@ h1 {
                 onmouseout="this.style.backgroundColor='#007bff'">
             Submit
         </button>
+        <button type="submit" id="submitNew" class="bg-green-500 text-white px-4 py-2 rounded">Submit and New</button>
+
     </div>
+ 
 
 
 
@@ -564,6 +567,21 @@ h1 {
 
   </div>  
   <script>
+        document.getElementById("submitNew").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        let form = document.querySelector("form");
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "action";
+        input.value = "Submit and New";
+        form.appendChild(input);
+        form.submit();
+        
+        // Redirect after form submission
+        form.addEventListener("submit", function() {
+            window.location.href = "{{ url_for('empcontainer') }}";
+        });
+    });
       document.addEventListener("DOMContentLoaded", function() {
         function updateApplicantName() {
             const title = document.getElementById("applicantTitle").value;
