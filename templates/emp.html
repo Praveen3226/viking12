@@ -453,6 +453,29 @@ overflow-y: auto;
             z-index: 9999; /* Ensure it stays on top of other elements */
     }
 
+
+/*Search bar for container and consignee*/
+/* Search Bar Styles */
+.search-container {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #646cff;
+  outline: none;
+}
 </style>
 </head>
 <body>
@@ -543,7 +566,9 @@ overflow-y: auto;
             <div id="add-container-modal" class="modal">
                 <div class="modal-content">
                     <div class="custom-table-container">
-
+                        <div class="search-container">
+                            <input type="text" class="search-input"  id="containerSearch" placeholder="Search all columns...">
+                          </div>
                     <h4>Select Container Details</h4>
                     <div class="table-wrapper">
                     <table class="custom-table">
@@ -573,7 +598,9 @@ overflow-y: auto;
                 <div class="modal-content">
 
                 <div class="custom-table-container">
-
+                    <div class="search-container">
+                        <input type="text" class="search-input"  id="consignmentSearch" placeholder="Search all columns...">
+                      </div>
                     <h4>Select Consignment Details</h4>
                     <div class="table-wrapper">
                     <table class="custom-table">
@@ -1053,6 +1080,90 @@ document.addEventListener('DOMContentLoaded', function() {
             backdrop.classList.remove('active');
         });
     });
+});
+
+
+// Table search functionality
+// Container Search Handler
+document.getElementById('containerSearch').addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    const tbody = document.querySelector('#add-container-modal tbody');
+    const rows = tbody.querySelectorAll('tr');
+    let hasMatches = false;
+
+    // Remove any existing "no data" messages
+    tbody.querySelectorAll('.no-data-row').forEach(row => row.remove());
+
+    rows.forEach(row => {
+        // Skip existing message rows
+        if (row.classList.contains('no-data-row')) return;
+
+        const cells = row.querySelectorAll('td');
+        let match = false;
+        
+        // Check all columns except checkbox
+        for(let i=1; i<cells.length; i++) {
+            if(cells[i].textContent.toLowerCase().includes(term)) {
+                match = true;
+                break;
+            }
+        }
+        
+        if (match) {
+            row.style.display = '';
+            hasMatches = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    if (!hasMatches) {
+        const messageRow = document.createElement('tr');
+        messageRow.className = 'no-data-row';
+        messageRow.innerHTML = `<td colspan="8" style="text-align: center; padding: 20px;">No data found matching "${term}"</td>`;
+        tbody.appendChild(messageRow);
+    }
+});
+
+// Consignment Search Handler
+document.getElementById('consignmentSearch').addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    const tbody = document.querySelector('#modal tbody');
+    const rows = tbody.querySelectorAll('tr');
+    let hasMatches = false;
+
+    // Remove any existing "no data" messages
+    tbody.querySelectorAll('.no-data-row').forEach(row => row.remove());
+
+    rows.forEach(row => {
+        // Skip existing message rows
+        if (row.classList.contains('no-data-row')) return;
+
+        const cells = row.querySelectorAll('td');
+        let match = false;
+        
+        // Check all columns except checkbox
+        for(let i=1; i<cells.length; i++) {
+            if(cells[i].textContent.toLowerCase().includes(term)) {
+                match = true;
+                break;
+            }
+        }
+        
+        if (match) {
+            row.style.display = '';
+            hasMatches = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    if (!hasMatches) {
+        const messageRow = document.createElement('tr');
+        messageRow.className = 'no-data-row';
+        messageRow.innerHTML = `<td colspan="10" style="text-align: center; padding: 20px;">No data found matching "${term}"</td>`;
+        tbody.appendChild(messageRow);
+    }
 });
 
 </script>    
