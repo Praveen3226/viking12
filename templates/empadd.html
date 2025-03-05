@@ -582,55 +582,74 @@ h1 {
             alert('Edit cancelled. No changes were saved.');
         });
 
-        document.getElementById('deleteEmployeeBtn').addEventListener('click', () => {
-            const thead = document.querySelector('.employee-table thead tr');
-            const rows = document.querySelectorAll('#employeeTableBody tr');
+        document.getElementById("deleteEmployeeBtn").addEventListener("click", () => {
+        const thead = document.querySelector(".employee-table thead tr");
+        const rows = document.querySelectorAll("#employeeTableBody tr");
 
-            if (!document.querySelector('.employee-table thead th.checkbox-cell')) {
-                const newCheckboxHeader = document.createElement('th');
-                newCheckboxHeader.className = 'checkbox-cell';
-                newCheckboxHeader.textContent = 'Select';
-                thead.prepend(newCheckboxHeader);
+        if (!document.querySelector(".employee-table thead th.checkbox-cell")) {
+            const newCheckboxHeader = document.createElement("th");
+            newCheckboxHeader.className = "checkbox-cell";
+            newCheckboxHeader.textContent = "Select";
+            thead.prepend(newCheckboxHeader);
 
-                rows.forEach(row => {
-                    const checkboxCell = document.createElement('td');
-                    checkboxCell.className = 'checkbox-cell';
-                    checkboxCell.innerHTML = `<input type="checkbox" class="employee-checkbox">`;
-                    row.prepend(checkboxCell);
+            rows.forEach((row) => {
+                const checkboxCell = document.createElement("td");
+                checkboxCell.className = "checkbox-cell";
+                checkboxCell.innerHTML = `<input type="checkbox" class="employee-checkbox">`;
+                row.prepend(checkboxCell);
+            });
+        }
+
+        document.getElementById("deleteControls").style.display = "flex";
+    });
+
+    document.getElementById("cancelDeleteBtn").addEventListener("click", () => {
+        document.querySelectorAll(".employee-table thead th.checkbox-cell, .employee-table td.checkbox-cell").forEach(cell => cell.remove());
+        document.getElementById("deleteControls").style.display = "none";
+    });
+
+    document.getElementById("confirmDeleteBtn").addEventListener("click", async () => {
+        const selectedCheckboxes = document.querySelectorAll(".employee-checkbox:checked");
+        if (selectedCheckboxes.length === 0) {
+            alert("Please select at least one employee to delete.");
+            return;
+        }
+
+        const employeeIds = Array.from(selectedCheckboxes).map(checkbox => {
+            return checkbox.closest("tr").querySelector("td:nth-child(2)").textContent.trim(); // Ensure correct column
+        });
+
+        console.log("Selected Employee IDs:", employeeIds);
+
+        if (employeeIds.length === 0 || employeeIds.some(id => id === "")) {
+            alert("Error: Unable to retrieve employee IDs.");
+            return;
+        }
+
+        if (confirm(`Are you sure you want to delete ${employeeIds.length} employee(s)?`)) {
+            try {
+                const response = await fetch("/delete_employees", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ids: employeeIds }),
                 });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || "Failed to delete employees");
+                }
+
+                selectedCheckboxes.forEach(checkbox => checkbox.closest("tr").remove());
+
+                document.getElementById("cancelDeleteBtn").click();
+                alert("Selected employees have been deleted.");
+            } catch (error) {
+                console.error("Error deleting employees:", error);
+                alert("Error: " + error.message);
             }
+        }
+    });
 
-            document.getElementById('deleteControls').style.display = 'flex';
-        });
-
-        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
-            const checkboxHeader = document.querySelector('.employee-table thead th.checkbox-cell');
-            if (checkboxHeader) {
-                checkboxHeader.remove();
-            }
-
-            const checkboxCells = document.querySelectorAll('.employee-table td.checkbox-cell');
-            checkboxCells.forEach(cell => cell.remove());
-
-            document.getElementById('deleteControls').style.display = 'none';
-        });
-
-        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-            const selectedRows = document.querySelectorAll('.employee-checkbox:checked');
-            if (selectedRows.length === 0) {
-                alert('Please select at least one employee to delete.');
-                return;
-            }
-
-            if (confirm(`Are you sure you want to delete ${selectedRows.length} employee(s)?`)) {
-                selectedRows.forEach(checkbox => {
-                    checkbox.closest('tr').remove();
-                });
-
-                document.getElementById('cancelDeleteBtn').click();
-                alert('Selected employees have been deleted.');
-            }
-        });
 
         function generatePassword(username) {
             const firstThreeLetters = username.substring(0, 3).toUpperCase();
