@@ -13,14 +13,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dasboard.css') }}">
     <link href="https://fonts.cdnfonts.com/css/cooper-black" rel="stylesheet">
     <style>
-/* @import url('https://fonts.cdnfonts.com/css/cooper-black'); 
+ @import url('https://fonts.cdnfonts.com/css/cooper-black'); 
 
 h1 {
     font-family: 'Cooper Black', sans-serif;
-    font-size: 48px; 
+    font-size: 34px; 
     text-align: center; 
     color: #da3936;
-} */
+    padding-left: 130px /* Adjust this value as needed */
+} 
         h1 {
             -webkit-text-fill-color: #da3936;
         }
@@ -131,6 +132,16 @@ h1 {
         }
 
         /* Responsive adjustments */
+
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 24px; /* Even smaller font size for mobile phones */
+        padding-left: 10px; /* Minimal padding for very small screens */
+    }
+}
+
+
         @media (max-width: 768px) {
             aside.sidebar {
                 display: none;
@@ -278,6 +289,12 @@ h1 {
             .nav-bar {
                 flex-wrap: wrap;
             }
+
+            .h1 {
+                font-size: 36px; /* Smaller font size for tablets */
+                padding-left: 20px; /* Reduced padding for smaller screens */
+            }
+        
         }
 
 
@@ -301,7 +318,7 @@ h1 {
     <!-- Navigation Bar -->
     <div class="nav-bar">
         <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo" style=height:70px; display:inline-block; margin-right:35px;>
-        <h1 class="text-2xl font-bold" style="color: #da3936;">VIKING MARINE INC.</h1>
+        <h1 class="text-2xl font-bold" style="color: rgba(253, 0, 0, 1);">VIKING MARINE INC.</h1>
 
         <nav class="nav-links">
             <ul>
