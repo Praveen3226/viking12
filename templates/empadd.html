@@ -446,7 +446,6 @@ h1 {
 
         <div class="action-buttons">
             <button class="btn" id="addEmployeeBtn">Add Employee</button>
-                        <button class="btn" id="editEmployeeBtn">Edit Employee</button>
             <button class="btn" id="deleteEmployeeBtn">Delete Employee</button>
         </div>
 
@@ -550,23 +549,9 @@ h1 {
 
         document.getElementById('addEmployeeBtn').addEventListener('click', () => openModal('addEmployeeModal'));
 
-        document.getElementById('editEmployeeBtn').addEventListener('click', () => {
-            const rows = document.querySelectorAll('#employeeTableBody tr');
-            originalData = [];
 
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const rowData = [];
-                cells.forEach(cell => {
-                    rowData.push(cell.textContent);
-                    cell.contentEditable = true;
-                });
-                originalData.push(rowData);
-            });
 
-            document.getElementById('saveChangesBtn').style.display = 'block';
-            document.getElementById('cancelEditBtn').style.display = 'block';
-        });
+
 
         document.getElementById('saveChangesBtn').addEventListener('click', () => {
             const rows = document.querySelectorAll('#employeeTableBody tr');
