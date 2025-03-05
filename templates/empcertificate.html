@@ -321,6 +321,9 @@ h1 {
                 <button type="submit" name="action" value="Save as Draft" class="btn btn-secondary">Save as Draft</button>
 
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+                    
+                <button type="submit" id="submitNew" class="bg-green-500 text-white px-4 py-2 rounded">Submit and New</button>
+
             </div>
 
 
@@ -332,7 +335,21 @@ h1 {
 
     <script>
         // Generate certificate number on page load
-
+        document.getElementById("submitNew").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        let form = document.querySelector("form");
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "action";
+        input.value = "Submit and New";
+        form.appendChild(input);
+        form.submit();
+        
+        // Redirect after form submission
+        form.addEventListener("submit", function() {
+            window.location.href = "{{ url_for('empcertificate') }}";
+        });
+    });
 
 document.addEventListener("DOMContentLoaded", function () {
 
