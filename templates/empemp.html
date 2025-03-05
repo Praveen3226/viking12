@@ -505,7 +505,7 @@ overflow-y: auto;
         <div class="text-center bg-red-600 text-white py-2 mb-4">
             <h2 class="text-lg font-semibold">FCL STUFFING SURVEY REPORT FORM</h2>
         </div>
-        <form method="POST" action="{{ url_for('submit') }}">
+        <form method="POST" action="{{ url_for('submitem') }}">
             <table class="custom-table">
                 <tr>
                     <th>Report Number</th>
@@ -741,6 +741,8 @@ overflow-y: auto;
             <button type="submit" name="action" value="Save as Draft" class="btn btn-secondary">Save as Draft</button>
 
             <button type="submit" class="btn">Submit</button>
+            <button type="submit" id="submitNew" class="btn">Submit and New</button>
+
 
         </form>
             <!-- Footer -->
@@ -749,6 +751,21 @@ overflow-y: auto;
     </footer>
     </div>
     <script>
+        document.getElementById("submitNew").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        let form = document.querySelector("form");
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "action";
+        input.value = "Submit and New";
+        form.appendChild(input);
+        form.submit();
+        
+        // Redirect after form submission
+        form.addEventListener("submitNew", function() {
+            window.location.href = "{{ url_for('emp') }}";
+        });
+    });
 document.getElementById("add-container-btn").addEventListener("click", function () {
     fetch('/get_containers')
         .then(response => response.json())
