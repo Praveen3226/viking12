@@ -609,7 +609,140 @@ def empcertificate():
         print(f"Error generating certificate: {e}")
         return "Error generating certificate", 500
 
+@app.route('/submit_cerem', methods=['POST'])
+@login_required
+def submit_cerem():
+    try:
+        # Extract form data
+        certificate_number = request.form.get('CertificateNumber', '').strip()
+        date = request.form.get('date', '').strip()
+        applicant_name = request.form.get('applicantName', '').strip()
+        shipper = request.form.get('shipper', '').strip()
+        consignee = request.form.get('consignee', '').strip()
+        commodity = request.form.get('commodity', '').strip()
+        port_of_discharge = request.form.get('portOfDischarge', '').strip()
+        sb_number = request.form.get('sb_number', '').strip()
+        cf_agent = request.form.get('cf_agent', '').strip()
+        action = request.form.get('action')  # Determine if saving as draft or submitting
 
+        def safe_float(value):
+            try:
+                return float(value) if value.strip() else None  # Return None if empty
+            except ValueError:
+                return None
+
+        quantity = safe_float(request.form.get('quantity', ''))
+        gross_weight = safe_float(request.form.get('gross_weight', ''))
+
+        survey_data = []
+        rows = len(request.form.getlist('marksNos[]'))
+        for i in range(rows):
+            marks_no = request.form.getlist('marksNos[]')[i].strip() or None
+            no_of_pkgs = (
+                int(request.form.getlist('noOfPkgs[]')[i])
+                if request.form.getlist('noOfPkgs[]')[i].strip()
+                else None
+            )
+            length = safe_float(request.form.getlist('length[]')[i])
+            breadth = safe_float(request.form.getlist('breadth[]')[i])
+            height = safe_float(request.form.getlist('height[]')[i])
+            volume_unit = safe_float(request.form.getlist('volumeUnit[]')[i])
+            volume_cum = safe_float(request.form.getlist('volumePerUnit[]')[i])
+            survey_data.append(
+                {
+                    'marks_no': marks_no,
+                    'no_of_pkgs': no_of_pkgs,
+                    'length': length,
+                    'breadth': breadth,
+                    'height': height,
+                    'volume_unit': volume_unit,
+                    'volumePerUnit': volume_cum,
+                }
+            )
+
+        # Get total volume and total packages from frontend (instead of calculating)
+        total_volume = safe_float(request.form.get('totalVolume', ''))
+        total_pkgs = safe_float(request.form.get('totalPkgs', ''))
+
+        survey_data_json = json.dumps(survey_data)
+
+        status = "Draft" if action == "Save as Draft" else "In Progress"
+
+        # If submitting, validate required fields
+        if status == "In Progress":
+            required_fields = {
+                "Certificate Number": certificate_number,
+                "Date": date,
+                "Applicant Name": applicant_name,
+                "Shipper": shipper,
+                "Consignee": consignee,
+                "Commodity": commodity,
+                "Port of Discharge": port_of_discharge,
+                "Surveyor": cf_agent,
+            }
+            for field, value in required_fields.items():
+                if not value:
+                    flash(f"Error: {field} is required!", "error")
+                    return redirect(url_for('forms'))
+
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT CertificateNumber FROM cer WHERE CertificateNumber = %s",
+                    (certificate_number,),
+                )
+                exists = cursor.fetchone()
+
+                if exists:
+                    update_query = """
+                        UPDATE cer SET 
+                            date = %s, applicant_name = %s, shipper = %s, consignee = %s, 
+                            commodity = %s, port_of_discharge = %s, sb_number = %s, quantity = %s, 
+                            gross_weight = %s, cf_agent = %s, 
+                            total_volume = %s, total_pkgs = %s, survey_data = %s, status = %s
+                        WHERE CertificateNumber = %s
+                    """
+                    cursor.execute(
+                        update_query,
+                        (
+                            date,
+                            applicant_name,
+                            shipper,
+                            consignee,
+                            commodity,
+                            port_of_discharge,
+                            sb_number,
+                            quantity,
+                            gross_weight,
+                            cf_agent,
+                            total_volume,
+                            total_pkgs,
+                            survey_data_json,
+                            status,
+                            certificate_number,
+                        ),
+                    )
+                else:
+                    flash("Error: Certificate number not found in database.", "error")
+                    return redirect(url_for('empforms'))
+
+                conn.commit()
+
+        flash(
+            'Form saved as draft!' if status == "Draft" else 'Form submitted successfully!',
+            'success',
+        )
+
+        # ✅ Redirect based on action
+        if action == "Submit and New":
+            return redirect(url_for('empcertificate'))  # Redirect to form for new entry
+        
+        return redirect(url_for('empforms'))  # Default redirect to forms page
+
+    except Exception as e:
+        print(f"Error: {e}")
+        flash(f'An error occurred while processing the form. Error: {e}', 'error')
+        return redirect(url_for('empforms'))
 
 @app.route('/empcertificateedit')
 @login_required
@@ -804,42 +937,7 @@ def empdash():
     return render_template('empdash.html')
 
 
-@app.route('/empemp')
-@login_required
-def empemp():
-    try:
-        with get_db_connection() as conn:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                conn.begin()
 
-                # 🔹 Fetch the latest CertificateNumber and status
-                cursor.execute("SELECT CertificateNumber FROM form ORDER BY id DESC LIMIT 1 FOR UPDATE")
-                last_record = cursor.fetchone()
-
-                if last_record and last_record["CertificateNumber"].isdigit():
-                    next_number = int(last_record["CertificateNumber"]) + 1
-                else:
-                    next_number = 1  # Start from 1 if no records exist
-
-                # 🔹 Generate new Certificate Number
-                new_certificate_number = str(next_number)
-
-                # Insert new certificate with status "Open"
-                cursor.execute("INSERT INTO form (CertificateNumber, status) VALUES (%s, %s)", 
-                               (new_certificate_number, "Open"))
-                conn.commit()
-
-                # Prepare data for template
-                form_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
-
-    except Exception as e:
-        conn.rollback()  # Rollback if there's an error
-        print(f"Error generating form data: {e}")
-        form_data = {"CertificateNumber": "Error", "status": "Error"}
-
-    print("Fetched Form Data:", form_data)  # ✅ Debugging log
-
-    return render_template('empemp.html', form=form_data)
 
 #####################################################################
 #                 <--- Admin Container--->                          #
@@ -1295,7 +1393,7 @@ def add_surveyem():
                     status = "Draft"
                 else:
                     status = "In Progress"
-                    # ✅ Validate required fields only for "Submit"
+                    # ✅ Validate required fields only for "Submit" and "Submit and New"
                     required_fields = {
                         "CertificateNumber": CertificateNumber,
                         "date": date,
@@ -1311,11 +1409,11 @@ def add_surveyem():
                             flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
                             return redirect(url_for('empcontainer'))  # Redirect if a field is missing
 
-                # ✅ Check if CertificateNumber exists
+                # ✅ Check if CertificateNumber exists before updating
                 cursor.execute("SELECT COUNT(*) AS count FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
                 result = cursor.fetchone()
 
-                if result and result["count"] == 0:
+                if not result or result["count"] == 0:
                     flash(f"Error: Certificate Number {CertificateNumber} not found!", "error")
                     return redirect(url_for('empforms'))  # Redirect if record does not exist
 
@@ -1340,12 +1438,19 @@ def add_surveyem():
                 conn.commit()
 
                 flash('Survey saved as draft!' if status == "Draft" else 'Survey submitted successfully!', 'success')
-                return redirect(url_for('empforms'))  # ✅ Redirect on success
+
+                # ✅ Redirect based on action
+                if action == "Submit and New":
+                    return redirect(url_for('empcontainer'))  # Redirect to form for new entry
+                return redirect(url_for('empforms'))  # Default redirect to forms page
 
     except Exception as e:
-        print(f"Error: {e}")
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in add_survey: {e}")
+
         flash(f'An error occurred: {e}', 'error')
-        return redirect(url_for('empcontainer'))
+        return redirect(url_for('empcontainer')) 
     
 @app.route('/empcontainer')
 @login_required
@@ -1841,6 +1946,9 @@ def submit():
         if conn:
             conn.close()
 
+
+
+
 @app.route('/empedit')
 @login_required
 def empedit():
@@ -2137,6 +2245,168 @@ def reportFCL1(CertificateNumber):
 #  carefully before modifying this section.                         #
 ##########################START######################################
 
+@app.route('/empemp')
+@login_required
+def empemp():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                conn.begin()
+
+                # 🔹 Fetch the latest CertificateNumber and status
+                cursor.execute("SELECT CertificateNumber FROM form ORDER BY id DESC LIMIT 1 FOR UPDATE")
+                last_record = cursor.fetchone()
+
+                if last_record and last_record["CertificateNumber"].isdigit():
+                    next_number = int(last_record["CertificateNumber"]) + 1
+                else:
+                    next_number = 1  # Start from 1 if no records exist
+
+                # 🔹 Generate new Certificate Number
+                new_certificate_number = str(next_number)
+
+                # Insert new certificate with status "Open"
+                cursor.execute("INSERT INTO form (CertificateNumber, status) VALUES (%s, %s)", 
+                               (new_certificate_number, "Open"))
+                conn.commit()
+
+                # Prepare data for template
+                form_data = {"CertificateNumber": new_certificate_number, "status": "Open"}
+
+    except Exception as e:
+        conn.rollback()  # Rollback if there's an error
+        print(f"Error generating form data: {e}")
+        form_data = {"CertificateNumber": "Error", "status": "Error"}
+
+    print("Fetched Form Data:", form_data)  # ✅ Debugging log
+
+    return render_template('empemp.html', form=form_data)
+
+@app.route('/submitem', methods=['POST'])
+@login_required
+def submitem():
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Get form data
+        CertificateNumber = request.form.get('CertificateNumber', '').strip()
+        date = request.form.get('date', '').strip()
+        applicant_name = request.form.get('applicantName', '').strip()
+        container_number = request.form.get('containerNumber', '').strip()
+        size_type = request.form.get('sizeType', '').strip()
+        tare_weight = request.form.get('tareWeight', '').strip()
+        payload_capacity = request.form.get('payloadCapacity', '').strip()
+        declared_total_weight = request.form.get('declaredTotalWeight', '').strip()
+        stuffing_comm_date_time = request.form.get('stuffingCommDateTime', '').strip()
+        stuffing_comp_date_time = request.form.get('stuffingCompDateTime', '').strip()
+        seal_number = request.form.get('sealNumber', '').strip()
+        port_of_discharge = request.form.get('portOfDischarge', '').strip()
+        place_of_stuffing = request.form.get('placeOfStuffing', '').strip()
+        cbm = request.form.get('volume', '').strip()
+        loading_condition = request.form.get('loadingCondition', '').strip()
+        lashing = request.form.get('lashing', '').strip()
+        others = request.form.get('others', '').strip()
+        weather_condition = request.form.get('weatherCondition', '').strip()
+        surveyor_name = request.form.get('surveyorName', '').strip()
+        signature = request.form.get('signature', '').strip()
+        totalPackages = request.form.get('totalPackages', '').strip()
+        gross_weight = request.form.get('grossWeight', '').strip()
+
+        # Get button action
+        action = request.form.get('action', '')
+
+        # ✅ Determine status based on action
+        status = "Draft" if action == "Save as Draft" else "Completed"
+
+        # ✅ Validate required fields only for "Submit"
+        if status == "Completed":
+            required_fields = {
+                "Certificate Number": CertificateNumber,
+                "Date": date,
+                "Applicant Name": applicant_name,
+                "Container Number": container_number,
+                "Surveyor Name": surveyor_name
+            }
+
+            for field, value in required_fields.items():
+                if not value:
+                    flash(f"Error: {field} is required!", "error")
+                    return redirect(url_for("empforms"))
+
+        # ✅ Parse and validate consignment details safely
+        consignment_details = request.form.get('consignmentDetails', '[]').strip()
+        try:
+            consignment_details = json.loads(consignment_details)
+            if not isinstance(consignment_details, list):
+                consignment_details = []  # Ensure it's always a list
+        except json.JSONDecodeError:
+            consignment_details = []  # Default to empty list if invalid
+
+        # ✅ Check if Certificate Number exists before updating
+        cursor.execute("SELECT 1 FROM form WHERE CertificateNumber = %s", (CertificateNumber,))
+        if not cursor.fetchone():
+            flash("Error: Certificate Number not found in the database.", "error")
+            return redirect(url_for("empforms"))
+
+        # ✅ Update the form entry
+        update_form_query = """
+            UPDATE form
+            SET date = %s, applicant_name = %s, container_number = %s, size_type = %s, tare_weight = %s, 
+                payload_capacity = %s, declared_total_weight = %s, stuffing_comm_date_time = %s, 
+                stuffing_comp_date_time = %s, seal_number = %s, port_of_discharge = %s, place_of_stuffing = %s, 
+                cbm = %s, total_gross_weight = %s, loading_condition = %s, lashing = %s, others = %s, 
+                weather_condition = %s, surveyor_name = %s, signature = %s, totalPackages = %s, 
+                consignment_details = %s, status = %s
+            WHERE CertificateNumber = %s
+        """
+
+        cursor.execute(update_form_query, (
+            date or None, applicant_name or None, container_number or None, size_type or None,
+            tare_weight or None, payload_capacity or None, declared_total_weight or None,
+            stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None,
+            port_of_discharge or None, place_of_stuffing or None, cbm or None, gross_weight or None,
+            loading_condition or None, lashing or None, others or None, weather_condition or None,
+            surveyor_name or None, signature or None, totalPackages or None, json.dumps(consignment_details),
+            status, CertificateNumber
+        ))
+
+        # ✅ If submitting, update container and consignment status
+        if status == "Completed":
+            cursor.execute(
+                "UPDATE container SET status = 'Completed' WHERE container_no = %s AND status = 'In Progress'",
+                (container_number,)
+            )
+
+            # ✅ Update related consignments
+            consignment_ids = [item["id"] for item in consignment_details if "id" in item]
+            if consignment_ids:
+                format_strings = ",".join(["%s"] * len(consignment_ids))
+                cursor.execute(
+                    f"UPDATE cer SET status = 'Completed' WHERE id IN ({format_strings})",
+                    tuple(consignment_ids)
+                )
+
+        # ✅ Commit changes
+        conn.commit()
+
+        flash("Form saved as draft!" if status == "Draft" else "Form submitted successfully!", "success")
+
+        # ✅ Redirect based on action
+        return redirect(url_for('empemp')) if action == "Submit and New" else redirect(url_for("forms"))
+
+    except Exception as e:
+        print(f"Error: {e}")
+        flash(f'An error occurred while processing the form. Error: {e}', 'error')
+        return redirect(url_for('empforms'))
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route('/empempedit')
 @login_required
