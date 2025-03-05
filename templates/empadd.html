@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,18 +10,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-    <link href="https://fonts.cdnfonts.com/css/cooper-black" rel="stylesheet">
-    
     <style>
-        @import url('https://fonts.cdnfonts.com/css/cooper-black'); 
 
 h1 {
-            font-family: 'Cooper Black', sans-serif;
+            font-family: 'Copper Black', serif;
             font-size: 48px; 
             text-align: center;
-            -webkit-text-fill-color: #da3936;
-            padding-left: 130px; /* Adjust this value as needed */
-
         }
         
         body {
@@ -145,13 +139,16 @@ h1 {
         }
 
         .search-bar input {
-            width: 100%;
+            width: 70%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
         }
 
+        .search-bar .btn {
+            width: 25%;
+        }
 
         .modal {
             display: none;
@@ -417,7 +414,7 @@ h1 {
     <!-- Navigation Bar -->
     <div class="nav-bar">
         <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo" style=height:70px; display:inline-block; margin-right:35px;>
-        <h1 class="text-2xl font-bold" style="color: rgba(253, 0, 0, 1);">VIKING MARINE INC.</h1>
+        <h1>VIKING MARINE INC</h1>
 
         <nav class="nav-links">
             <ul>
@@ -441,10 +438,6 @@ h1 {
         </ul>
     </div>
 
-    <h2>
-        <a href="{{url_for('admindash') }}" >Back to previous page</a>
-        </h2>
-
     <div class="form-container">
         <div class="form-header">
             <h1>EMPLOYEE MANAGEMENT</h1>
@@ -453,11 +446,13 @@ h1 {
 
         <div class="action-buttons">
             <button class="btn" id="addEmployeeBtn">Add Employee</button>
+            <button class="btn" id="editEmployeeBtn">Edit Employee</button>
             <button class="btn" id="deleteEmployeeBtn">Delete Employee</button>
         </div>
-        <!-- Search Bar -->
+
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search by employee name...">
+            <input type="text" placeholder="Search employees...">
+            <button class="btn">Search</button>
         </div>
 
         <div class="table-wrapper">
@@ -475,12 +470,10 @@ h1 {
                 </thead>
                 <tbody id="employeeTableBody">
                     <!-- Employee rows will be dynamically inserted here -->
-
-                    
                 </tbody>
             </table>
         </div>
-  <div id="searchMessage" style="text-align: center; margin-top: 10px; color: #dc3545; display: none;"></div>
+
         <div class="delete-controls" id="deleteControls">
             <button class="btn btn-danger" id="confirmDeleteBtn">Confirm Delete</button>
             <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
@@ -544,214 +537,253 @@ h1 {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    let employees = [];
-    let originalData = [];
+        let employees = [];
+        let originalData = [];
 
-    function openModal(modalId) {
-        document.getElementById(modalId).style.display = "flex";
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = "none";
-    }
-
-    document.getElementById("addEmployeeBtn").addEventListener("click", () => openModal("addEmployeeModal"));
-
-/*    document.getElementById("editEmployeeBtn").addEventListener("click", () => {
-        const rows = document.querySelectorAll("#employeeTableBody tr");
-        originalData = [];
-
-        rows.forEach((row) => {
-            const cells = row.querySelectorAll("td");
-            const rowData = [];
-            cells.forEach((cell) => {
-                rowData.push(cell.textContent);
-                cell.contentEditable = true;
-            });
-            originalData.push(rowData);
-        });
-
-        document.getElementById("saveChangesBtn").style.display = "block";
-        document.getElementById("cancelEditBtn").style.display = "block";
-    });
-
-    document.getElementById("saveChangesBtn").addEventListener("click", () => {
-        const rows = document.querySelectorAll("#employeeTableBody tr");
-        rows.forEach((row) => {
-            row.querySelectorAll("td").forEach((cell) => {
-                cell.contentEditable = false;
-            });
-        });
-
-        document.getElementById("saveChangesBtn").style.display = "none";
-        document.getElementById("cancelEditBtn").style.display = "none";
-        alert("Changes saved successfully!");
-    });
-
-    document.getElementById("cancelEditBtn").addEventListener("click", () => {
-        const rows = document.querySelectorAll("#employeeTableBody tr");
-        rows.forEach((row, rowIndex) => {
-            row.querySelectorAll("td").forEach((cell, cellIndex) => {
-                cell.textContent = originalData[rowIndex][cellIndex];
-                cell.contentEditable = false;
-            });
-        });
-
-        document.getElementById("saveChangesBtn").style.display = "none";
-        document.getElementById("cancelEditBtn").style.display = "none";
-        alert("Edit cancelled. No changes were saved.");
-    });
-*/
-    document.getElementById("deleteEmployeeBtn").addEventListener("click", () => {
-        const thead = document.querySelector(".employee-table thead tr");
-        const rows = document.querySelectorAll("#employeeTableBody tr");
-
-        if (!document.querySelector(".employee-table thead th.checkbox-cell")) {
-            const newCheckboxHeader = document.createElement("th");
-            newCheckboxHeader.className = "checkbox-cell";
-            newCheckboxHeader.textContent = "Select";
-            thead.prepend(newCheckboxHeader);
-
-            rows.forEach((row) => {
-                const checkboxCell = document.createElement("td");
-                checkboxCell.className = "checkbox-cell";
-                checkboxCell.innerHTML = `<input type="checkbox" class="employee-checkbox">`;
-                row.prepend(checkboxCell);
-            });
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
         }
 
-        document.getElementById("deleteControls").style.display = "flex";
-    });
-
-    document.getElementById("cancelDeleteBtn").addEventListener("click", () => {
-        document.querySelectorAll(".employee-table thead th.checkbox-cell, .employee-table td.checkbox-cell").forEach(cell => cell.remove());
-        document.getElementById("deleteControls").style.display = "none";
-    });
-
-    document.getElementById("confirmDeleteBtn").addEventListener("click", async () => {
-        const selectedCheckboxes = document.querySelectorAll(".employee-checkbox:checked");
-        if (selectedCheckboxes.length === 0) {
-            alert("Please select at least one employee to delete.");
-            return;
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
-        const employeeIds = Array.from(selectedCheckboxes).map(checkbox => {
-            return checkbox.closest("tr").querySelector("td:nth-child(2)").textContent.trim(); // Ensure correct column
+        document.getElementById('addEmployeeBtn').addEventListener('click', () => openModal('addEmployeeModal'));
+
+        document.getElementById('editEmployeeBtn').addEventListener('click', () => {
+            const rows = document.querySelectorAll('#employeeTableBody tr');
+            originalData = [];
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                cells.forEach(cell => {
+                    rowData.push(cell.textContent);
+                    cell.contentEditable = true;
+                });
+                originalData.push(rowData);
+            });
+
+            document.getElementById('saveChangesBtn').style.display = 'block';
+            document.getElementById('cancelEditBtn').style.display = 'block';
         });
 
-        console.log("Selected Employee IDs:", employeeIds);
+        document.getElementById('saveChangesBtn').addEventListener('click', () => {
+            const rows = document.querySelectorAll('#employeeTableBody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.contentEditable = false;
+                });
+            });
 
-        if (employeeIds.length === 0 || employeeIds.some(id => id === "")) {
-            alert("Error: Unable to retrieve employee IDs.");
-            return;
-        }
+            document.getElementById('saveChangesBtn').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            alert('Changes saved successfully!');
+        });
 
-        if (confirm(`Are you sure you want to delete ${employeeIds.length} employee(s)?`)) {
-            try {
-                const response = await fetch("/delete_employees", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ids: employeeIds }),
+        document.getElementById('cancelEditBtn').addEventListener('click', () => {
+            const rows = document.querySelectorAll('#employeeTableBody tr');
+            rows.forEach((row, rowIndex) => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach((cell, cellIndex) => {
+                    cell.textContent = originalData[rowIndex][cellIndex];
+                    cell.contentEditable = false;
+                });
+            });
+
+            document.getElementById('saveChangesBtn').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            alert('Edit cancelled. No changes were saved.');
+        });
+
+        document.getElementById('deleteEmployeeBtn').addEventListener('click', () => {
+            const thead = document.querySelector('.employee-table thead tr');
+            const rows = document.querySelectorAll('#employeeTableBody tr');
+
+            if (!document.querySelector('.employee-table thead th.checkbox-cell')) {
+                const newCheckboxHeader = document.createElement('th');
+                newCheckboxHeader.className = 'checkbox-cell';
+                newCheckboxHeader.textContent = 'Select';
+                thead.prepend(newCheckboxHeader);
+
+                rows.forEach(row => {
+                    const checkboxCell = document.createElement('td');
+                    checkboxCell.className = 'checkbox-cell';
+                    checkboxCell.innerHTML = `<input type="checkbox" class="employee-checkbox">`;
+                    row.prepend(checkboxCell);
+                });
+            }
+
+            document.getElementById('deleteControls').style.display = 'flex';
+        });
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+            const checkboxHeader = document.querySelector('.employee-table thead th.checkbox-cell');
+            if (checkboxHeader) {
+                checkboxHeader.remove();
+            }
+
+            const checkboxCells = document.querySelectorAll('.employee-table td.checkbox-cell');
+            checkboxCells.forEach(cell => cell.remove());
+
+            document.getElementById('deleteControls').style.display = 'none';
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            const selectedRows = document.querySelectorAll('.employee-checkbox:checked');
+            if (selectedRows.length === 0) {
+                alert('Please select at least one employee to delete.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete ${selectedRows.length} employee(s)?`)) {
+                selectedRows.forEach(checkbox => {
+                    checkbox.closest('tr').remove();
                 });
 
-                const result = await response.json();
+                document.getElementById('cancelDeleteBtn').click();
+                alert('Selected employees have been deleted.');
+            }
+        });
+
+        function generatePassword(username) {
+            const firstThreeLetters = username.substring(0, 3).toUpperCase();
+            const randomNumbers = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${firstThreeLetters}VKM${randomNumbers}`;
+        }
+
+        document.getElementById('name').addEventListener('input', function () {
+    const name = this.value.trim();
+    const username = name.substring(0, 3).toUpperCase() + 'VKM' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    document.getElementById('username').value = username;
+    document.getElementById('password').value = username; // Set password field
+});
+
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        });
+
+        document.getElementById('employeeForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = {
+                empId: document.getElementById('empId').value,
+                role: document.getElementById('role').value,
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                
+            };
+
+            try {
+                const response = await fetch('/add_employee', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
                 if (!response.ok) {
-                    throw new Error(result.error || "Failed to delete employees");
+                    throw new Error('Failed to add employee');
                 }
 
-                selectedCheckboxes.forEach(checkbox => checkbox.closest("tr").remove());
-
-                document.getElementById("cancelDeleteBtn").click();
-                alert("Selected employees have been deleted.");
+                closeModal('addEmployeeModal');
+                fetchEmployees(); // Refresh the employee list
             } catch (error) {
-                console.error("Error deleting employees:", error);
-                alert("Error: " + error.message);
+                console.error('Error adding employee:', error);
+            }
+        });
+
+        window.onload = fetchEmployees;
+
+        async function fetchEmployees() {
+            try {
+                const response = await fetch('/employees');
+                const employees = await response.json();
+                console.log("Received Employees:", employees); // Debugging
+
+                const tableBody = document.getElementById('employeeTableBody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                employees.forEach(emp => {
+                    const row = document.createElement("tr");
+                   row.innerHTML = `
+                                     <td contenteditable="false">${emp.empId}</td>
+                                     <td contenteditable="false">${emp.role}</td>
+                                     <td contenteditable="false">${emp.name}</td>
+                                     <td contenteditable="false">${emp.phone}</td>
+                                     <td contenteditable="false">${emp.address}</td>
+                                     <td contenteditable="false">${emp.username}</td>
+                                     <td contenteditable="false">${emp.username}</td>
+                                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error fetching employees:", error);
             }
         }
-    });
-
-    async function fetchEmployees() {
-        try {
-            const response = await fetch("/employees");
-            const employeesData = await response.json();
-            console.log("Received Employees:", employeesData);
-
-            if (!Array.isArray(employeesData)) {
-                throw new Error("Invalid employee data received.");
-            }
-
-            const tableBody = document.getElementById("employeeTableBody");
-            tableBody.innerHTML = ""; // Clear existing rows
-
-            employeesData.forEach(emp => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${emp.empId}</td>
-                    <td>${emp.role}</td>
-                    <td>${emp.name}</td>
-                    <td>${emp.phone}</td>
-                    <td>${emp.address}</td>
-                    <td>${emp.username}</td>
-                    <td>${emp.username}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        } catch (error) {
-            console.error("Error fetching employees:", error);
-        }
-    }
-
- // Global Search Functionality
- document.getElementById('searchInput').addEventListener('input', function () {
-    const searchText = this.value.trim().toLowerCase();
-    const rows = document.querySelectorAll('#employeeTableBody tr');
-    const messageElement = document.getElementById('searchMessage');
-    let hasMatches = false;
-    let visibleCount = 0;
-
-    rows.forEach(row => {
-        const nameCell = row.querySelector('td:nth-child(3)');
-        const name = nameCell.textContent.toLowerCase();
-        const isVisible = name.includes(searchText);
         
-        row.style.display = isVisible ? '' : 'none';
-        if (isVisible) {
-            visibleCount++;
-            hasMatches = true;
-        }
-    });
+        document.getElementById('employeeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
 
-    // Show/hide no data message
-    if (visibleCount === 0 && searchText.length > 0) {
-        messageElement.textContent = 'No data found';
-        messageElement.style.display = 'block';
-    } else {
-        messageElement.style.display = 'none';
-    }
+    const formData = new FormData(this);
+
+    fetch('/add_employee', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            alert(data.message);
+            closeModal('addEmployeeModal');
+            fetchEmployees(); // Refresh the employee list
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 });
 
-    document.getElementById("hamburger").addEventListener("click", function (e) {
-        e.stopPropagation();
-        document.getElementById("mobileMenu").classList.toggle("active");
-    });
 
-    document.addEventListener("click", function (e) {
-        const mobileMenu = document.getElementById("mobileMenu");
-        if (mobileMenu.classList.contains("active") && !mobileMenu.contains(e.target) && e.target.id !== "hamburger") {
-            mobileMenu.classList.remove("active");
-        }
-    });
+        // Hamburger Menu Toggle
+        document.getElementById('hamburger').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('mobileMenu').classList.toggle('active');
+        });
 
-    window.addEventListener("resize", function () {
-        if (window.innerWidth > 768) {
-            document.getElementById("mobileMenu").classList.remove("active");
-        }
-    });
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.getElementById('hamburger');
+            
+            if (mobileMenu.classList.contains('active') && 
+                !mobileMenu.contains(e.target) && 
+                !hamburger.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
 
-    window.onload = fetchEmployees;
-});
-
+        // Close menu on window resize (optional)
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('mobileMenu').classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
