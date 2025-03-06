@@ -1002,7 +1002,7 @@ h1 {
 
     // Add section-specific comments
     for (const [section, comments] of Object.entries(sections)) {
-      remarksContent += `\n\n${section}:\n- ${comments.join("\n- ")}`;
+    remarksContent += `\n\n**${section}**:\n- ${comments.join("\n- ")}`;
     }
 
     document.getElementById("finalRemarks").value = remarksContent.trim();
