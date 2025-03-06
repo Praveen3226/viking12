@@ -372,201 +372,642 @@ h1 {
     <hr class="my-4"/>
     <h2 class="text-lg font-semibold text-center">EMPTY CONTAINER CONDITION SURVEY REPORT</h2>    
     
+
     <form method="POST" action="{{ url_for('add_surveyem') }}" class="p-4 border border-gray-300">     
-       <div class="border-t border-b border-gray-300 py-2 mb-4">
-        <div class="flex justify-between">
-          <div>
-            <label class="block text-sm font-semibold">Report No.:</label>
-            <input type="text" id="CertificateNumber" readonly name="CertificateNumber" class="border border-gray-300 p-1 w-full"/>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold">Date:</label>
-            <input type="date" name="date" id="date" required class="border border-gray-300 p-1 w-full"/>
-          </div>
-        </div>
-      </div>
+      <div class="border-t border-b border-gray-300 py-2 mb-4">
+       <div class="flex justify-between">
+         <div>
+           <label class="block text-sm font-semibold">Report No.: </label>
+           <input type="text" id="CertificateNumber"  name="CertificateNumber" class="border border-gray-300 p-1 w-full"/>
+         </div>
+         <div>
+           <label class="block text-sm font-semibold">Date:</label>
+           <input type="date" name="date" id="date" required class="border border-gray-300 p-1 w-full"/>
+         </div>
+       </div>
+     </div>
 
-      <div class="text-center bg-red-600 text-white py-2 mb-4">
-        <h2 class="text-lg font-semibold">EMPTY CONTAINER CONDITION SURVEY REPORT</h2>
-      </div>
+     <div class="text-center bg-red-600 text-white py-2 mb-4">
+       <h2 class="text-lg font-semibold">EMPTY CONTAINER CONDITION SURVEY REPORT</h2>
+     </div>
 
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-sm font-semibold">Applicant for Survey:</label>
-          <div class="flex gap-2">
-              <select id="applicantTitle" class="border border-gray-300 p-1">
-                  <option value="Mr">Mr.</option>
-                  <option value="Mrs">M/s</option>
-              </select>
-              <input type="text" id="applicantNameInput" class="border border-gray-300 p-1 w-full"/>
-          </div>
-          <!-- Hidden input field to store the full name -->
-          <input type="hidden" name="applicant_for_survey" id="applicant_for_survey" />
-      </div>
-        <div>
-          <label class="block text-sm font-semibold">Date of Inspection:</label>
-          <input type="date" name="date_of_inspection" class="border border-gray-300 p-1 w-full"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold">Container No.:</label>
-          <input type="text" name="container_no" class="border border-gray-300 p-1 w-full"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold">Place of Inspection:</label>
-          <input type="text" name="place_of_inspection" class="border border-gray-300 p-1 w-full"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold">Type:</label>
-          <input type="text" name="type" class="border border-gray-300 p-1 w-full"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold">Size:</label>
-          <input type="text" name="size" class="border border-gray-300 p-1 w-full"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold">Tare Weight:</label>
-          <input type="number" name="tare_weight" id="tare_weight" class="border border-gray-300 p-1 w-full"/>
-      </div>
-      <div>
-          <label class="block text-sm font-semibold">Payload Capacity:</label>
-          <input type="number" name="payload_capacity" id="payload_capacity" class="border border-gray-300 p-1 w-full"/>
-      </div>
-      <div>
-          <label class="block text-sm font-semibold">Max. Gross Weight:</label>
-          <input type="number" name="max_gross_weight" id="max_gross_weight" class="border border-gray-300 p-1 w-full" readonly/>
-      </div>
-        <div>
-          <label class="block text-sm font-semibold">CSC No.:</label>
-          <input type="text" name="csc_no" class="border border-gray-300 p-1 w-full"/>
-        </div>
+     <div class="grid grid-cols-2 gap-4 mb-4">
+       <div>
+         <label class="block text-sm font-semibold">Applicant for Survey:</label>
+         <div class="flex gap-2">
+             <select id="applicantTitle" class="border border-gray-300 p-1">
+                 <option value="Mr">Mr.</option>
+                 <option value="Mrs">M/s</option>
+             </select>
+             <input type="text" id="applicantNameInput" class="border border-gray-300 p-1 w-full"/>
+         </div>
+         <!-- Hidden input field to store the full name -->
+         <input type="hidden" name="applicant_for_survey" id="applicant_for_survey" />
+     </div>
 
-        <div>
-          <label class="block text-sm font-semibold">Year of Manufacture:</label>
-          <input type="text" name="year_of_manufacture" class="border border-gray-300 p-1 w-full"/>
-        </div>
+   
+   <div>
+       <label class="block text-sm font-semibold">Date of Inspection:</label>
+       <input type="date" name="date_of_inspection" class="border border-gray-300 p-1 w-full"/>
+   </div>
+       <div>
+         <label class="block text-sm font-semibold">Date of Inspection:</label>
+         <input type="date" name="date_of_inspection" class="border border-gray-300 p-1 w-full"/>
+       </div>
+       <div>
+         <label class="block text-sm font-semibold">Container No.:</label>
+         <input type="text" name="container_no" class="border border-gray-300 p-1 w-full"/>
+       </div>
+       <div>
+         <label class="block text-sm font-semibold">Tare Weight:</label>
+         <input type="number" name="tare_weight" id="tare_weight" class="border border-gray-300 p-1 w-full"/>
+     </div>
+    
+       <div>
+         <label class="block text-sm font-semibold">Type:</label>
+         <input type="text" name="type" class="border border-gray-300 p-1 w-full"/>
+       </div>
+       <div>
+         <label class="block text-sm font-semibold">Size:</label>
+         <input type="text" name="size" class="border border-gray-300 p-1 w-full"/>
+       </div>
 
-      <!-- Radio Box Questions in Table Format -->
-    </div>
-      <div class="table-container overflow-x-auto">
-<table class="w-full mb-4 light-border">
-  <tbody>
-    <tr>
-      <td class="font-semibold">Rear End</td>
-      <td>Are any holes found?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="rear_end" value="Yes"> Yes</label>
-        <label><input type="radio" name="rear_end" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Right Panel</td>
-      <td>Are doors closing properly?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="right_panel" value="Yes"> Yes</label>
-        <label><input type="radio" name="right_panel" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Left Panel</td>
-      <td>Are there any patches in the container?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="left_panel" value="Yes"> Yes</label>
-        <label><input type="radio" name="left_panel" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Front Panel</td>
-      <td>Are any stickers or marks found in the container?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="front_panel" value="Yes"> Yes</label>
-        <label><input type="radio" name="front_panel" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Roof Panel</td>
-      <td>Is the floor clean and free from damages?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="roof_panel" value="Yes"> Yes</label>
-        <label><input type="radio" name="roof_panel" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Floor Board</td>
-      <td>Any objectionable odor persist?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="floor_board" value="Yes"> Yes</label>
-        <label><input type="radio" name="floor_board" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Understructure</td>
-      <td>Any evidence of contamination or infestation found?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="understructure" value="Yes"> Yes</label>
-        <label><input type="radio" name="understructure" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Interior</td>
-      <td>Any toxic chemical residues found?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="interior" value="Yes"> Yes</label>
-        <label><input type="radio" name="interior" value="No"> No</label>
-      </td>
-    </tr>
-    <tr>
-      <td class="font-semibold">Exterior</td>
-      <td>Is there any presence of high rust formation inside the container?</td>
-      <td class="radio-column">
-        <label><input type="radio" name="exterior" value="Yes"> Yes</label>
-        <label><input type="radio" name="exterior" value="No"> No</label>
-      </td>
-    </tr>
-  </tbody>
-</table>
+       <div>
+         <label class="block text-sm font-semibold">Place of Inspection:</label>
+         <input type="text" name="place_of_inspection" class="border border-gray-300 p-1 w-full"/>
+       </div>
+
+     <div>
+         <label class="block text-sm font-semibold">Payload Capacity:</label>
+         <input type="number" name="payload_capacity" id="payload_capacity" class="border border-gray-300 p-1 w-full"/>
+     </div>
+     <div>
+       <label class="block text-sm font-semibold">CSC No.:</label>
+       <input type="text" name="csc_no" class="border border-gray-300 p-1 w-full"/>
+     </div>
+     <div>
+         <label class="block text-sm font-semibold">Max. Gross Weight:</label>
+         <input type="number" name="max_gross_weight" id="max_gross_weight" class="border border-gray-300 p-1 w-full" readonly/>
+     </div>
+
+       <div>
+         <label class="block text-sm font-semibold">Year of Manufacture:</label>
+         <input type="text" name="year_of_manufacture" class="border border-gray-300 p-1 w-full"/>
+       </div>
+
+     </div>
+
+     <!-- Radio Box Questions in Table Format -->
+
+     <div class="table-container overflow-x-auto">
+       <table class="w-full mb-4 light-border">
+         <tbody>
+           <!-- Inspection Items -->
+           <tr>
+             <td class="font-semibold">Rear End</td>
+             <td>
+               <div class="relative">
+                 <button id="dropdownBtnRearEnd" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                   <span id="selectedOptionsRearEnd">Select Rear End Issues</span>
+                   <span>▼</span>
+                 </button>
+             
+                 <div id="dropdownMenuRearEnd" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                   <div class="p-2 space-y-2 checkbox-group" data-section="Rear End">
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                       1.Container inspected externally / internally found in satisfactory condition.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                       2.Container Internal panels found with rust marks at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                       3.Container External panels found with IMDG Stickers. To be removed.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                       4.Container internal panels found with Black stain at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                       5.Floor board found with chipped off at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                       6.Floor board found middle running gap 4 feet.
+                     </label>
+                   </div>
+                 </div>
+               </div>
+             </td>
+             <td>Are any holes found?</td>
+             <td class="radio-column">
+               <label><input type="radio" name="rear_end" value="Yes"> Yes</label>
+               <label><input type="radio" name="rear_end" value="No"> No</label>
+             </td>
+           </tr>
+       
+           <tr>
+             <td class="font-semibold">Right Panel</td>
+             <td>
+               <div class="relative">
+                 <button id="dropdownBtnRightPanel" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                   <span id="selectedOptionsRightPanel">Select Right Panel Issues</span>
+                   <span>▼</span>
+                 </button>
+             
+                 <div id="dropdownMenuRightPanel" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                   <div class="p-2 space-y-2 checkbox-group" data-section="Right Panel">
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                       1.Container inspected externally / internally found in satisfactory condition.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                       2.Container Internal panels found with rust marks at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                       3.Container External panels found with IMDG Stickers. To be removed.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                       4.Container internal panels found with Black stain at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                       5.Floor board found with chipped off at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                       6.Floor board found middle running gap 4 feet.
+                     </label>
+                   </div>
+                 </div>
+               </div>
+             </td>
+             <td>Are doors closing properly?</td>
+             <td class="radio-column">
+               <label><input type="radio" name="right_panel" value="Yes"> Yes</label>
+               <label><input type="radio" name="right_panel" value="No"> No</label>
+             </td>
+           </tr>
+       
+           <tr>
+             <td class="font-semibold">Left Panel</td>
+             <td>
+               <div class="relative">
+                 <button id="dropdownBtnLeftPanel" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                   <span id="selectedOptionsLeftPanel">Select Left Panel Issues</span>
+                   <span>▼</span>
+                 </button>
+             
+                 <div id="dropdownMenuLeftPanel" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                   <div class="p-2 space-y-2 checkbox-group" data-section="Left Panel">
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                       1.Container inspected externally / internally found in satisfactory condition.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                       2.Container Internal panels found with rust marks at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                       3.Container External panels found with IMDG Stickers. To be removed.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                       4.Container internal panels found with Black stain at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                       5.Floor board found with chipped off at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                       6.Floor board found middle running gap 4 feet.
+                     </label>
+                   </div>
+                 </div>
+               </div>
+             </td>
+             <td>Are there any patches in the container?</td>
+             <td class="radio-column">
+               <label><input type="radio" name="left_panel" value="Yes"> Yes</label>
+               <label><input type="radio" name="left_panel" value="No"> No</label>
+             </td>
+           </tr>
+
+           <tr>
+             <td class="font-semibold">Front Panel</td>
+             <td>
+               <div class="relative">
+                 <button id="dropdownBtnFrontPanel" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                   <span id="selectedOptionsFrontPanel">Select Front Panel Issues</span>
+                   <span>▼</span>
+                 </button>
+             
+                 <div id="dropdownMenuFrontPanel" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                   <div class="p-2 space-y-2 checkbox-group" data-section="Front Panel">
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                       1.Container inspected externally / internally found in satisfactory condition.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                       2.Container Internal panels found with rust marks at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                       3.Container External panels found with IMDG Stickers. To be removed.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                       4.Container internal panels found with Black stain at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                       5.Floor board found with chipped off at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                       6.Floor board found middle running gap 4 feet.
+                     </label>
+                   </div>
+                 </div>
+               </div>
+             </td>
+             <td>Are any stickers or marks found in the container?</td>
+             <td class="radio-column">
+               <label><input type="radio" name="front_panel" value="Yes"> Yes</label>
+               <label><input type="radio" name="front_panel" value="No"> No</label>
+             </td>
+           </tr>
+         
+           <tr>
+             <td class="font-semibold">Roof Panel</td>
+             <td>
+             <div class="relative">
+               <button id="dropdownBtnRoofPanel" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                 <span id="selectedOptionsRoofPanel">Select Roof Panel Issues</span>
+                 <span>▼</span>
+               </button>
+           
+               <div id="dropdownMenuRoofPanel" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                 <div class="p-2 space-y-2 checkbox-group" data-section="Roof Panel">
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                     1.Container inspected externally / internally found in satisfactory condition.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                     2.Container Internal panels found with rust marks at places.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                     3.Container External panels found with IMDG Stickers. To be removed.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                     4.Container internal panels found with Black stain at places.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                     5.Floor board found with chipped off at places.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                     6.Floor board found middle running gap 4 feet.
+                   </label>
+                 </div>
+               </div>
+             </div>
+           </td>
+             <td>Is the floor clean and free from damages?	</td>
+             <td class="radio-column">
+               <label><input type="radio" name="roof_panel" value="Yes"> Yes</label>
+               <label><input type="radio" name="roof_panel" value="No"> No</label>
+             </td>
+           </tr> 
+
+           <tr>
+             <td class="font-semibold">Floor Board</td>
+             <td>
+             <div class="relative">
+               <button id="dropdownBtnFloorBoard" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                 <span id="selectedOptionsFloorBoard">Select Floor Board Issues</span>
+                 <span>▼</span>
+               </button>
+         
+               <div id="dropdownMenuFloorBoard" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                 <div class="p-2 space-y-2 checkbox-group" data-section="Floor Board">
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                     1.Container inspected externally / internally found in satisfactory condition.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                     2.Container Internal panels found with rust marks at places.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                     3.Container External panels found with IMDG Stickers. To be removed.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                     4.Container internal panels found with Black stain at places.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                     5.Floor board found with chipped off at places.
+                   </label>
+                   <label class="flex items-center gap-2">
+                     <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                     6.Floor board found middle running gap 4 feet.
+                   </label>
+                 </div>
+               </div>
+             </div>
+           </td>
+             <td>Any objectionable odor persist?</td>
+             <td class="radio-column">
+               <label><input type="radio" name="floor_board" value="Yes"> Yes</label>
+               <label><input type="radio" name="floor_board" value="No"> No</label>
+             </td>
+           </tr> 
+
+           <tr>
+             <td class="font-semibold">Understructure</td>
+             
+               <td>
+                 <div class="relative">
+                   <button id="dropdownBtnUnderstructure" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                     <span id="selectedOptionsUnderstructure">Select Understructure Issues</span>
+                     <span>▼</span>
+                   </button>
+               
+                   <div id="dropdownMenuUnderstructure" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                     <div class="p-2 space-y-2 checkbox-group" data-section="Understructure">
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                         1.Container inspected externally / internally found in satisfactory condition.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                         2.Container Internal panels found with rust marks at places.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                         3.Container External panels found with IMDG Stickers. To be removed.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                         4.Container internal panels found with Black stain at places.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                         5.Floor board found with chipped off at places.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                         6.Floor board found middle running gap 4 feet.
+                       </label>
+                     </div>
+                   </div>
+                 </div>
+               </td>
+             
+             <td>Any evidence of contamination or infestation found?	</td>
+             <td class="radio-column">
+               <label><input type="radio" name="understructure" value="Yes"> Yes</label>
+               <label><input type="radio" name="understructure" value="No"> No</label>
+             </td>
+           </tr> 
+
+           <tr>
+               <td class="font-semibold">Interior</td>
+               <td>
+                 <div class="relative">
+                   <button id="dropdownBtnInterior" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                     <span id="selectedOptionsInterior">Select Interior Issues</span>
+                     <span>▼</span>
+                   </button>
+               
+                   <div id="dropdownMenuInterior" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                     <div class="p-2 space-y-2 checkbox-group" data-section="Interior">
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition, except for normal permissible wear and tear.">
+                         1.Container inspected externally / internally found in satisfactory condition.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                         2.Container Internal panels found with rust marks at places.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                         3.Container External panels found with IMDG Stickers. To be removed.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                         4.Container internal panels found with Black stain at places.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                         5.Floor board found with chipped off at places.
+                       </label>
+                       <label class="flex items-center gap-2">
+                         <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                         6.Floor board found middle running gap 4 feet.
+                       </label>
+                     </div>
+                   </div>
+                 </div>
+               </td>
+             <td>Any toxic chemical residues found?	</td>
+             <td class="radio-column">
+               <label><input type="radio" name="interior" value="Yes"> Yes</label>
+               <label><input type="radio" name="interior" value="No"> No</label>
+             </td>
+           </tr> 
+           
+           <tr>
+             <td class="font-semibold">Exterior</td>
+             <td>
+               <div class="relative">
+                 <button id="dropdownBtnExterior" type="button" class="border rounded p-2 w-full text-left flex justify-between items-center">
+                   <span id="selectedOptionsExterior">Select Exterior Issues</span>
+                   <span>▼</span>
+                 </button>
+             
+                 <div id="dropdownMenuExterior" class="absolute left-0 mt-2 w-full bg-white border rounded shadow-md hidden z-10">
+                   <div class="p-2 space-y-2 checkbox-group" data-section="Exterior">
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="1. Container inspected externally / internally found in satisfactory condition.">
+                       1.Container inspected externally / internally found in satisfactory condition
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="2. Container Internal panels found with rust marks at places.">
+                       2.Container Internal panels found with rust marks at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="3. Container External panels found with IMDG Stickers. To be removed.">
+                       3.Container External panels found with IMDG Stickers. To be removed.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="4. Container internal panels found with Black stain at places.">
+                       4.Container internal panels found with Black stain at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="5. Floor board found with chipped off at places.">
+                       5.Floor board found with chipped off at places.
+                     </label>
+                     <label class="flex items-center gap-2">
+                       <input type="checkbox" class="checkbox-option" data-comment="6. Floor board found middle running gap 4 feet.">
+                       6.Floor board found middle running gap 4 feet.
+                     </label>
+                   </div>
+                 </div>
+               </div>
+             </td>
+             <td>Is there any presence of high rust formation inside the container?</td>
+             <td class="radio-column">
+               <label><input type="radio" name="exterior" value="Yes"> Yes</label>
+               <label><input type="radio" name="exterior" value="No"> No</label>
+             </td>
+           </tr> 
+         </tbody>
+       </table>
+       
+
+
+       
 </div>
 
-      <!-- Remarks -->
-      <div class="mb-4">
-        <label class="block text-sm font-semibold">Remarks:</label>
-        <textarea class="border border-gray-300 p-2 w-full h-24" name="remarks"></textarea>
-      </div>
+     <!-- Remarks -->
+     <div class="mb-4">
+       <label class="block text-sm font-semibold">Remarks:</label>
+       <textarea class="border border-gray-300 p-2 w-full h-24" name="remarks" id="finalRemarks"></textarea>
+     </div>
 
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-sm font-semibold">For Viking Marine Inc.</p>
-          <div class="mt-8">
-            <label class="block text-sm font-semibold">Surveyor</label>
-            <input class="border border-gray-300 p-1 w-full" type="text" name="surveyor"/>
-          </div>
-        </div>
-        <div class="text-right">
-          <p class="text-sm italic">"Issued Without Prejudice"</p>
-        </div>
-      </div>
+     <div class="flex justify-between items-center">
+       <div>
+         <p class="text-sm font-semibold">For Viking Marine Inc.</p>
+         <div class="mt-8">
+           <label class="block text-sm font-semibold">Surveyor</label>
+           <input class="border border-gray-300 p-1 w-full" type="text" name="surveyor"/>
+         </div>
+       </div>
+       <div class="text-right">
+         <p class="text-sm italic">"Issued Without Prejudice"</p>
+       </div>
+     </div>
 
-      <div class="flex justify-between mt-4">
-        <button type="submit" name="action" value="Save as Draft" class="btn btn-secondary">Save as Draft</button>
-        <button type="submit" id="btn" 
-                style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
-                onmouseover="this.style.backgroundColor='#0056b3'"
-                onmouseout="this.style.backgroundColor='#007bff'">
-            Submit
-        </button>
-        <button type="submit" id="submitNew" class="bg-green-500 text-white px-4 py-2 rounded">Submit and New</button>
-
-    </div>
- 
+       <div class="text-center mt-4">
+         <button type="submit" name="action" value="Save as Draft" class="btn btn-secondary">Save as Draft</button>
+     
+         <button type="submit" name="action" value="Submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+     
+         <button type="submit" id="submitNew" class="bg-green-500 text-white px-4 py-2 rounded">Submit and New</button>
+     </div>
 
 
 
-            <footer class="footer">
-      &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
-  </footer>
-    </form>
 
+           <footer class="footer">
+     &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+ </footer>
+   </form>
   </div>  
   <script>
+         document.addEventListener("DOMContentLoaded", () => {
+    updateRemarks();
+
+    // Setup dropdown for Interior section
+    function setupDropdown(buttonId, menuId, selectedId) {
+      const button = document.getElementById(buttonId);
+      const menu = document.getElementById(menuId);
+      const selectedText = document.getElementById(selectedId);
+
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        menu.classList.toggle("hidden");
+      });
+
+      menu.querySelectorAll(".checkbox-option").forEach((checkbox) => {
+        checkbox.addEventListener("change", function (event) {
+          event.stopPropagation();
+          updateSelectedOptions(selectedId, menu);
+          updateRemarks();
+        });
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!menu.contains(event.target) && !button.contains(event.target)) {
+          menu.classList.add("hidden");
+        }
+      });
+    }
+
+    // Initialize dropdown for Interior section
+    setupDropdown("dropdownBtnInterior", "dropdownMenuInterior", "selectedOptionsInterior");
+    setupDropdown("dropdownBtnUnderstructure", "dropdownMenuUnderstructure", "selectedOptionsUnderstructure");
+    setupDropdown("dropdownBtnFloorBoard", "dropdownMenuFloorBoard", "selectedOptionsFloorBoard");
+  setupDropdown("dropdownBtnExterior", "dropdownMenuExterior", "selectedOptionsExterior");
+  setupDropdown("dropdownBtnRoofPanel", "dropdownMenuRoofPanel", "selectedOptionsRoofPanel");
+  setupDropdown("dropdownBtnFrontPanel", "dropdownMenuFrontPanel", "selectedOptionsFrontPanel");
+  setupDropdown("dropdownBtnRightPanel", "dropdownMenuRightPanel", "selectedOptionsRightPanel");
+  setupDropdown("dropdownBtnLeftPanel", "dropdownMenuLeftPanel", "selectedOptionsLeftPanel");
+  setupDropdown("dropdownBtnRearEnd", "dropdownMenuRearEnd", "selectedOptionsRearEnd");
+
+
+
+
+
+});
+  // Function to update selected text in button
+  function updateSelectedOptions(selectedId, menu) {
+    const selected = Array.from(menu.querySelectorAll(".checkbox-option:checked"))
+      .map((cb) => cb.parentElement.textContent.trim())
+      .join(", ");
+
+    document.getElementById(selectedId).textContent = selected || "Select Issues";
+  }
+
+  // Function to update remarks dynamically
+  function updateRemarks() {
+    const sections = {};
+    document.querySelectorAll('.checkbox-option:checked').forEach(checkbox => {
+      const section = checkbox.closest('.checkbox-group')?.dataset.section || "Other";
+      const comment = checkbox.dataset.comment;
+
+      if (!sections[section]) {
+        sections[section] = [];
+      }
+      if (!sections[section].includes(comment)) {
+        sections[section].push(comment);
+      }
+    });
+
+    let remarksContent = '';
+
+    // General comments
+    const generalComments = [
+      "This container is suitable for General Cargo.",
+      "Understructure of the container was not made available for our inspection."
+    ];
+    remarksContent += generalComments.join("\n");
+
+    // Add section-specific comments
+    for (const [section, comments] of Object.entries(sections)) {
+      remarksContent += `\n\n${section}:\n- ${comments.join("\n- ")}`;
+    }
+
+    document.getElementById("finalRemarks").value = remarksContent.trim();
+  } 
+  
         document.getElementById("submitNew").addEventListener("click", function(event) {
         event.preventDefault(); // Prevent default form submission
         let form = document.querySelector("form");
