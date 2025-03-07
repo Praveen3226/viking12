@@ -16,7 +16,7 @@
 
 h1 {
     font-family: 'Cooper Black', sans-serif;
-    font-size: 48px;
+    font-size: 34px;
     text-align: center;
     -webkit-text-fill-color: #da3936;
     padding-left: 130px; /* Adjust this value as needed */
@@ -40,7 +40,7 @@ body {
     box-shadow: 0 4px 8px rgb(105, 105, 105);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 1000; /* Explicitly define */
 }
 
 .nav-bar h1 {
@@ -67,6 +67,7 @@ body {
 .nav-links a:hover {
     color: #007bff;
 }
+
 
 /* Main container for sidebar and content */
 .main-content {
@@ -170,6 +171,7 @@ body {
     font-size: 24px;
     cursor: pointer;
     margin-left: auto;
+    z-index: 2001 !important; /* Keep button above menu */
 }
 
 /* Mobile Navigation */
@@ -181,8 +183,10 @@ body {
     height: 100%;
     background-color: #282525;
     transition: right 0.3s ease-in-out;
-    z-index: 1000;
     padding: 60px 20px 20px;
+    z-index: 2000 !important; /* Must be higher than nav-bar's z-index */
+    -webkit-transition: right 0.3s ease-in-out; /* Add browser prefix */
+    transition: right 0.3s ease-in-out
 }
 
 .mobile-menu.active {
@@ -211,75 +215,114 @@ body {
     color: #007bff;
 }
 
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* Remove column layout for nav-bar */
+    .nav-bar {
+        flex-direction: row !important;
+        position: relative;
+        padding: 10px 60px 10px 80px; /* Add space for logo and hamburger */
+    }
+
+    /* Hide regular nav links */
     .nav-links {
         display: none;
     }
 
+    /* Show hamburger */
     .hamburger {
         display: block;
+        margin-right: -30px;
     }
 
-    .nav-bar {
-        flex-wrap: wrap;
-    }
-
-    /* Sidebar hidden on mobile */
-    aside.sidebar {
-        display: none;
-    }
-
-    .container-fluid {
-        margin-left: 0;
-    }
-}
-@media (max-width: 425px) {
-    .nav-links {
-        display: none; /* Hide navigation links */
-    }
-
-    .hamburger {
-        display: block; /* Show hamburger menu */
-    }
-
-    .nav-bar {
-        flex-wrap: wrap;
-        padding: 10px 15px;
-    }
-
-    /* Sidebar hidden on mobile */
-    aside.sidebar {
-        display: none;
-    }
-
-    .container-fluid {
-        margin-left: 0;
-    }
-
-    /* Logo stays on the left */
     .nav-bar img {
-        height: 70px; /* Adjust logo size */
+        margin-left: -100px;
+    }
+
+
+    .nav-bar h1 {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Ensure proper centering */
+        padding-left: 0;
+        font-size: 22px;
+        text-align: center;
+        margin: 0;
+    }
+
+}
+
+        /* Sidebar styles */
+        aside.sidebar {
+            width: 200px;
+            background-color: rgb(23, 23, 23);
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(222, 189, 189, 0.1);
+            height: 100%;
+        }
+
+        aside .links li {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #030303;
+            box-shadow: 0 2px 4px rgba(255, 250, 250, 0.29);
+            margin-bottom: 10px;
+            list-style: none;
+        }
+
+        aside .links a {
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        aside .logout-link a {
+            color: red;
+        }
+
+@media (max-width: 425px) {
+    .nav-bar {
+        padding: 10px 50px 10px 70px; /* Adjust padding for smaller screens */
+    }
+
+        /* Sidebar hidden on mobile */
+        aside.sidebar {
+        display: none;
+    }
+
+    .container-fluid {
+        margin-left: 0;
+    }
+
+    /* Logo positioning */
+    .nav-bar img {
         position: absolute;
         left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 50px; /* Adjust logo size */
     }
 
-    /* Centered H1 */
+    /* Center h1 */
     .nav-bar h1 {
-    font-size: 18px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    margin-left: -10px; /* Move slightly left */
-}
-
-
-    /* Hamburger Menu on the right */
-    .hamburger {
         position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Ensure proper centering */
+        padding-left: 0;
+        font-size: 1.5rem;
+        text-align: center;
+        margin: 0;
+    }
+
+    /* Hamburger positioning */
+    .hamburger {
         right: 10px;
-        font-size: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        position: absolute;
     }
 }
 
@@ -326,7 +369,7 @@ body {
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
     </div>
-    </div>
+
 
     <!-- Dashboard Content -->
     <div class="container-fluid">
