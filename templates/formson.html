@@ -223,10 +223,11 @@
     z-index: 1000;
         }
 
-        .nav-bar h1 {
+    .nav-bar h1 {
     color: rgba(253, 0, 0, 255);
     margin: 0;
     font-size: 24px;
+    align-items: center;
 }
 
 .nav-links ul {
@@ -297,18 +298,32 @@
         }
 
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
+    /* Remove column layout for nav-bar */
+    .nav-bar {
+        flex-direction: row !important;
+        position: relative;
+        padding: 10px 60px 10px 80px; /* Add space for logo and hamburger */
+    }
 
-            .hamburger {
-                display: block;
-            }
+    /* Hide regular nav links */
+    .nav-links {
+        display: none;
+    }
 
-            .nav-bar {
-                flex-wrap: wrap;
-            }
-        }
+    /* Show hamburger */
+    .hamburger {
+        display: block;
+        margin-right: -20px;
+    }
+
+    .nav-bar img {
+        margin-left: -100px;
+    }
+
+    .nav-bar h1 {
+        margin-left: -60px;
+    }
+}
 
         @media (max-width: 425px) {
     .nav-links {
@@ -347,7 +362,7 @@
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
-    margin-left: -10px; /* Move slightly left */
+    margin-right: -300px; /* Move slightly left */
 }
 
 /* Hamburger Menu on the right */
@@ -363,14 +378,15 @@
         @media (max-width: 768px) {
             h1 {
                 font-size: 36px; /* Smaller font size for tablets */
-                padding-left: 20px; /* Reduced padding for smaller screens */
+                padding-left: 0px; /* Reduced padding for smaller screens */
             }
         }
 
         @media (max-width: 480px) {
             h1 {
+                align-items: center;
                 font-size: 24px; /* Even smaller font size for mobile phones */
-                padding-left: 10px; /* Minimal padding for very small screens */
+                padding-left: 30px; /* Minimal padding for very small screens */
             }
         }
         </style>
@@ -392,7 +408,7 @@
 <!-- Navigation Bar -->
 <div class="nav-bar">
     <img src="{{ url_for('static', filename='logo.png') }}" alt=" Logo" style=height:100px; display:inline-block; margin-right:55px;>
-    <h1 class="text-2xl font-bold" style="color: rgba(253, 0, 0, 1);">VIKING MARINE INC.</h1>
+    <h1>VIKING MARINE INC.</h1>
     <nav class="nav-links">
         <ul>
             <li><a href="{{ url_for('admindash') }}">Home</a></li>
