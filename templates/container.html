@@ -338,6 +338,13 @@ h1 {
   .dropdown.show {
     display: block;
   }
+  .checkbox-group::before {
+    content: attr(data-section);
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
 </style>
 </head>
 <body class="bg-gray-100 p-4">
@@ -515,6 +522,7 @@ h1 {
         </div>
 
       </div>
+      <img src="{{ url_for('static', filename='cont.png') }}" alt=" Logo" style=height:450px; style=width:400px;  display:inline-block; margin-right:55px;>
 
       <!-- Radio Box Questions in Table Format -->
 
