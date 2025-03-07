@@ -30,39 +30,60 @@
             height: 100vh;
         }
 
+        /* Dashboard content styles */
+.container-fluid {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col-md-3 {
+    flex: 0 0 25%;
+    padding: 10px;
+}
+
         /* Navigation Bar */
         .nav-bar {
-            background-color: #282525;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgb(105, 105, 105);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
         }
 
         .nav-bar h1 {
-            color:rgba(253,0,0,255);
-            margin: 0;
-            font-size: 24px;
-        }
+    color: rgba(253, 0, 0, 255);
+    margin: 0;
+    font-size: 24px;
+}
 
-        .nav-links ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 2rem;
-        }
+.nav-links ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 2rem;
+}
 
-        .nav-links a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
+.nav-links a {
+    text-decoration: none;
+    color: rgb(1, 1, 1);
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
 
-        .nav-links a:hover {
-            color: #007bff;
-        }
+.nav-links a:hover {
+    color: #007bff;
+}
 
         /* Center the "Back to previous page" link */
         h2 {
@@ -204,7 +225,7 @@
             display: none;
             background: none;
             border: none;
-            color: white;
+            color: black;
             font-size: 24px;
             cursor: pointer;
             padding: 15px;
@@ -278,6 +299,55 @@
                 padding-right: 80px;
             }
         }
+
+
+        @media (max-width: 425px) {
+    .nav-links {
+        display: none; /* Hide navigation links */
+    }
+
+    .hamburger {
+        display: block; /* Show hamburger menu */
+    }
+
+    .nav-bar {
+        flex-wrap: wrap;
+        padding: 10px 15px;
+    }
+
+    /* Sidebar hidden on mobile */
+    aside.sidebar {
+        display: none;
+    }
+
+    .container-fluid {
+        margin-left: 0;
+    }
+
+    /* Logo stays on the left */
+    .nav-bar img {
+        height: 70px; /* Adjust logo size */
+        position: absolute;
+        left: 10px;
+    }
+
+    /* Centered H1 */
+    .nav-bar h1 {
+    font-size: 18px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    margin-left: -10px; /* Move slightly left */
+}
+
+/* Hamburger Menu on the right */
+    .hamburger {
+        position: absolute;
+        right: 10px;
+        font-size: 20px;
+    }
+}
     </style>
 </head>
 
@@ -295,7 +365,7 @@
     {% endwith %}
     <!-- Navigation Bar -->
     <div class="nav-bar">
-        <img src="{{ url_for('static', filename='logo.jpg') }}" alt=" Logo" style="height:70px; display:inline-block; margin-right:35px;">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt=" Logo" style=height:100px; display:inline-block; margin-right:55px;>
         <h1 class="text-2xl font-bold" style="color: rgba(253, 0, 0, 1);">VIKING MARINE INC.</h1>
         <nav class="nav-links">
             <ul>
@@ -305,6 +375,10 @@
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
             </ul>
         </nav>
+                 <!-- Hamburger Menu Button -->
+                 <button class="hamburger" id="hamburger">
+                    <i class="fa fa-bars"></i>
+                </button>
     </div>
 
     <!-- "Back to previous page" link -->
@@ -312,15 +386,10 @@
         <a href="{{ url_for('admindash') }}">Back to previous page</a>
     </h2>
 
-    <!-- Hamburger Menu Button -->
-    <button class="hamburger" id="hamburger">
-        <i class="fa fa-bars"></i>
-    </button>
-
     <!-- Add backdrop element -->
     <div class="mobile-backdrop" id="mobileBackdrop"></div>
 
-    <!-- Updated Mobile Menu -->
+    <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
         <ul>
             <li><a href="{{ url_for('admindash') }}">Home</a></li>
