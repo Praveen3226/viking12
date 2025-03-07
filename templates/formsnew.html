@@ -204,7 +204,7 @@ h1 {
     box-shadow: 0 4px 8px rgb(105, 105, 105);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 1000; /* Explicitly define */
         }
 
         .nav-bar h1 {
@@ -246,6 +246,7 @@ h1 {
             font-size: 24px;
             cursor: pointer;
             margin-left: auto;
+            z-index: 2001 !important; /* Keep button above menu */
         }
 
         .mobile-menu {
@@ -256,8 +257,10 @@ h1 {
             height: 100%;
             background-color: #282525;
             transition: right 0.3s ease;
-            z-index: 1000;
             padding: 60px 20px 20px;
+            z-index: 2000 !important; /* Must be higher than nav-bar's z-index */
+    -webkit-transition: right 0.3s ease-in-out; /* Add browser prefix */
+    transition: right 0.3s ease-in-out;
         }
 
         .mobile-menu.active {
@@ -287,63 +290,79 @@ h1 {
         }
 
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hamburger {
-                display: block;
-            }
-
-            .nav-bar {
-                flex-wrap: wrap;
-            }
-        }
-       @media (max-width: 425px) {
-    .nav-links {
-        display: none; /* Hide navigation links */
-    }
-
-    .hamburger {
-        display: block; /* Show hamburger menu */
-    }
-
+    /* Remove column layout for nav-bar */
     .nav-bar {
-        flex-wrap: wrap;
-        padding: 10px 15px;
+        flex-direction: row !important;
+        position: relative;
+        padding: 10px 60px 10px 80px; /* Add space for logo and hamburger */
     }
 
-    /* Sidebar hidden on mobile */
-    aside.sidebar {
+    /* Hide regular nav links */
+    .nav-links {
         display: none;
     }
 
-    .container-fluid {
-        margin-left: 0;
+    /* Show hamburger */
+    .hamburger {
+        display: block;
+        margin-right: -30px;
     }
 
-    /* Logo stays on the left */
     .nav-bar img {
-        height: 70px; /* Adjust logo size */
-        position: absolute;
-        align-items: center;
+        margin-left: -100px;
     }
 
-    /* Centered H1 */
+
     .nav-bar h1 {
-    font-size: 18px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    margin-left: -10px; /* Move slightly left */
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Ensure proper centering */
+        padding-left: 0;
+        font-size: 20px;
+        text-align: center;
+        margin: 0;
+    }
+
 }
 
-/* Hamburger Menu on the right */
-    .hamburger {
+@media (max-width: 425px) {
+    .nav-bar {
+        padding: 10px 50px 10px 70px; /* Adjust padding for smaller screens */
+    }
+
+    /* Logo positioning */
+    .nav-bar img {
         position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 50px; /* Adjust logo size */
+    }
+
+    /* Center h1 */
+    .nav-bar h1 {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Ensure proper centering */
+        padding-left: 0;
+        font-size: 34px;
+        text-align: center;
+        margin: 0;
+    }
+
+    /* Hamburger positioning */
+    .hamburger {
         right: 10px;
-        font-size: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        position: absolute;
+        margin-right: -50px;
+    }
+
+    .nav-bar img {
+        margin-left: -30px;
     }
 }
 
