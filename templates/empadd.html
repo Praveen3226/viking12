@@ -329,6 +329,7 @@
             font-size: 24px;
             cursor: pointer;
             margin-left: auto;
+            z-index: 1000;
         }
 
         .mobile-menu {
@@ -339,8 +340,10 @@
             height: 100%;
             background-color: #282525;
             transition: right 0.3s ease;
-            z-index: 1000;
             padding: 60px 20px 20px;
+            z-index: 2000 !important; /* Must be higher than nav-bar's z-index */
+            -webkit-transition: right 0.3s ease-in-out; /* Add browser prefix */
+            transition: right 0.3s ease-in-out;
         }
 
         .mobile-menu.active {
@@ -421,10 +424,11 @@
 
     .hamburger {
         display: block; /* Show hamburger menu */
+        margin-right: -30px;
     }
 
     .nav-bar {
-        flex-wrap: wrap;
+        width: 100%;
         padding: 10px 15px;
     }
 
@@ -460,6 +464,43 @@
         right: 10px;
         font-size: 20px;
     }
+}
+
+@media (max-width: 768px) {
+    /* Remove column layout for nav-bar */
+    .nav-bar {
+        flex-direction: row !important;
+        position: relative;
+        padding: 10px 60px 10px 80px; /* Add space for logo and hamburger */
+    }
+
+    /* Hide regular nav links */
+    .nav-links {
+        display: none;
+    }
+
+    /* Show hamburger */
+    .hamburger {
+        display: block;
+        margin-right: -30px;
+    }
+
+    .nav-bar img {
+        margin-left: -90px;
+    }
+
+
+    .nav-bar h1 {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Ensure proper centering */
+        padding-left: 0;
+        font-size: 20px;
+        text-align: center;
+        margin: 0;
+    }
+
 }
 
 
@@ -506,10 +547,10 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
+<!-- Navigation Bar -->
 <div class="nav-bar">
     <img src="{{ url_for('static', filename='logo.png') }}" alt=" Logo" style=height:100px; display:inline-block; margin-right:55px;>
-    <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color:#da3936 ;">VIKING MARINE INC</h1>           
+    <h1 style="font-family: 'Cooper Black', sans-serif; color: #da3936;">VIKING MARINE INC.</h1>
     <nav class="nav-links">
         <ul>
             <li><a href="{{ url_for('admindash') }}">Home</a></li>
