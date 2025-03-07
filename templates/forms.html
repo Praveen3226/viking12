@@ -16,7 +16,7 @@
 
         h1 {
             font-family: 'Cooper Black', sans-serif;       
-             font-size: 48px; 
+             font-size: 34px; 
             text-align: center; 
             -webkit-text-fill-color: #da3936;
              padding-left: 130px; /* Adjust this value as needed */
@@ -48,7 +48,7 @@
 }
 
         /* Navigation Bar */
-        .nav-bar {
+    .nav-bar {
     background-color: #ffffff;
     padding: 10px 20px;
     display: flex;
@@ -58,13 +58,13 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-        }
+    }
 
-        .nav-bar h1 {
+    .nav-bar h1 {
     color: rgba(253, 0, 0, 255);
     margin: 0;
     font-size: 24px;
-}
+    }
 
 .nav-links ul {
     list-style-type: none;
@@ -288,64 +288,73 @@
         }
 
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            .hamburger {
-                display: block;
-            }
-            .nav-bar {
-                position: relative;
-                padding-right: 80px;
-            }
-        }
-
-
-        @media (max-width: 425px) {
-    .nav-links {
-        display: none; /* Hide navigation links */
-    }
-
-    .hamburger {
-        display: block; /* Show hamburger menu */
-    }
-
+    /* Remove column layout for nav-bar */
     .nav-bar {
-        flex-wrap: wrap;
-        padding: 10px 15px;
+        flex-direction: row !important;
+        position: relative;
+        padding: 10px 60px 10px 80px; /* Add space for logo and hamburger */
     }
 
-    /* Sidebar hidden on mobile */
-    aside.sidebar {
+    /* Hide regular nav links */
+    .nav-links {
         display: none;
     }
 
-    .container-fluid {
-        margin-left: 0;
+    /* Show hamburger */
+    .hamburger {
+        display: block;
     }
 
-    /* Logo stays on the left */
     .nav-bar img {
-        height: 70px; /* Adjust logo size */
-        position: absolute;
-        left: 10px;
+        margin-left: -90px;
     }
 
-    /* Centered H1 */
+
     .nav-bar h1 {
-    font-size: 18px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    margin-left: -10px; /* Move slightly left */
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Ensure proper centering */
+        padding-left: 0;
+        font-size: 20px;
+        text-align: center;
+        margin: 0;
+    }
+
 }
 
-/* Hamburger Menu on the right */
-    .hamburger {
+@media (max-width: 425px) {
+    .nav-bar {
+        padding: 10px 50px 10px 70px; /* Adjust padding for smaller screens */
+    }
+
+    /* Logo positioning */
+    .nav-bar img {
         position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 50px; /* Adjust logo size */
+    }
+
+    /* Center h1 */
+    .nav-bar h1 {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Ensure proper centering */
+        padding-left: 0;
+        font-size: 1.5rem;
+        text-align: center;
+        margin: 0;
+    }
+
+    /* Hamburger positioning */
+    .hamburger {
         right: 10px;
-        font-size: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        position: absolute;
     }
 }
     </style>
@@ -366,7 +375,7 @@
     <!-- Navigation Bar -->
     <div class="nav-bar">
         <img src="{{ url_for('static', filename='logo.png') }}" alt=" Logo" style=height:100px; display:inline-block; margin-right:55px;>
-        <h1 class="text-2xl font-bold" style="color: rgba(253, 0, 0, 1);">VIKING MARINE INC.</h1>
+        <h1>VIKING MARINE INC.</h1>
         <nav class="nav-links">
             <ul>
                 <li><a href="{{ url_for('admindash') }}">Home</a></li>
