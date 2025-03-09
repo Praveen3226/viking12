@@ -6,6 +6,8 @@ from mysql.connector import Error
 from datetime import datetime, timedelta
 import traceback
 import json  # ✅ Use Python’s built-in json module
+import string
+
 
 
 
@@ -2590,7 +2592,173 @@ def update_form(CertificateNumber):
 def empadd():
     return render_template('empadd.html')
 
-# Fetch all employees
+@app.route('/cargo')
+def cargo():
+    return render_template('cargo.html')
+
+@app.route('/cargoman')
+def cargoman():
+    return render_template('cargoman.html')
+
+@app.route("/add_cargo", methods=["POST"])
+def add_cargo():
+    try:
+        data = request.get_json()  # Get JSON data from frontend
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Insert into database
+        query = """
+        INSERT INTO cargo (received_date, cfs_name, shipper, destination, invoice_no, invoice_date,
+                           invoice_value, total_packages, gross_weight, net_weight, volume, hbl_no, sb_no, sb_date)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = (
+            data["receivedDate"], data["cfsName"], data["shipper"], data["destination"],
+            data["invoiceNo"], data["invoiceDate"], data["invoiceValue"], data["totalPackages"],
+            data["grossWeight"], data["netWeight"], data["volume"], data["hblNo"], data["sbNo"], data["sbDate"]
+        )
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Cargo entry added successfully!"})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/get_cargo", methods=["GET"])
+def get_cargo():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Fetch data from cargo table
+        query = "SELECT * FROM cargo ORDER BY id DESC"
+        cursor.execute(query)
+        cargo_data = cursor.fetchall()
+
+        return jsonify({"success": True, "data": cargo_data})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+
+@app.route('/pic')
+def pic():
+    return render_template('pic.html')
+
+def increment_alpha_suffix(suffix):
+    """ Increment a two-letter alphabetical suffix (AA → AB → AC ... AZ → BA → ZZ) """
+    if suffix == "ZZ":
+        return "AA"  # Reset to AA after ZZ
+    
+    first, second = suffix
+    alphabet = string.ascii_uppercase
+
+    if second != "Z":  
+        return first + alphabet[alphabet.index(second) + 1]  # Increment second letter
+    else:  
+        return alphabet[alphabet.index(first) + 1] + "A"  # Increment first, reset second
+
+def generate_report_number():
+    """ Generate report number in VKM(YEAR,MONTH)AA format with alphabetic increments """
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+    prefix = f"VKM{current_year}{current_month:02}"
+
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = f"""
+                SELECT report_number FROM po 
+                WHERE report_number LIKE '{prefix}%'
+                ORDER BY report_number DESC 
+                LIMIT 1
+            """
+            cursor.execute(sql)
+            result = cursor.fetchone()
+
+        if result and result["report_number"]:
+            last_suffix = result["report_number"][-2:]  # Extract last two characters (AA, AB, etc.)
+            next_suffix = increment_alpha_suffix(last_suffix)  # Increment alphabetically
+        else:
+            next_suffix = "AA"  # Start from AA if no records exist
+
+        return f"{prefix}{next_suffix}"
+    finally:
+        connection.close()
+
+@app.route('/generate_report_number')
+def get_report_number():
+    report_number = generate_report_number()
+    return jsonify({"report_number": report_number})
+
+@app.route('/submit_po', methods=['POST'])
+def submit_po():
+    company_name = request.form['company_name']
+    address = request.form['address']
+    phone = request.form['phone']
+    gst = request.form['GST']
+    status = request.form['status']
+    report_number = generate_report_number()  # Auto-generate report number
+    submitted_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = """
+                INSERT INTO po (company_name, address, phone, gst, report_number, status, submitted_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (company_name, address, phone, gst, report_number, status, submitted_at))
+        connection.commit()
+        flash(f"Form submitted successfully! Report Number: {report_number}", "success")
+    except Exception as e:
+        print(f"Error: {e}")
+        flash("Failed to submit form", "danger")
+    finally:
+        connection.close()
+
+    return redirect(url_for('po'))
+
+@app.route('/po')
+@login_required
+def po():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Fetch all POs
+        cursor.execute("SELECT id, company_name, address, phone, gst, report_number, status FROM po ")
+        po_data = cursor.fetchall()
+
+        conn.close()
+
+        return render_template('po.html', po_data=po_data)
+    except Exception as e:
+        print(f"Error: {e}")
+        flash('An error occurred while fetching the purchase orders.', 'error')
+        return redirect(url_for('po'))
+
+
+
+
+
+
 @app.route('/employees', methods=['GET'])
 def get_employees():
     conn = get_db_connection()
