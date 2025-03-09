@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 
 
@@ -183,6 +184,50 @@ h1 {
     display: inline-block;
     background-color: currentColor;
 }
+.status-badge {
+    display: inline-block;
+    background-color: red; /* Adjust color */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+@media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                page-break-inside: avoid;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+            .no-print {
+        display: none !important;
+    }
+        }
+        .print-container {
+            padding: 20px;
+            background: #fff;
+        }
+        .certificate-title {
+    text-align: center;
+    background-color: #b91c1c;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -218,7 +263,6 @@ h1 {
        <div class="sidebar" id="sidebar">
         <ul>
             <li><a href="{{ url_for('admindash') }}">Home</a></li>
-            <li><a href="#">Profile</a></li>
             <li><a href="{{ url_for('forms') }}">Forms</a></li>
             <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
@@ -237,24 +281,18 @@ h1 {
             <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
         </div>
         {% if cer %}
-        <p><strong>Certificate Number:</strong> {{ cer.CertificateNumber }}</p>
-        <p><strong>Status:</strong> 
-            <span class="status-indicator 
-                {% if cer.status == 'Open' %} status-open
-                {% elif cer.status == 'In Progress' %} status-in-progress
-                {% elif cer.status == 'Completed' %} status-completed
-                {% else %} status-unknown
-                {% endif %}">
-                <span class="status-circle"></span> <!-- Small round indicator -->
-                {{ cer.status }}
-            </span>
+        <p class="no-print"><strong>Certificate Number:</strong> {{ cer.CertificateNumber }}</p>
+        <p class="no-print"><strong>Status:</strong> 
+            <span class="status-badge">{{ cer.status }}</span>
         </p>
     {% else %}
-        <p>No certificate data available.</p>
+        <p class="no-print">No certificate data available.</p>
     {% endif %}
+    
+    
         <!-- Title -->
-        <div class="text-center my-4">
-            <span class="bg-red-700 text-white px-4 py-1 rounded">CERTIFICATE OF MEASUREMENT REPORT</span>
+        <div class="certificate-title">
+            CERTIFICATE OF MEASUREMENT REPORT
         </div>
 
         <!-- Applicant Information -->
@@ -346,7 +384,7 @@ h1 {
 
 
         <button onclick="generatePDF()" class="fixed bottom-8 right-8 bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-800 z-50">
-            <i class="fas fa-print mr-2"></i>Print
+            <i class="fas fa-print mr-2"></i>Print PDF
         </button>
 
         <!-- Footer -->
@@ -355,12 +393,79 @@ h1 {
             <p class="text-sm">For <span class="font-bold">VIKING MARINE INC.,</span></p>
             <p class="text-sm">Surveyor</p>
         </div>
-        <footer class="footer">
-            &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
-        </footer>
-    </div>
 
+    </div>
+    <footer class="footer">
+        &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+    </footer>
     <script>
+async function generatePDF() {
+    // Hide unnecessary elements before capturing
+    const elementsToHide = document.querySelectorAll('.header, .footer, .status, .certificate-btn, .nav-bar, .sidebar, .sidebar-backdrop, button');
+    const originalStyles = [];
+
+    elementsToHide.forEach(el => {
+        originalStyles.push(el.style.display);
+        el.style.display = 'none';
+    });
+
+    // Select main content
+    const element = document.getElementById("pdf-content");
+
+    // Capture content with high resolution
+    const canvas = await html2canvas(element, {
+        scale: 3, // Higher resolution
+        useCORS: true,
+        backgroundColor: '#ffffff'
+    });
+
+    // Convert to black and white (grayscale)
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+        const avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3; // Grayscale conversion
+        pixels[i] = avg;  // Red
+        pixels[i + 1] = avg;  // Green
+        pixels[i + 2] = avg;  // Blue
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+    const imgData = canvas.toDataURL('image/png');
+
+    // Create PDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    let imgWidth = pageWidth - 20; // 10mm margins
+    let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    // If content overflows, split into pages
+    let yPosition = 10;
+    while (imgHeight > 0) {
+        doc.addImage(imgData, 'PNG', 10, yPosition, imgWidth, imgHeight > pageHeight ? pageHeight - 20 : imgHeight);
+        imgHeight -= pageHeight;
+        yPosition = 10;
+
+        if (imgHeight > 0) {
+            doc.addPage();
+        }
+    }
+
+    // Restore hidden elements
+    elementsToHide.forEach((el, index) => {
+        el.style.display = originalStyles[index];
+    });
+
+    // Save the PDF with a dynamic filename
+    const certNo = document.querySelector("#certificate-number")?.textContent.trim() || "shipment_certificate";
+    doc.save(`Certificate_${certNo}.pdf`);
+}
+
+
 
         // Hamburger Menu Toggle
         document.querySelector('.hamburger').addEventListener('click', function() {
@@ -423,8 +528,6 @@ h1 {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'italic');
     doc.setTextColor(128);
-    doc.text("Crafted with care, protected with pride - © 2025 Bitsmart", 
-            pageWidth/2, pageHeight - 10, { align: 'center' });
 
     // Restore hidden elements
     elementsToHide.forEach((el, index) => {
