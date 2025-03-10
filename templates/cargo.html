@@ -338,6 +338,41 @@ html, body {
     height: 100vh;
     display: flex;
 }
+.flash-messagebr {
+    position: fixed;
+    bottom: 50px; /* Move it up */
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(45deg, #ffd700, #ffb700, #ff9800); /* Golden gradient */
+    color: rgb(33, 26, 26);
+    padding: 15px 30px; /* Bigger padding */
+    font-size: 20px; /* Bigger text */
+    font-weight: bold;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 1s ease-in-out, bounce 1s infinite alternate;
+}
+
+
+.heart {
+    animation: pulse 1.5s infinite;
+    display: inline-block;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes bounce {
+    from { transform: translateX(-50%) translateY(0); }
+    to { transform: translateX(-50%) translateY(-5px); }
+}
 
 </style>
 </head>
@@ -376,9 +411,13 @@ html, body {
  
         
     </div>
+    <div class="flash-messagebr">
+        <p>🚀 Designed & Developed with <span class="heart">🖤</span> by <strong>Bitsmart</strong> 🔥</p>
+    </div>
     <footer class="footer">
         &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
     </footer>
+
     <script>
         // Show/hide tabs
         function showTab(tabName) {
