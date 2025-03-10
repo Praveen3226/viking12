@@ -316,6 +316,26 @@
             display: none;
         }
     }
+    .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    color: white;
+    background-color: rgb(49, 45, 45);
+    border-top: 1px solid #e7e7e7;
+}
+html, body {
+    height: 100vh;
+    overflow-y: auto; /* Allow vertical scrolling */
+}
+
+.min-h-screen {
+    height: 100vh;
+    display: flex;
+}
     </style>
 </head>
 <body>
@@ -432,7 +452,11 @@
                 </form>
             </div>
         </main>
+
     </div>
+    <footer class="footer">
+        &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
+    </footer>
     <script>
         // Check authentication
 
