@@ -161,6 +161,24 @@
     from { transform: translateX(-50%) translateY(0); }
     to { transform: translateX(-50%) translateY(-5px); }
 }
+ /* Smaller devices */
+@media (max-width: 768px) {
+    .flash-messagebr {
+        bottom: 70px; /* Avoid covering footer */
+        padding: 6px 15px;
+        font-size: 12px;
+    }
+}
+
+/* Very small devices */
+@media (max-width: 480px) {
+    .flash-messagebr {
+        bottom: 80px; /* Extra space for very small screens */
+        padding: 5px 10px;
+        font-size: 10px;
+    }
+}
+
 </style>
 </head>
 <body>
