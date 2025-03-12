@@ -128,19 +128,18 @@
 }
 .flash-messagebr {
     position: fixed;
-    bottom: 50px; /* Move it up */
+    bottom: 50px; /* Lower position */
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(45deg, #ffd700, #ffb700, #ff9800); /* Golden gradient */
     color: rgb(33, 26, 26);
-    padding: 15px 30px; /* Bigger padding */
-    font-size: 20px; /* Bigger text */
+    padding: 8px 20px; /* Smaller padding */
+    font-size: 14px; /* Smaller text */
     font-weight: bold;
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 8px; /* Softer rounded corners */
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
     animation: fadeIn 1s ease-in-out, bounce 1s infinite alternate;
 }
-
 
 .heart {
     animation: pulse 1.5s infinite;
@@ -149,9 +148,10 @@
 
 @keyframes pulse {
     0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
+    50% { transform: scale(1.1); }
     100% { transform: scale(1); }
 }
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateX(-50%) translateY(10px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
