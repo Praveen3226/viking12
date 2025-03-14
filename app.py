@@ -7,13 +7,22 @@ from datetime import datetime, timedelta
 import traceback
 import json  # ✅ Use Python’s built-in json module
 import string
+import os
+from werkzeug.utils import secure_filename
+from flask import send_from_directory
 
 
 
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for session management
-app.permanent_session_lifetime = timedelta(minutes=30)  # Auto logout after 30 minutes of inactivity
+app.permanent_session_lifetime = timedelta(minutes=30) # Auto logout after 30 minutes of inactivity
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# ✅ Ensure the folder exists
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])  
 
 # Database Connection Function
 def get_db_connection():
@@ -1008,13 +1017,14 @@ def container():
 #                <--- Admin Container Form --->                     #
 #####################################################################
 
+
+
 @app.route('/add_survey', methods=['POST'])
 @login_required
 def add_survey():
     try:
         with get_db_connection() as conn:
             with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                
                 # Extract form data
                 CertificateNumber = request.form.get('CertificateNumber', '').strip()
                 date = request.form.get('date', '').strip()
@@ -1031,72 +1041,76 @@ def add_survey():
                 max_gross_weight = request.form.get('max_gross_weight', '').strip()
                 remarks = request.form.get('remarks', '').strip()
                 surveyor = request.form.get('surveyor', '').strip()
-                
-                action = request.form.get('action')  # Get which button was clicked
+                action = request.form.get('action')
 
-                # ✅ Determine status based on action
-                if action == "Save as Draft":
-                    status = "Draft"
-                else:
-                    status = "In Progress"
-                    # ✅ Validate required fields only for "Submit" and "Submit and New"
-                    required_fields = {
-                        "CertificateNumber": CertificateNumber,
-                        "date": date,
-                        "applicant_for_survey": applicant_for_survey,
-                        "date_of_inspection": date_of_inspection,
-                        "container_no": container_no,
-                        "place_of_inspection": place_of_inspection,
-                        "surveyor": surveyor,
-                    }
+                # Handle photo uploads
+                photo_paths = []
+                for i in range(1, 8):
+                    photo = request.files.get(f'photo_{i}')
+                    if photo and photo.filename != '':
+                        filename = secure_filename(f"{CertificateNumber}_photo_{i}.jpg")
+                        photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-                    for field, value in required_fields.items():
-                        if not value:
-                            flash(f"Error: {field.replace('_', ' ').title()} is required!", "error")
-                            return redirect(url_for('container'))  # Redirect if a field is missing
+                        print(f"Saving photo {i} to: {photo_path}")  # Debugging statement
 
-                # ✅ Check if CertificateNumber exists before updating
+                        photo.save(photo_path)
+                        photo_paths.append(f"uploads/{filename}")  # Store relative path for easier access
+                    else:
+                        photo_paths.append(None)
+
+
+
+                # Determine status
+                status = "Draft" if action == "Save as Draft" else "In Progress"
+
+                # Validate required fields for submission
+                if status != "Draft":
+                    required_fields = [CertificateNumber, date, applicant_for_survey, date_of_inspection, container_no, place_of_inspection, surveyor]
+                    if not all(required_fields):
+                        flash("All required fields must be filled!", "error")
+                        return redirect(url_for('container'))
+
+                # Check if CertificateNumber exists
                 cursor.execute("SELECT COUNT(*) AS count FROM container WHERE CertificateNumber = %s", (CertificateNumber,))
                 result = cursor.fetchone()
-
                 if not result or result["count"] == 0:
                     flash(f"Error: Certificate Number {CertificateNumber} not found!", "error")
-                    return redirect(url_for('forms'))  # Redirect if record does not exist
+                    return redirect(url_for('forms'))
 
-                # ✅ Update survey record
+                # Update survey record
                 update_query = """
                     UPDATE container
                     SET 
                         date = %s, applicant_for_survey = %s, date_of_inspection = %s, container_no = %s,
                         place_of_inspection = %s, type = %s, size = %s, tare_weight = %s, csc_no = %s,
                         payload_capacity = %s, year_of_manufacture = %s, max_gross_weight = %s, 
-                        remarks = %s, surveyor = %s, status = %s
+                        remarks = %s, surveyor = %s, status = %s,
+                        photo_1 = %s, photo_2 = %s, photo_3 = %s, photo_4 = %s, photo_5 = %s, photo_6 = %s, photo_7 = %s
                     WHERE CertificateNumber = %s
                 """
                 values = (
-                    date or None, applicant_for_survey or None, date_of_inspection or None, container_no or None,
-                    place_of_inspection or None, container_type or None, size or None, tare_weight or None, 
-                    csc_no or None, payload_capacity or None, year_of_manufacture or None, max_gross_weight or None,
-                    remarks or None, surveyor or None, status, CertificateNumber
+                    date, applicant_for_survey, date_of_inspection, container_no,
+                    place_of_inspection, container_type, size, tare_weight, csc_no,
+                    payload_capacity, year_of_manufacture, max_gross_weight,
+                    remarks, surveyor, status, *photo_paths, CertificateNumber
                 )
-
                 cursor.execute(update_query, values)
                 conn.commit()
+                print("Photo Paths:", photo_paths)
 
                 flash('Survey saved as draft!' if status == "Draft" else 'Survey submitted successfully!', 'success')
 
-                # ✅ Redirect based on action
                 if action == "Submit and New":
-                    return redirect(url_for('container'))  # Redirect to form for new entry
-                return redirect(url_for('forms'))  # Default redirect to forms page
+                    return redirect(url_for('container'))
+                return redirect(url_for('forms'))
 
     except Exception as e:
         import logging
         logger = logging.getLogger(__name__)
         logger.error(f"Error in add_survey: {e}")
-
         flash(f'An error occurred: {e}', 'error')
-        return redirect(url_for('container'))  # Redirect to avoid data loss
+        return redirect(url_for('container'))
+
 
     
 #####################################################################
