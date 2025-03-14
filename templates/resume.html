@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+	.input-row {
+    margin-bottom: 10px;
+}
+
+.form-control:not(textarea) {
+    height: 38px;
+}
+
+
+/* Dark Mode Styles */
+
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.dark-mode .resume-preview {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+.dark-mode .input-box {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .accordion-button {
+    background-color: #333;
+    color: #ffffff;
+}
+
+.dark-mode .accordion-button:not(.collapsed) {
+    background-color: #444;
+}
+
+.dark-mode .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.dark-mode .delete-btn {
+    background-color: #dc3545;
+}
+
+
+/* Light Mode Styles */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.resume-preview {
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.input-box {
+    border: 1px solid #ddd;
+    background: #ffffff;
+}
+
+
+/* Layout Styles */
+
+.container {
+    max-width: 100%;
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.resume-builder {
+    flex: 1;
+    max-width: 50%;
+}
+
+.resume-preview-section {
+    flex: 1;
+    max-width: 50%;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.resume-preview {
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.input-box {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+
+/* Component Styles */
+
+.serial-no {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+.add-btn-container {
+    margin-top: 10px;
+    padding: 10px 0;
+}
+
+.current-work-group {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+/* Add to the CSS section */
+
+#downloadPdf {
+    transition: all 0.3s ease;
+}
+
+#downloadPdf:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode #downloadPdf {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        padding: 15px;
+    }
+    .resume-builder,
+    .resume-preview-section {
+        max-width: 100%;
+    }
+    .resume-preview {
+        height: auto;
+        position: static;
+    }
+}
+ </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="resume-builder">
+            <h2 class="text-center mb-4">Resume Builder</h2>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+            </div>
+
+            <div class="accordion" id="resumeAccordion">
+                <!-- Personal Information -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#personalInfo">
+                            Personal Information
+                        </button>
+                    </h2>
+                    <div id="personalInfo" class="accordion-collapse collapse show" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="personalInfoSection">
+                            <div class="input-box">
+                                <div class="row input-row">
+                                    <div class="col-12">
+                                        <input type="text" class="form-control" id="fullName" placeholder="Full Name" required>
+                                    </div>
+                                </div>
+                                <div class="row input-row">
+                                    <div class="col-12">
+                                        <input type="email" class="form-control" id="email" placeholder="Email Address">
+                                    </div>
+                                </div>
+                                <div class="row input-row">
+                                    <div class="col-12">
+                                        <input type="tel" class="form-control" id="phone" placeholder="Phone Number">
+                                    </div>
+                                </div>
+                                <div class="row input-row">
+                                    <div class="col-12">
+                                        <input type="date" class="form-control" id="dob" placeholder="Date of Birth">
+                                    </div>
+                                </div>
+                                <div class="row input-row">
+                                    <div class="col-12">
+                                        <input type="text" class="form-control" id="address" placeholder="Street Address">
+                                    </div>
+                                </div>
+                                <div class="row input-row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" id="city" placeholder="City">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" id="state" placeholder="State">
+                                    </div>
+                                </div>
+                                <div class="row input-row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" id="country" placeholder="Country">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" id="zip" placeholder="Zip Code">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#education">
+                            Education
+                        </button>
+                    </h2>
+                    <div id="education" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="educationSection">
+                            <div class="add-btn-container">
+                                <button type="button" class="btn btn-primary" onclick="addEducation()">Add Education</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Work Experience -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#workExperience">
+                            Work Experience
+                        </button>
+                    </h2>
+                    <div id="workExperience" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="workExperienceSection">
+                            <div class="add-btn-container">
+                                <button type="button" class="btn btn-primary" onclick="addWorkExperience()">Add Experience</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#projects">
+                            Projects
+                        </button>
+                    </h2>
+                    <div id="projects" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="projectsSection">
+                            <div class="add-btn-container">
+                                <button type="button" class="btn btn-primary" onclick="addProject()">Add Project</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills & Interests -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#skills">
+                            Skills & Interests
+                        </button>
+                    </h2>
+                    <div id="skills" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="skillsSection">
+                            <div class="add-btn-container">
+                                <button type="button" class="btn btn-primary" onclick="addSkill()">Add Skill</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Website & Social Links -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#websites">
+                            Website & Social Links
+                        </button>
+                    </h2>
+                    <div id="websites" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="websitesSection">
+                            <div class="add-btn-container">
+                                <button type="button" class="btn btn-primary" onclick="addWebsite()">Add Link</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#certifications">
+                            Certifications
+                        </button>
+                    </h2>
+                    <div id="certifications" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="certificationsSection">
+                            <div class="add-btn-container">
+                                <button type="button" class="btn btn-primary" onclick="addCertification()">Add Certification</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Awards -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#awards">
+                            Awards & Achievements
+                        </button>
+                    </h2>
+                    <div id="awards" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                        <div class="accordion-body" id="awardsSection">
+                            <div class="add-btn-container">
+                                <button type="button" class="btn btn-primary" onclick="addAward()">Add Award</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <!-- In the resume-preview-section div -->
+        <div class="resume-preview-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Preview</h3>
+                <button class="btn btn-success" id="downloadPdf">Download PDF</button>
+            </div>
+            <div class="resume-preview" id="resumeOutput"></div>
+        </div>
+
+        <script >
+
+// Dark Mode and Initial Setup
+const darkModeToggle = document.getElementById('darkModeToggle');
+const body = document.body;
+
+if (localStorage.getItem('darkMode') === 'enabled') {
+    body.classList.add('dark-mode');
+    darkModeToggle.checked = true;
+}
+
+darkModeToggle.addEventListener('change', () => {
+    body.classList.toggle('dark-mode', darkModeToggle.checked);
+    localStorage.setItem('darkMode', darkModeToggle.checked ? 'enabled' : 'disabled');
+});
+
+// Initialize Counters
+let educationCounter = 1;
+let workExperienceCounter = 1;
+let projectCounter = 1;
+let skillCounter = 1;
+let websiteCounter = 1;
+let certificationCounter = 1;
+let awardCounter = 1;
+
+// Helper Functions
+function createInput(type, placeholder, className) {
+    const input = document.createElement("input");
+    input.type = type;
+    input.placeholder = placeholder;
+    input.className = className;
+    return input;
+}
+
+function createTextarea(placeholder, className) {
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = placeholder;
+    textarea.className = className;
+    return textarea;
+}
+
+function createDeleteButton(onClick) {
+    const btn = document.createElement("button");
+    btn.classList.add("delete-btn");
+    btn.innerHTML = "×";
+    btn.onclick = onClick;
+    return btn;
+}
+
+function createInputRow(input, labelText) {
+    const row = document.createElement("div");
+    row.className = "row input-row";
+    const col = document.createElement("div");
+    col.className = "col-12";
+    if (labelText) {
+        const label = document.createElement("label");
+        label.textContent = labelText;
+        col.appendChild(label);
+    }
+    col.appendChild(input);
+    row.appendChild(col);
+    return row;
+}
+
+function updateSerialNumbers(section) {
+    section.querySelectorAll('.input-box').forEach((entry, index) => {
+        entry.querySelector('.serial-no').textContent = `${index + 1}.`;
+    });
+}
+
+// Section Creation Functions
+function addEducation() {
+    const section = document.getElementById('educationSection');
+    const entry = document.createElement("div");
+    entry.classList.add("input-box");
+
+    const serialNo = document.createElement("span");
+    serialNo.classList.add("serial-no");
+    serialNo.textContent = `${educationCounter}.`;
+
+    const degreeInput = createInput("text", "Degree", "form-control mb-2");
+    const institutionInput = createInput("text", "Institution", "form-control mb-2");
+    const yearInput = createInput("text", "Year of Completion", "form-control mb-2"); // Updated placeholder
+    const gpaInput = createInput("text", "GPA/Percentage", "form-control");
+
+    const deleteBtn = createDeleteButton(() => {
+        entry.remove();
+        educationCounter--;
+        updateSerialNumbers(section);
+        generateResume();
+    });
+
+    entry.append(
+        serialNo,
+        createInputRow(degreeInput, "Degree"),
+        createInputRow(institutionInput, "Institution"),
+        createInputRow(yearInput, "Year of Completion"),
+        createInputRow(gpaInput, "GPA/Percentage"),
+        deleteBtn
+    );
+
+    section.insertBefore(entry, section.querySelector('.add-btn-container'));
+    [degreeInput, institutionInput, yearInput, gpaInput].forEach(input =>
+        input.addEventListener('input', generateResume));
+
+    // Debugging: Log the yearInput element
+    console.log(yearInput);
+
+    educationCounter++;
+}
+
+function addWorkExperience() {
+    const section = document.getElementById('workExperienceSection');
+    const entry = document.createElement("div");
+    entry.classList.add("input-box");
+
+    const serialNo = document.createElement("span");
+    serialNo.classList.add("serial-no");
+    serialNo.textContent = `${workExperienceCounter}.`;
+
+    const jobTitleInput = createInput("text", "Job Title", "form-control mb-2");
+    const companyInput = createInput("text", "Company", "form-control mb-2");
+    const startYearInput = createInput("text", "Start Year", "form-control mb-2");
+    const endYearInput = createInput("text", "End Year", "form-control mb-2");
+    const descriptionInput = createTextarea("Job Description", "form-control mb-2");
+
+    const currentWorkGroup = document.createElement("div");
+    currentWorkGroup.className = "current-work-group";
+    const currentCheckbox = createInput("checkbox", "", "form-check-input");
+    currentCheckbox.className = "form-check-input";
+    const currentLabel = document.createElement("label");
+    currentLabel.textContent = "I currently work here";
+    currentLabel.className = "form-check-label";
+    currentWorkGroup.append(currentCheckbox, currentLabel);
+
+    const deleteBtn = createDeleteButton(() => {
+        entry.remove();
+        workExperienceCounter--;
+        updateSerialNumbers(section);
+        generateResume();
+    });
+
+    entry.append(
+        serialNo,
+        createInputRow(jobTitleInput, "Job Title"),
+        createInputRow(companyInput, "Company"),
+        createInputRow(startYearInput, "Start Year"),
+        createInputRow(endYearInput, "End Year"),
+        createInputRow(descriptionInput, "Description"),
+        currentWorkGroup,
+        deleteBtn
+    );
+
+    section.insertBefore(entry, section.querySelector('.add-btn-container'));
+    [jobTitleInput, companyInput, startYearInput, endYearInput, descriptionInput].forEach(input =>
+        input.addEventListener('input', generateResume));
+    currentCheckbox.addEventListener('change', generateResume);
+    workExperienceCounter++;
+}
+
+function addProject() {
+    const section = document.getElementById('projectsSection');
+    const entry = document.createElement("div");
+    entry.classList.add("input-box");
+
+    const serialNo = document.createElement("span");
+    serialNo.classList.add("serial-no");
+    serialNo.textContent = `${projectCounter}.`;
+
+    const projectNameInput = createInput("text", "Project Name", "form-control mb-2");
+    const projectDescInput = createTextarea("Project Description", "form-control mb-2");
+    const projectLinkInput = createInput("text", "Project Link (optional)", "form-control");
+
+    const deleteBtn = createDeleteButton(() => {
+        entry.remove();
+        projectCounter--;
+        updateSerialNumbers(section);
+        generateResume();
+    });
+
+    entry.append(
+        serialNo,
+        createInputRow(projectNameInput, "Project Name"),
+        createInputRow(projectDescInput, "Description"),
+        createInputRow(projectLinkInput, "Link"),
+        deleteBtn
+    );
+
+    section.insertBefore(entry, section.querySelector('.add-btn-container'));
+    [projectNameInput, projectDescInput, projectLinkInput].forEach(input =>
+        input.addEventListener('input', generateResume));
+    projectCounter++;
+}
+
+function addSkill() {
+    const section = document.getElementById('skillsSection');
+    const entry = document.createElement("div");
+    entry.classList.add("input-box");
+
+    const serialNo = document.createElement("span");
+    serialNo.classList.add("serial-no");
+    serialNo.textContent = `${skillCounter}.`;
+
+    const skillInput = createInput("text", "Skill Name", "form-control mb-2");
+    const proficiencySelect = document.createElement("select");
+    proficiencySelect.className = "form-select";
+    proficiencySelect.innerHTML = `
+    <option value="">Select Proficiency</option>
+    <option value="Beginner">Beginner</option>
+    <option value="Intermediate">Intermediate</option>
+    <option value="Advanced">Advanced</option>
+`;
+
+    const deleteBtn = createDeleteButton(() => {
+        entry.remove();
+        skillCounter--;
+        updateSerialNumbers(section);
+        generateResume();
+    });
+
+    entry.append(
+        serialNo,
+        createInputRow(skillInput, "Skill"),
+        createInputRow(proficiencySelect, "Proficiency"),
+        deleteBtn
+    );
+
+    section.insertBefore(entry, section.querySelector('.add-btn-container'));
+    skillInput.addEventListener('input', generateResume);
+    proficiencySelect.addEventListener('change', generateResume);
+    skillCounter++;
+}
+
+function addWebsite() {
+    const section = document.getElementById('websitesSection');
+    const entry = document.createElement("div");
+    entry.classList.add("input-box");
+
+    const serialNo = document.createElement("span");
+    serialNo.classList.add("serial-no");
+    serialNo.textContent = `${websiteCounter}.`;
+
+    const platformInput = createInput("text", "Platform (e.g., LinkedIn)", "form-control mb-2");
+    const urlInput = createInput("url", "URL", "form-control");
+
+    const deleteBtn = createDeleteButton(() => {
+        entry.remove();
+        websiteCounter--;
+        updateSerialNumbers(section);
+        generateResume();
+    });
+
+    entry.append(
+        serialNo,
+        createInputRow(platformInput, "Platform"),
+        createInputRow(urlInput, "URL"),
+        deleteBtn
+    );
+
+    section.insertBefore(entry, section.querySelector('.add-btn-container'));
+    [platformInput, urlInput].forEach(input =>
+        input.addEventListener('input', generateResume));
+    websiteCounter++;
+}
+
+function addCertification() {
+    const section = document.getElementById('certificationsSection');
+    const entry = document.createElement("div");
+    entry.classList.add("input-box");
+
+    const serialNo = document.createElement("span");
+    serialNo.classList.add("serial-no");
+    serialNo.textContent = `${certificationCounter}.`;
+
+    const certNameInput = createInput("text", "Certification Name", "form-control mb-2");
+    const issuerInput = createInput("text", "Issuing Organization", "form-control mb-2");
+    const dateInput = createInput("date", "Date Earned", "form-control");
+
+    const deleteBtn = createDeleteButton(() => {
+        entry.remove();
+        certificationCounter--;
+        updateSerialNumbers(section);
+        generateResume();
+    });
+
+    entry.append(
+        serialNo,
+        createInputRow(certNameInput, "Certification"),
+        createInputRow(issuerInput, "Issuer"),
+        createInputRow(dateInput, "Date Earned"),
+        deleteBtn
+    );
+
+    section.insertBefore(entry, section.querySelector('.add-btn-container'));
+    [certNameInput, issuerInput, dateInput].forEach(input =>
+        input.addEventListener('input', generateResume));
+    certificationCounter++;
+}
+
+function addAward() {
+    const section = document.getElementById('awardsSection');
+    const entry = document.createElement("div");
+    entry.classList.add("input-box");
+
+    const serialNo = document.createElement("span");
+    serialNo.classList.add("serial-no");
+    serialNo.textContent = `${awardCounter}.`;
+
+    const awardNameInput = createInput("text", "Award Name", "form-control mb-2");
+    const issuerInput = createInput("text", "Issuing Organization", "form-control mb-2");
+    const dateInput = createInput("date", "Date Received", "form-control");
+
+    const deleteBtn = createDeleteButton(() => {
+        entry.remove();
+        awardCounter--;
+        updateSerialNumbers(section);
+        generateResume();
+    });
+
+    entry.append(
+        serialNo,
+        createInputRow(awardNameInput, "Award"),
+        createInputRow(issuerInput, "Issuer"),
+        createInputRow(dateInput, "Date Received"),
+        deleteBtn
+    );
+
+    section.insertBefore(entry, section.querySelector('.add-btn-container'));
+    [awardNameInput, issuerInput, dateInput].forEach(input =>
+        input.addEventListener('input', generateResume));
+    awardCounter++;
+}
+
+// Real-Time Preview Generation
+function generateResume() {
+    const resumeOutput = document.getElementById('resumeOutput');
+
+    // Personal Information
+    const personalInfo = {
+        name: document.getElementById('fullName').value || 'Your Name',
+        email: document.getElementById('email').value || 'email@example.com',
+        phone: document.getElementById('phone').value || '(123) 456-7890',
+        dob: document.getElementById('dob').value || 'yyyy/mm/dd',
+
+        address: [
+            document.getElementById('address').value,
+            document.getElementById('city').value,
+            document.getElementById('state').value,
+            document.getElementById('country').value,
+            document.getElementById('zip').value
+        ].filter(Boolean).join(', ')
+    };
+
+    // Collect Data from Sections
+    const educationEntries = Array.from(document.querySelectorAll('#educationSection .input-box')).map(entry => ({
+        degree: entry.querySelector('input[placeholder="Degree"]') ?.value || '',
+        institution: entry.querySelector('input[placeholder="Institution"]') ?.value || '',
+        year: entry.querySelector('input[placeholder="Year of Completion"]') ?.value || '',
+        gpa: entry.querySelector('input[placeholder="GPA/Percentage"]') ?.value || ''
+    })).filter(edu => edu.degree || edu.institution);
+
+    const workExperienceEntries = Array.from(document.querySelectorAll('#workExperienceSection .input-box')).map(entry => ({
+        jobTitle: entry.querySelector('input[placeholder="Job Title"]') ?.value || '',
+        company: entry.querySelector('input[placeholder="Company"]') ?.value || '',
+        startYear: entry.querySelector('input[placeholder="Start Year"]') ?.value || '',
+        endYear: entry.querySelector('input[placeholder="End Year"]') ?.value || '',
+        description: entry.querySelector('textarea') ?.value || '',
+        current: entry.querySelector('.form-check-input') ?.checked || false
+    })).filter(exp => exp.jobTitle || exp.company);
+
+    const projectEntries = Array.from(document.querySelectorAll('#projectsSection .input-box')).map(entry => ({
+        name: entry.querySelector('input[placeholder="Project Name"]') ?.value || '',
+        description: entry.querySelector('textarea') ?.value || '',
+        link: entry.querySelector('input[placeholder="Project Link (optional)"]') ?.value || ''
+    })).filter(proj => proj.name || proj.description);
+
+    const skillEntries = Array.from(document.querySelectorAll('#skillsSection .input-box')).map(entry => ({
+        skill: entry.querySelector('input[placeholder="Skill Name"]') ?.value || '',
+        proficiency: entry.querySelector('select') ?.value || ''
+    })).filter(skill => skill.skill);
+
+    const websiteEntries = Array.from(document.querySelectorAll('#websitesSection .input-box')).map(entry => ({
+        platform: entry.querySelector('input[placeholder="Platform (e.g., LinkedIn)"]') ?.value || '',
+        url: entry.querySelector('input[type="url"]') ?.value || ''
+    })).filter(web => web.platform || web.url);
+
+    const certificationEntries = Array.from(document.querySelectorAll('#certificationsSection .input-box')).map(entry => ({
+        name: entry.querySelector('input[placeholder="Certification Name"]') ?.value || '',
+        issuer: entry.querySelector('input[placeholder="Issuing Organization"]') ?.value || '',
+        date: entry.querySelector('input[type="date"]') ?.value || ''
+    })).filter(cert => cert.name || cert.issuer);
+
+    const awardEntries = Array.from(document.querySelectorAll('#awardsSection .input-box')).map(entry => ({
+        name: entry.querySelector('input[placeholder="Award Name"]') ?.value || '',
+        issuer: entry.querySelector('input[placeholder="Issuing Organization"]') ?.value || '',
+        date: entry.querySelector('input[type="date"]') ?.value || ''
+    })).filter(award => award.name || award.issuer);
+
+    // Build Resume Content
+    const resumeContent = `
+    <header class="text-center mb-4">
+        <h1>${personalInfo.name}</h1>
+        <div class="contact-info">
+            <p>${personalInfo.dob ? `${personalInfo.dob}` : ''} | ${personalInfo.phone} | ${personalInfo.email}</p>
+            ${personalInfo.address ? `<p>${personalInfo.address}</p>` : ''}
+             
+        </div>
+    </header>
+
+${educationEntries.length ? `
+<section class="mb-4">
+<h2>Education</h2>
+${educationEntries.map(edu => `
+<div class="mb-3">
+${edu.degree ? `<h3>${edu.degree}</h3>` : ''}
+${edu.institution ? `<p>${edu.institution}</p>` : ''}
+${edu.year ? `<p>Completion Year: ${edu.year}</p>` : ''}
+${edu.gpa ? `<p>GPA/Percentage: ${edu.gpa}</p>` : ''}
+</div>
+`).join('')}
+</section>` : ''}
+
+    ${workExperienceEntries.length ? `
+    <section class="mb-4">
+        <h2>Work Experience</h2>
+        ${workExperienceEntries.map(exp => `
+            <div class="mb-3">
+                ${exp.jobTitle ? `<h3>${exp.jobTitle}</h3>` : ''}
+                ${exp.company ? `<p>${exp.company}</p>` : ''}
+                ${exp.startYear || exp.endYear ? `
+                    <p>${exp.startYear} - ${exp.current ? 'Present' : exp.endYear}</p>
+                ` : ''}
+                ${exp.description ? `<p>${exp.description}</p>` : ''}
+            </div>
+        `).join('')}
+    </section>` : ''}
+
+    ${projectEntries.length ? `
+    <section class="mb-4">
+        <h2>Projects</h2>
+        ${projectEntries.map(proj => `
+            <div class="mb-3">
+                ${proj.name ? `<h3>${proj.name}</h3>` : ''}
+                ${proj.description ? `<p>${proj.description}</p>` : ''}
+                ${proj.link ? `<a href="${proj.link}" target="_blank">View Project</a>` : ''}
+            </div>
+        `).join('')}
+    </section>` : ''}
+
+    ${skillEntries.length ? `
+    <section class="mb-4">
+        <h2>Skills</h2>
+        <div class="row">
+            ${skillEntries.map(skill => `
+                <div class="col-md-6">
+                    ${skill.skill ? `<p>${skill.skill}${skill.proficiency ? ` - ${skill.proficiency}` : ''}</p>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    </section>` : ''}
+
+    ${websiteEntries.length ? `
+    <section class="mb-4">
+        <h2>Social Links</h2>
+        <div class="row">
+            ${websiteEntries.map(web => `
+                <div class="col-md-6">
+                    ${web.platform ? `<p>${web.platform}: ` : ''}
+                    ${web.url ? `<a href="${web.url}" target="_blank">${web.url}</a></p>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    </section>` : ''}
+
+    ${certificationEntries.length ? `
+    <section class="mb-4">
+        <h2>Certifications</h2>
+        ${certificationEntries.map(cert => `
+            <div class="mb-3">
+                ${cert.name ? `<h3>${cert.name}</h3>` : ''}
+                ${cert.issuer ? `<p>${cert.issuer}</p>` : ''}
+                ${cert.date ? `<p>${cert.date}</p>` : ''}
+            </div>
+        `).join('')}
+    </section>` : ''}
+
+    ${awardEntries.length ? `
+    <section class="mb-4">
+        <h2>Awards</h2>
+        ${awardEntries.map(award => `
+            <div class="mb-3">
+                ${award.name ? `<h3>${award.name}</h3>` : ''}
+                ${award.issuer ? `<p>${award.issuer}</p>` : ''}
+                ${award.date ? `<p>${award.date}</p>` : ''}
+            </div>
+        `).join('')}
+    </section>` : ''}
+`;
+
+// Update the Resume Output
+resumeOutput.innerHTML = resumeContent;
+}
+
+// Add event listeners to personal information fields
+const personalInfoFields = [
+'fullName', 'email', 'phone', 'dob', 'address', 'city', 'state', 'country', 'zip'
+];
+
+personalInfoFields.forEach(fieldId => {
+const field = document.getElementById(fieldId);
+if (field) {
+    field.addEventListener('input', generateResume);
+}
+});
+
+// Initial Resume Generation
+generateResume();
+
+// PDF Generation
+document.getElementById('downloadPdf').addEventListener('click', function() {
+const element = document.getElementById('resumeOutput');
+const opt = {
+margin: 10,
+filename: 'resume.pdf',
+image: { type: 'jpeg', quality: 0.98 },
+html2canvas: { 
+scale: 2,
+logging: true,
+useCORS: true,
+windowHeight: element.scrollHeight
+},
+jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+};
+
+// Clone element to preserve original styles
+const clone = element.cloneNode(true);
+clone.style.width = '210mm';
+clone.style.backgroundColor = '#fff';
+clone.style.color = '#000';
+document.body.appendChild(clone);
+
+html2canvas(clone, opt.html2canvas).then(canvas => {
+const imgData = canvas.toDataURL('image/jpeg', 1.0);
+const pdf = new jspdf.jsPDF(opt.jsPDF);
+const imgProps = pdf.getImageProperties(imgData);
+const pdfWidth = pdf.internal.pageSize.getWidth();
+const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+pdf.save(opt.filename);
+document.body.removeChild(clone);
+});
+});
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+
+</html>
