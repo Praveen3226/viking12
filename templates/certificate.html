@@ -1,9 +1,12 @@
+
 <html>
 <head>
     <title>Certificate of Measurement Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/cooper-black" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         /* @import url('https://fonts.cdnfonts.com/css/cooper-black'); 
 h1 {
@@ -177,6 +180,7 @@ h1 {
         color: black;
         border: 1px solid black;
         padding: 5px;
+       
     }
 
     /* Style buttons for consistency */
@@ -301,6 +305,30 @@ h1 {
         
             <div class="mb-4">
                 <h2 class="text-center font-bold">Survey Measure</h2>
+                <div class="flex justify-between items-center my-2">
+                    <div class="flex gap-2">
+                        <input type="text" id="searchInput" placeholder="Enter Marks Nos." 
+                               class="border border-gray-300 rounded p-1 w-48 text-sm">
+                        <button type="button" onclick="searchMarks()" 
+                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                            Search
+                        </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="addNewRow()" 
+                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                            Add Row
+                        </button>
+                        <button type="button" onclick="toggleDeleteMode()" id="deleteBtn"
+                        class="bg-red-700 text-white px-3 py-1 rounded text-sm hover:bg-red-800">
+                        Delete Rows
+                        </button>
+                        <button type="button" onclick="cancelDelete()" id="cancelBtn"
+            class="cancel-btn text-white px-3 py-1 rounded text-sm" disabled>
+        Cancel
+    </button>
+                    </div>
+                </div>
                 <div class="scrollable-table">
                     <table class="w-full border-collapse border border-black text-sm">
                         <thead>
@@ -356,6 +384,8 @@ h1 {
                 <button type="submit" name="action" value="Save as Draft" class="btn btn-secondary">Save as Draft</button>
                 <button type="submit" class="btn btn-secondary">Submit</button>
                 <button type="submit" id="submitNew" class="btn btn-secondary">Submit and New</button>
+                <button type="button" onclick="submitAndPrint()" class="btn btn-secondary">Print</button>
+
             </div>
         
             <footer class="footer">
@@ -366,6 +396,238 @@ h1 {
     </div>
 
     <script>
+document.querySelector("button[onclick='submitAndPrint()']").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent immediate form submission
+
+    // First, generate and print the certificate
+    printCertificate().then(() => {
+        // After printing, submit the form
+        document.querySelector("form").submit();
+    }).catch(error => {
+        console.error("Print failed:", error);
+        alert("Error while printing. Please try again.");
+    });
+});
+
+
+
+async function printCertificate() {
+    try {
+        const { jsPDF } = window.jspdf;
+        const form = document.querySelector('form');
+        
+        // Validate required elements
+        if (!form) throw new Error('Form not found');
+        if (!window.jspdf || !html2canvas) throw new Error('Required libraries not loaded');
+
+        // Create PDF content container
+        const pdfContainer = document.createElement('div');
+        pdfContainer.style.width = '210mm';
+        pdfContainer.style.minHeight = '297mm';
+        pdfContainer.style.padding = '20px';
+        pdfContainer.style.backgroundColor = 'white';
+
+        // Build PDF content
+        pdfContainer.innerHTML = `
+            <style>
+                .pdf-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin: 15px 0;
+                }
+                .pdf-table td, .pdf-table th {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .pdf-header {
+                    text-align: center;
+                    margin-bottom: 25px;
+                }
+        .certificate-title {
+    text-align: center;
+    background-color: #b91c1c;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+            </style>
+<div class="header" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color: rgba(253,0,0,255);">
+        VIKING MARINE INC.
+    </h1>
+    <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+    <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
+    <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
+    <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
+    <p class="text-sm">
+        E-mail: ops@vikingmarine.in, 
+        Website: <a href="http://www.vikingmarine.in" target="_blank">www.vikingmarine.in</a>
+    </p>
+</div>
+
+            
+        <div class="certificate-title">
+            CERTIFICATE OF MEASUREMENT REPORT
+        </div>
+
+
+
+            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                Applicant Information
+            </h2>
+            ${createApplicantTable(form)}
+
+            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                Survey Measures
+            </h2>
+            ${createSurveyMeasuresTable()}
+
+            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <p><strong>Total No. of Pkgs:</strong> ${form.totalPkgs.value || 'N/A'}</p>
+                <p><strong>Total Volume (Cu. M):</strong> ${form.totalVolume.value || 'N/A'}</p>
+            </div>
+        `;
+
+        // Add to document
+        document.body.appendChild(pdfContainer);
+
+        // Generate PDF
+        const canvas = await html2canvas(pdfContainer, {
+            scale: 2,
+            logging: true,
+            useCORS: true,
+            backgroundColor: '#FFFFFF'
+        });
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(canvas, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`Certificate_${form.CertificateNumber.value || 'Report'}.pdf`);
+
+        // Cleanup
+        document.body.removeChild(pdfContainer);
+
+    } catch (error) {
+        console.error('PDF generation failed:', error);
+        alert('Error generating PDF: ' + error.message);
+    }
+}
+
+function createApplicantTable(form) {
+    return `
+        <table class="pdf-table">
+            <tbody>
+                <tr>
+                    <th>Certificate No.</th>
+                    <td>${form.CertificateNumber.value || ''}</td>
+                    <th>Date</th>
+                    <td>${form.date.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Name of Applicant</th>
+                    <td>${(form.applicantTitle.value || '') + ' ' + (form.applicantName.value || '')}</td>
+                    <th>Shipper</th>
+                    <td>${form.shipper.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Consignee</th>
+                    <td>${form.consignee.value || ''}</td>
+                    <th>Commodity</th>
+                    <td>${form.commodity.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Port of Discharge</th>
+                    <td>${form.portOfDischarge.value || ''}</td>
+                    <th>Quantity</th>
+                    <td>${form.quantity.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Gross Wt.</th>
+                    <td>${form.gross_weight.value || ''}</td>
+                    <th>C & F Agent</th>
+                    <td>${form.cf_agent.value || ''}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+}
+
+function createSurveyMeasuresTable() {
+    return `
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="display: none;"></th> <!-- Hide first column header -->
+                    <th>Marks Nos.</th>
+                    <th>No. of Pkgs</th>
+                    <th>Length</th>
+                    <th>Breadth</th>
+                    <th>Height</th>
+                    <th>Volume in 1 Unit</th>
+                    <th>Volume in Cu. M</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${Array.from(document.querySelectorAll('tbody tr'))
+                    .map(row => {
+                        const inputs = row.querySelectorAll('input');
+                        return inputs.length >= 7 ? `
+                            <tr>
+                                ${Array.from(inputs).slice(1).map(input => // Skip first input
+                                    `<td>${input.value || ''}</td>`
+                                ).join('')}
+                            </tr>
+                        ` : '';
+                    }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+function createSurveyMeasuresTable() {
+    return `
+        <table class="w-full border-collapse border border-black text-sm">
+            <thead>
+                <tr>
+                    <th class="border border-black p-2">Mark & No.s</th>
+                    <th class="border border-black p-2">No. of Pkgs</th>
+                    <th class="border border-black p-2">Length</th>
+                    <th class="border border-black p-2">Breadth</th>
+                    <th class="border border-black p-2">Height</th>
+                    <th class="border border-black p-2">Volume in 1 Unit</th>
+                    <th class="border border-black p-2">Volume in Cu. M</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${Array.from(document.querySelectorAll('tbody tr'))
+                    .map(row => {
+                        const inputs = row.querySelectorAll('input');
+                        return inputs.length >= 7 ? `
+                            <tr>
+                                ${Array.from(inputs).slice(1).map(input => // Skip first input
+                                    `<td class="border border-black p-2">${input.value || ''}</td>`
+                                ).join('')}
+                            </tr>
+                        ` : '';
+                    }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+
+
+
         //flash message
         setTimeout(() => {
             document.getElementById('flash-message').style.display = 'none';
