@@ -400,7 +400,7 @@ h1 {
     //print functionality
     async function generatePDF() {
     // Hide elements that shouldn't be in the PDF
-    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .hamburger, .status-indicator, button');
+    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .hamburger, .status-indicator, button,.footer');
     const originalStyles = [];
     elementsToHide.forEach(el => {
         originalStyles.push(el.style.display);
