@@ -394,11 +394,12 @@ h1 {
               <p  class="text-sm italic text-left font-bold">"Issued Without Prejudice"</p>
             </div>
         </div>
-
-    </div>
     <footer class="footer">
         &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
     </footer>
+    </div>
+    </div>
+
     <script>
 async function generatePDF() {
     // Hide unnecessary elements before capturing
@@ -492,7 +493,7 @@ async function generatePDF() {
         //print button functionality
         async function generatePDF() {
     // Hide unnecessary elements
-    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .sidebar-backdrop, button ,.status ,.status-badge');
+    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .sidebar-backdrop, button ,.status ,.status-badge ,.footer');
     const originalStyles = [];
     elementsToHide.forEach(el => {
         originalStyles.push(el.style.display);
