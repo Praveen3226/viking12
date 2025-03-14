@@ -282,13 +282,13 @@ body {
             color: red;
         }
 
-@media (max-width: 425px) {
+        @media (max-width: 425px) {
     .nav-bar {
-        padding: 10px 50px 10px 70px; /* Adjust padding for smaller screens */
+        padding: 10px 20px; /* Reduced padding for smaller screens */
     }
 
-        /* Sidebar hidden on mobile */
-        aside.sidebar {
+    /* Sidebar hidden on mobile */
+    aside.sidebar {
         display: none;
     }
 
@@ -302,7 +302,7 @@ body {
         left: 10px;
         top: 50%;
         transform: translateY(-50%);
-        height: 50px; /* Adjust logo size */
+        height: 40px; /* Slightly smaller logo */
     }
 
     /* Center h1 */
@@ -310,9 +310,9 @@ body {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        width: 100%; /* Ensure proper centering */
+        width: 100%;
         padding-left: 0;
-        font-size: 1.5rem;
+        font-size: 1.3rem; /* Smaller font size for 375px */
         text-align: center;
         margin: 0;
     }
@@ -323,6 +323,99 @@ body {
         top: 50%;
         transform: translateY(-50%);
         position: absolute;
+    }
+}
+
+
+/* Specific adjustments for 375px */
+@media (max-width: 375px) {
+    /* Ensure viewport meta tag exists in HTML: */
+    /* <meta name="viewport" content="width=device-width, initial-scale=1.0"> */
+    
+    /* Navigation Bar */
+    .nav-bar {
+        padding: 12px 15px !important; /* Force override */
+        position: relative;
+        display: flex !important; /* Ensure flex context */
+        justify-content: space-between;
+    }
+
+    .nav-bar img {
+        height: 35px !important;
+        position: relative !important; /* Reset positioning */
+        left: auto !important;
+        transform: none !important;
+        margin-right: 15px;
+    }
+
+    .nav-bar h1 {
+        font-size: 1.2rem !important;
+        padding: 0 !important;
+        position: relative !important;
+        left: auto !important;
+        transform: none !important;
+        flex-grow: 1;
+        text-align: left;
+    }
+
+    /* Main Content */
+    .container-fluid {
+        padding: 15px !important;
+        margin-left: 0 !important;
+        width: 100vw !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Form Sections */
+    .form-reports-container > div {
+        width: 100% !important;
+        margin: 10px 0 !important;
+        float: none !important;
+        clear: both !important;
+    }
+
+    /* Management Cards */
+    .management-card {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 15px 0 !important;
+    }
+
+    /* Links/Buttons */
+    .full-detail-link {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    /* Hamburger Menu */
+    .hamburger {
+        display: block !important;
+        position: relative !important;
+        right: auto !important;
+        top: auto !important;
+        margin-left: auto;
+    }
+
+    /* Force Stacking */
+    .form-reports-container,
+    .management-card,
+    footer {
+        display: block !important;
+        float: none !important;
+        clear: both !important;
+    }
+
+    /* Important Overrides */
+    body {
+        overflow-x: hidden !important;
+    }
+    
+    /* Debugging Border - remove after testing */
+    * {
+        border: 1px solid red !important;
     }
 }
 
@@ -416,7 +509,16 @@ body {
                     <a href="{{url_for('po') }}" class="block-anchor panel-footer">Full Detail <i class="fa fa-arrow-right"></i></a>
                 </div>
             </div>
-            
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body bk-primary text-light">
+                        <div class="stat-panel text-center">
+                            <div class="stat-panel-title">CARGO</div>
+                        </div>
+                    </div>
+                    <a href="{{url_for('dashboard') }}" class="block-anchor panel-footer">Full Detail <i class="fa fa-arrow-right"></i></a>
+                </div>
+            </div>
         </div>
     </div>
 
