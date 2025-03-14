@@ -492,7 +492,7 @@ async function generatePDF() {
         //print button functionality
         async function generatePDF() {
     // Hide unnecessary elements
-    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .sidebar-backdrop, button');
+    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .sidebar-backdrop, button ,.status ,.status-badge');
     const originalStyles = [];
     elementsToHide.forEach(el => {
         originalStyles.push(el.style.display);
