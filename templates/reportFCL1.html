@@ -6,6 +6,9 @@
     <title>FCL Survey Report</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
 
 h1 {
@@ -170,11 +173,47 @@ h1 {
       display: inline-block;
       background-color: currentColor;
   }
+  @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                page-break-inside: avoid;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+            .no-print {
+        display: none !important;
+    }
+        }
+        .print-container {
+            padding: 20px;
+            background: #fff;
+        }
+        .certificate-title {
+    text-align: center;
+    background-color: #b91c1c;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
 
     </style>
 </head>
 <body class="bg-gray-100 p-4">
-    <div class="max-w-4xl mx-auto bg-white p-6 border border-gray-300">
+
+    <div class="max-w-5xl mx-auto bg-white p-6 border border-gray-300">
         <!-- Header Section -->
         <div class="text-center mb-4">
             <div class="nav-bar">
@@ -236,12 +275,12 @@ h1 {
     {% endif %}
     
         <!-- Report Title -->
-        <div class="border-t border-b border-gray-300 py-2 mb-4">
+        <div class="border-t border-b border-gray-300 py-2 mb-4"  >
             <h2 class="text-lg font-semibold text-center">FCL STUFFING SURVEY REPORT</h2>
         </div>
 
         <!-- Report Data Table -->
-        <div class="table-wrapper">
+    <div class="table-wrapper " >
         <table class="w-full border border-gray-300 mb-4">
             <thead>
                 <tr>
@@ -404,13 +443,22 @@ h1 {
             </tbody>
         </table>
         </div>
+        <button onclick="generatePDF()" class="fixed bottom-8 right-8 bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-800 z-50">
+            <i class="fas fa-print mr-2"></i>Print PDF
+        </button>
+        <button onclick="generatePDF()">Generate PDF</button>
 
         <!-- Footer -->
         <footer class="footer">
             &copy; 2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
         </footer>
     </div>
+
+
     <script>
+        const element = document.querySelector('.max-w-5xl');
+        console.log('Element found:', element);
+
         // Hamburger Menu Toggle
         document.querySelector('.hamburger').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -430,6 +478,70 @@ h1 {
                 document.querySelector('.sidebar-backdrop').classList.remove('active');
             });
         });
+        async function generatePDF() {
+    try {
+        // Hide unnecessary elements
+        const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .sidebar-backdrop, button, .status, .status-badge, .footer , .status-indicator , .status-indicator');
+        const originalStyles = [];
+        elementsToHide.forEach(el => {
+            originalStyles.push(el.style.display);
+            el.style.display = 'none';
+        });
+
+        // Capture the main content
+        const element = document.querySelector('.max-w-5xl');
+        if (!element) throw new Error("Main content not found!");
+
+        const canvas = await html2canvas(element, {
+            scale: 2,  // Good balance between quality and performance
+            useCORS: true,
+            logging: true,
+            backgroundColor: '#ffffff'
+        });
+
+        const { jsPDF } = window.jspdf || window;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const imgWidth = pageWidth - 20; // 10mm margins on both sides
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // Slice the canvas into pages
+        let yPosition = 0;
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = Math.floor((pageHeight * canvas.width) / imgWidth);
+        const pageCtx = pageCanvas.getContext('2d');
+
+        while (yPosition < canvas.height) {
+            pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+            pageCtx.drawImage(canvas, 0, yPosition, canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
+
+            const imgData = pageCanvas.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 10, 10, imgWidth, pageHeight - 20);
+
+            yPosition += pageCanvas.height;
+            if (yPosition < canvas.height) doc.addPage();
+        }
+
+        // Bitsmart Footer (optional)
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(128);
+
+        // Restore hidden elements
+        elementsToHide.forEach((el, index) => {
+            el.style.display = originalStyles[index];
+        });
+
+        // Get certificate number dynamically
+        const certNo = document.getElementById('certificateNumber')?.textContent.trim() || 'N/A';
+        doc.save(`Certificate_${certNo}.pdf`);
+    } catch (error) {
+        console.error("PDF generation failed:", error);
+        alert("Failed to generate PDF. Check the console for details.");
+    }
+}
 
 
 
