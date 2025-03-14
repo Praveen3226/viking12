@@ -464,7 +464,8 @@ h1 {
         <div class="flex justify-between">
           <div>
             <label class="block text-sm font-semibold">Report No.: </label>
-             <input type="text" id="CertificateNumber" name="CertificateNumber" class="border border-gray-300 p-1 w-full" style="background-color: gold; color: black;" />
+            <input type="text" id="CertificateNumber" name="CertificateNumber" class="border border-gray-300 p-1 w-full" style="background-color: gold; color: black;" />
+
           </div>
           <div>
             <label class="block text-sm font-semibold">Date:</label>
@@ -543,6 +544,7 @@ h1 {
 
       </div>
       <div class="container">
+        <div id="viewer-container"></div>
         <img src="{{ url_for('static', filename='cont.png') }}" alt="Container Image">
     </div>
 
@@ -1016,7 +1018,7 @@ h1 {
       <div class="flex justify-between items-center">
         <div>
           <p  class="text-sm font-bold">For Viking Marine Inc.</p>
-          <p  class="text-sm italic text-left font-bold">"Issued Without Prejudice"</p>
+          <p  class="text-sm italic text-left ">"Issued Without Prejudice"</p>
           <div class="mt-8">
             <label class="block text-sm font-semibold">Surveyor</label>
             <input class="border border-gray-300 p-1 w-full" type="text" name="surveyor" style="background-color: gold; color: black;"/>
