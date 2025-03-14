@@ -62,21 +62,20 @@ h1 {
         }
 
 
-         /* Table Scorallable */
         .table-wrapper {
-            overflow-x: auto;
-            margin-bottom: 1rem;
-        }
-        
-        .table-wrapper table {
-            min-width: 100%;
-            width: auto;
-        }
-
-        .table-wrapper th,
-        .table-wrapper td {
-            white-space: nowrap;
-        }
+        width: 100%;
+        overflow: hidden;
+    }
+    table {
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse;
+        word-wrap: break-word;
+    }
+    th, td {
+        white-space: normal;
+        word-break: break-word;
+    }
 
 
 
