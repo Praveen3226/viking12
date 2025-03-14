@@ -322,20 +322,21 @@ h1 {
     </table>
 
     <h3 class="text-lg font-semibold mb-2">Photos</h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
       {% for i in range(1, 8) %}
         {% set photo_path = container['photo_' + i|string] %}
         {% if photo_path %}
           <div class="border border-gray-300 p-2">
-            <img src="{{ url_for('static', filename=photo_path) }}" alt="Photo {{ i }}" class="w-full h-auto">
+            <img src="{{ url_for('static', filename=photo_path) }}" alt="Photo {{ i }}" class="w-full h-auto" style="max-width: 100%; max-height: 297mm; object-fit: contain;">
           </div>
         {% else %}
-          <div class="border border-gray-300 p-2 text-center text-gray-500">
+          <div class="border border-gray-300 p-2 text-center text-gray-500" style="height: 80mm; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
             No Photo {{ i }}
           </div>
         {% endif %}
       {% endfor %}
     </div>
+    
     
     <!-- Inspection Details Table -->
 
