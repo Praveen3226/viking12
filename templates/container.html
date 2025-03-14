@@ -458,7 +458,8 @@ h1 {
     <hr class="my-4"/>
     <h2 class="text-lg font-semibold text-center">EMPTY CONTAINER CONDITION SURVEY REPORT</h2>    
     
-    <form method="POST" action="{{ url_for('add_survey') }}" class="p-4 border border-gray-300">     
+    <form method="POST" action="{{ url_for('add_survey') }}" class="p-4 border border-gray-300" enctype="multipart/form-data">
+  
        <div class="border-t border-b border-gray-300 py-2 mb-4">
         <div class="flex justify-between">
           <div>
@@ -968,7 +969,39 @@ h1 {
             </tr> 
           </tbody>
         </table>
-        
+
+        <!--- Photos --->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-semibold">Photo 1:</label>
+            <input type="file" accept="image/*" capture="camera" name="photo_1" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold">Photo 2:</label>
+            <input type="file" accept="image/*" capture="camera" name="photo_2" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold">Photo 3:</label>
+            <input type="file" accept="image/*" capture="camera" name="photo_3" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold">Photo 4:</label>
+            <input type="file" accept="image/*" capture="camera" name="photo_4" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold">Photo 5:</label>
+            <input type="file" accept="image/*" capture="camera" name="photo_5" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold">Photo 6:</label>
+            <input type="file" accept="image/*" capture="camera" name="photo_6" class="border border-gray-300 p-1 w-full"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold">Photo 7:</label>
+            <input type="file" accept="image/*" capture="camera" name="photo_7" class="border border-gray-300 p-1 w-full"/>
+          </div>
+        </div>
+  
 
 
         
