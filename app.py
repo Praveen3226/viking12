@@ -2606,6 +2606,10 @@ def update_form(CertificateNumber):
 def empadd():
     return render_template('empadd.html')
 
+@app.route('/resume')
+def resume():
+    return render_template('resume.html')
+
 @app.route('/cargo')
 def cargo():
     return render_template('cargo.html')
