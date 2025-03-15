@@ -400,10 +400,9 @@ h1 {
     });
 
 
-    //print functionality
     async function generatePDF() {
     // Hide elements that shouldn't be in the PDF
-    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .hamburger, .status-indicator, button,.footer');
+    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .hamburger, .status-indicator, button, .footer');
     const originalStyles = [];
     elementsToHide.forEach(el => {
         originalStyles.push(el.style.display);
@@ -412,34 +411,43 @@ h1 {
 
     // Capture the main content
     const element = document.querySelector('.max-w-4xl');
-    
-    // Use html2canvas with better scaling
     const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3, // Increased from 2 to 3 for better resolution
         useCORS: true,
         logging: true,
         backgroundColor: '#ffffff'
     });
 
-    const imgData = canvas.toDataURL('image/png');
-    
     // Create PDF
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Calculate image dimensions to fit PDF page
-    const imgWidth = pageWidth - 20; // 10mm margins
+    const margin = 10;
+    const imgWidth = pageWidth - 2 * margin;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const pageContentHeight = pageHeight - 2 * margin; // Content height after margins
 
-    // Add content to PDF
-    doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+    // Slice the canvas and handle multi-page content
+    let yPosition = 0;
+    while (yPosition < canvas.height) {
+        // Create a slice of the canvas
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = Math.min(pageContentHeight * (canvas.width / imgWidth), canvas.height - yPosition);
 
-    // Add footer text
-    doc.setFontSize(10);
-    doc.setTextColor(100); 
-        pageWidth / 2, pageHeight - 10, { align: 'center' };
+        const pageCtx = pageCanvas.getContext('2d');
+        pageCtx.drawImage(canvas, 0, yPosition, canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
+
+        // Convert the sliced canvas to image
+        const imgData = pageCanvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', margin, margin, imgWidth, (pageCanvas.height * imgWidth) / canvas.width);
+
+        yPosition += pageCanvas.height;
+
+        // Add a new page if there's more content to print
+        if (yPosition < canvas.height) doc.addPage();
+    }
 
     // Restore hidden elements
     elementsToHide.forEach((el, index) => {
@@ -450,6 +458,8 @@ h1 {
     const certNo = "{{ container.CertificateNumber }}";
     doc.save(`Container_Report_${certNo}.pdf`);
 }
+
+
 
 </script>
 </body>
