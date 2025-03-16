@@ -5,17 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FCL Stuffing Survey Report Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
 
     <link href="https://fonts.cdnfonts.com/css/cooper-black" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style> 
 /* @import url('https://fonts.cdnfonts.com/css/cooper-black'); 
 h1 {
             font-family: 'Copper Black', serif;
             font-size: 48px; 
-            text-align: center; 
-} */
-            h1 {
+            color: rgba (253,0,0,255) ;
+            text-align: center; /
+        } */
+        h1 {
             -webkit-text-fill-color: #da3936;
         }
 body {
@@ -41,7 +48,7 @@ border: 1px solid black; /* Add border to each column */
 padding: 8px; /* Add padding for better spacing */
 }
 h1{
-    -webkit-text-fill-color: #da3936;
+    -webkit-text-fill-color:rgba(253,0,0,255) ;
 }
 .form-container {
     background: #fff;
@@ -426,24 +433,32 @@ overflow-y: auto;
     display: inline-block;
     background-color: currentColor;
 }
-
-/* Style for the applicant title dropdown and name input */
-#applicantTitle, #applicantName {
+#applicantTitle {
     padding: 10px;
     font-size: 14px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    box-sizing: border-box;
+    background-color: #fff;
+    cursor: pointer;
 }
 
-#applicantTitle {
-    width: 20%;
-    margin-right: 5px;
-}
+#flash-message {
+            width: 80%; 
+            max-width: 600px;
+            padding: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            background-color: #10f85d; /* Your preferred color */
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Ensure it stays in place */
+            top: 50%; /* Position vertically at the center */
+            left: 50%; /* Position horizontally at the center */
+            transform: translate(-50%, -50%); /* Offset it by 50% of its own size */
+            z-index: 9999; /* Ensure it stays on top of other elements */
+    }
 
-#applicantName {
-    width: 75%;
-}
 
 /*Search bar for container and consignee*/
 /* Search Bar Styles */
@@ -467,15 +482,66 @@ overflow-y: auto;
   border-color: #646cff;
   outline: none;
 }
+input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+        background-color: gold;
+        color: black;
+        border: 1px solid black;
+        padding: 5px;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
+    /* Adjust the search inputs and small inputs if necessary */
+    .search-input,
+    .small-box {
+        background-color: gold;
+        color: black;
+        border: 1px solid black;
+        padding: 5px;
+    }
+
+    /* Style buttons for consistency */
+    .btn {
+        background-color: black;
+        color: gold;
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .btn:hover {
+        background-color: gold;
+        color: black;
+        border: 1px solid black;
+    }
 </style>
+
+    
+
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flash-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 max-w-4xl w-full text-white text-center p-8 rounded-lg shadow-lg">
+            {% for category, message in messages %}
+                <div class="bg-{{ 'green-500' if category == 'success' else 'red-500' }} p-6 rounded-lg text-2xl font-semibold">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
     <div class="form-container">
         <div class="form-header">
              <!-- Navigation Bar -->
         <div class="nav-bar">
-            <a href="{{ url_for('empforms') }}" 
+            <a href="{{ url_for('forms') }}" 
             style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
             onmouseover="this.style.backgroundColor='#0056b3'"
             onmouseout="this.style.backgroundColor='#007bff'">
@@ -483,8 +549,9 @@ overflow-y: auto;
          </a>
             <nav class="nav-links">
                 <ul>
-                    <li><a href="{{ url_for('empdash') }}">Home</a></li>
-                    <li><a href="{{ url_for('empforms') }}">Forms</a></li>
+                    <li><a href="{{ url_for('admindash') }}">Home</a></li>
+                    <li><a href="{{ url_for('forms') }}">Forms</a></li>
+                    <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 </ul>
             </nav>
@@ -494,8 +561,9 @@ overflow-y: auto;
             
             <div class="sidebar" id="sidebar">
                 <ul>
-                    <li><a href="{{ url_for('empdash') }}">Home</a></li>
-                    <li><a href="{{ url_for('empforms') }}">Forms</a></li>
+                    <li><a href="{{ url_for('admindash') }}">Home</a></li>
+                    <li><a href="{{ url_for('forms') }}">Forms</a></li>
+                    <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 </ul>
             </div>
@@ -503,9 +571,9 @@ overflow-y: auto;
             <div class="sidebar-backdrop"></div>
             
         </div>
-        <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color:#da3936 ;">VIKING MARINE INC.</h1>           
-
-            <p>#143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
+        
+       <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color:#da3936 ;">VIKING MARINE INC.</h1>           
+               <p> #143, Dinnur Village, Kadugodi Colony, Opp. India Satcom, Whitefield, Bangalore-560 067</p>
             <p>Ph: +91-80-6561240 | Email: info@vikingmarine.com</p>
         </div>
         {% if form %}
@@ -614,14 +682,16 @@ overflow-y: auto;
                 <tr>
                     <th>Applicant Name</th>
                     <td>
-                        <select id="applicantTitle" name="applicantTitle" style="width: 20%; margin-right: 5px;">
+                        <select id="applicantTitle" class="border border-gray-300 p-1" style="width: 60px;">
                             <option value="Mr">Mr</option>
-                            <option value="Mrs">Mrs</option>
-                            <option value="Ms">Ms</option>
-                            <option value="Dr">Dr</option>
+                            <option value="M/s">M/s</option>
                         </select>
-                        <input type="text" id="applicantName" name="applicantName" value="{{form.applicant_name}}" style="width: 75%;">
+                        <input type="text" id="applicantNameInput">
+                        <input type="hidden" name="applicantName" id="applicantName" />
                     </td>
+                    
+                   
+
                 </tr>
                 <tr>
                     <th>Container Number</th>
@@ -649,14 +719,18 @@ overflow-y: auto;
 <h3>Stuffing Details</h3>
 <div class="table-wrapper">
 <table id="added-containers-table" class="custom-table">
-<tr>
-    <th>Stuffing Commencement Date & Time</th>
-    <td><input type="datetime-local" id="stuffingCommDateTime" name="stuffingCommDateTime"></td>
-</tr>
-<tr>
-    <th>Stuffing Completion Date & Time</th>
-    <td><input type="datetime-local" id="stuffingCompDateTime" name="stuffingCompDateTime"></td>
-</tr>
+    <tr>
+        <th>Stuffing Commencement Date & Time</th>
+        <td>
+            <input type="datetime-local" id="stuffingCommDateTime" name="stuffingCommDateTime" step="1">
+        </td>
+    </tr>
+    <tr>
+        <th>Stuffing Completion Date & Time</th>
+        <td>
+            <input type="datetime-local" id="stuffingCompDateTime" name="stuffingCompDateTime" step="1">
+        </td>
+    </tr>
 <tr>
     <th>Seal Number(s)</th>
     <td><input type="text" id="sealNumber" name="sealNumber"></td>
@@ -768,17 +842,269 @@ overflow-y: auto;
             <button type="submit" name="action" value="Save as Draft" class="btn btn-secondary">Save as Draft</button>
 
             <button type="submit" class="btn">Submit</button>
+
             <button type="submit" id="submitNew" class="btn">Submit and New</button>
 
 
         </form>
+        <button onclick="generateFCLReportPDF()" class="fixed bottom-8 right-8 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 z-50 flex items-center space-x-2">
+            <i class="fas fa-print"></i>
+            <span>Print PDF</span>
+        </button>
             <!-- Footer -->
     <footer class="footer">
         &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
     </footer>
     </div>
     <script>
-        document.getElementById("submitNew").addEventListener("click", function(event) {
+
+
+function generateFCLReportPDF() {
+    try {
+        // Create a hidden container for PDF content
+        const pdfContainer = document.createElement('div');
+        pdfContainer.style.position = 'fixed';
+        pdfContainer.style.left = '-9999px';
+        pdfContainer.style.width = '794px'; // A4 width in pixels (210mm)
+        pdfContainer.style.padding = '20px';
+        document.body.appendChild(pdfContainer);    
+
+        // Safe value getter with fallback
+        const getValue = (id) => {
+            const element = document.getElementById(id);
+            return element && element.value ? element.value.trim() : 'N/A';
+        };
+
+        // Get applicant name components safely
+        const applicantTitle = document.getElementById('applicantTitle')?.value || '';
+        const applicantNameInput = document.getElementById('applicantNameInput')?.value || '';
+        const applicantName = `${applicantTitle} ${applicantNameInput}`.trim();
+
+        // Build consignment details table rows
+        let consignmentRows = '';
+        const mainTableRows = document.querySelectorAll('#main-table tbody tr');
+        
+        mainTableRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 8) { // Ensure we have enough cells
+                consignmentRows += `
+                    <tr>
+                        <td style="border: 1px solid #000; padding: 8px;">${cells[1]?.textContent || 'N/A'}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">${cells[2]?.textContent || 'N/A'}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">${cells[3]?.textContent || 'N/A'}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">${cells[4]?.textContent || 'N/A'}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">${cells[5]?.textContent || 'N/A'}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">${cells[6]?.textContent || 'N/A'}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">${cells[7]?.textContent || 'N/A'}</td>
+                    </tr>
+                `;
+            }
+        });
+
+        // Construct PDF HTML structure
+        pdfContainer.innerHTML = `
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h1 style="font-family: 'Cooper Black', sans-serif; font-size: 42px; color: #fd0000;">
+                    VIKING MARINE INC.
+                </h1>
+                <p style="font-size: 14px; font-weight: 600;">SURVEYORS AND CONSULTING ENGINEERS</p>
+                <p style="font-size: 14px;"># 143, Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
+                <p style="font-size: 14px;">Phone: +91-9035015240, +91-9036015249 & +91-9243185125.</p>
+            </div>
+
+            <!-- Main Report Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tbody>
+                    ${Object.entries({
+                        'Certificate Number': getValue('CertificateNumber'),
+                        'Date': getValue('date'),
+                        'Applicant Name': applicantName || 'N/A',
+                        'Container Number': getValue('containerNumber'),
+                        'Size/Type': getValue('sizeType'),
+                        'Tare Weight': `${getValue('tareWeight')} Kgs`,
+                        'Payload Capacity': `${getValue('payloadCapacity')} Kgs`,
+                        'Declared Total Weight': `${getValue('declaredTotalWeight')} Kgs`,
+                        'Stuffing Commencement': getValue('stuffingCommDateTime'),
+                        'Stuffing Completion': getValue('stuffingCompDateTime'),
+                        'Seal Number': getValue('sealNumber'),
+                        'Port of Discharge': getValue('portOfDischarge'),
+                        'Place of Stuffing': getValue('placeOfStuffing')
+                    }).map(([key, value]) => `
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 8px; font-weight: bold; width: 30%;">${key}</td>
+                            <td style="border: 1px solid #000; padding: 8px; width: 70%;">${value}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+
+            <!-- Consignment Details -->
+            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Consignment Details</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Consignor</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Consignee</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Description</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Marks & Nos.</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Packages</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Gross Weight</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${consignmentRows || '<tr><td colspan="7">No consignment data available</td></tr>'}
+                </tbody>
+            </table>
+
+            <!-- Summary Boxes -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                ${['volume', 'totalPackages', 'grossWeight'].map(id => {
+                    const value = getValue(id);
+                    const labels = {
+                        volume: { title: 'CBM', unit: 'CBM' },
+                        totalPackages: { title: 'Total Packages', unit: 'Pkgs' },
+                        grossWeight: { title: 'Gross Weight', unit: 'Kgs' }
+                    };
+                    return `
+                        <div style="border: 1px solid #000; padding: 15px; text-align: center;">
+                            <h3 style="font-weight: bold; margin-bottom: 5px;">${labels[id].title}</h3>
+                            <p style="font-size: 18px; font-weight: bold;">
+                                ${value} ${labels[id].unit}
+                            </p>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <!-- Remarks -->
+            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Remarks</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                ${Object.entries({
+                    'Loading Condition': getValue('loadingCondition'),
+                    'Lashing': getValue('lashing'),
+                    'Others': getValue('others')
+                }).map(([key, value]) => `
+                    <tr>
+                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold; width: 30%;">${key}</td>
+                        <td style="border: 1px solid #000; padding: 8px; width: 70%;">${value}</td>
+                    </tr>
+                `).join('')}
+            </table>
+
+            <!-- Surveyor Details -->
+            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Surveyor Details</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                ${Object.entries({
+                    'Name of Surveyor': getValue('surveyorName'),
+                    'Signature': getValue('signature')
+                }).map(([key, value]) => `
+                    <tr>
+                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold; width: 30%;">${key}</td>
+                        <td style="border: 1px solid #000; padding: 8px; width: 70%;">${value}</td>
+                    </tr>
+                `).join('')}
+            </table>
+
+<div class="mt-8 w-full">
+    <div class="text-left">
+        <p class="font-semibold">For Viking Marine Inc.</p>
+        <p class="italic">"Issued Without Prejudice"</p>
+    </div>
+</div>
+
+            </div>
+        </div>
+        `;
+
+        // Generate PDF
+        html2canvas(pdfContainer, { 
+            scale: 2,
+            useCORS: true,
+            logging: true
+        }).then(canvas => {
+            const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * pageWidth) / canvas.width;
+            
+            let position = 0;
+            let remainingHeight = imgHeight;
+
+            while (remainingHeight > 0) {
+                const sectionHeight = Math.min(pageHeight, remainingHeight);
+                const sectionCanvas = document.createElement('canvas');
+                const sectionContext = sectionCanvas.getContext('2d');
+                
+                sectionCanvas.width = canvas.width;
+                sectionCanvas.height = sectionHeight * (canvas.height / imgHeight);
+                
+                // Draw the section of the main canvas onto the section canvas
+                sectionContext.drawImage(
+                    canvas,
+                    0, // source x
+                    position * (canvas.height / imgHeight), // source y
+                    canvas.width, // source width
+                    sectionHeight * (canvas.height / imgHeight), // source height
+                    0, // destination x
+                    0, // destination y
+                    canvas.width, // destination width
+                    sectionHeight * (canvas.height / imgHeight) // destination height
+                );
+
+                // Add new page (except first iteration)
+                if (position > 0) pdf.addPage();
+
+                // Convert section canvas to image and add to PDF
+                const sectionImg = sectionCanvas.toDataURL('image/png');
+                pdf.addImage(
+                    sectionImg,
+                    'PNG',
+                    0, // x
+                    0, // y
+                    imgWidth,
+                    sectionHeight
+                );
+
+                remainingHeight -= sectionHeight;
+                position += sectionHeight;
+            }
+
+            pdf.save('FCL_Report.pdf');
+            document.body.removeChild(pdfContainer);
+        }).catch(error => {
+            console.error('Error generating PDF:', error);
+            alert('Error generating PDF. Please check the console for details.');
+        });
+
+    } catch (error) {
+        console.error('PDF generation failed:', error);
+        alert('Failed to generate PDF. Please check the console for errors.');
+    }
+}
+
+    document.addEventListener("DOMContentLoaded", function() {
+        function updateApplicantName() {
+            const title = document.getElementById("applicantTitle").value;
+            const name = document.getElementById("applicantNameInput").value.trim();
+            document.getElementById("applicantName").value = title + " " + name;
+        }
+
+        // Update hidden field when dropdown or input changes
+        document.getElementById("applicantTitle").addEventListener("change", updateApplicantName);
+        document.getElementById("applicantNameInput").addEventListener("input", updateApplicantName);
+    });
+
+
+                //flash message
+                setTimeout(() => {
+            document.getElementById('flash-message').style.display = 'none';
+        }, 2000);
+
+
+
+document.getElementById("submitNew").addEventListener("click", function(event) {
         event.preventDefault(); // Prevent default form submission
         let form = document.querySelector("form");
         let input = document.createElement("input");
@@ -790,9 +1116,28 @@ overflow-y: auto;
         
         // Redirect after form submission
         form.addEventListener("submitNew", function() {
-            window.location.href = "{{ url_for('emp') }}";
+            window.location.href = "{{ url_for('empemp') }}";
         });
     });
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Function to format datetime in 24-hour format
+    function formatDateTime(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
+
+    // Set default datetime values in 24-hour format
+    const now = new Date();
+    document.getElementById('stuffingCommDateTime').value = formatDateTime(now);
+    document.getElementById('stuffingCompDateTime').value = formatDateTime(now);
+});
+
 document.getElementById("add-container-btn").addEventListener("click", function () {
     fetch('/get_containers')
         .then(response => response.json())
@@ -880,7 +1225,22 @@ document.getElementById("add-container-to-main").addEventListener("click", funct
         const cells = row.querySelectorAll("td");
 
         document.getElementById("containerNumber").value = cells[1].textContent.trim();
-        document.getElementById("applicantName").value = cells[2].textContent.trim();
+
+        // Split applicant name into title and name
+        const fullName = cells[2].textContent.trim();
+        if (fullName.startsWith("Mr") || fullName.startsWith("M/s")) {
+            const [title, ...nameParts] = fullName.split(" ");
+            document.getElementById("applicantTitle").value = title;
+            document.getElementById("applicantNameInput").value = nameParts.join(" ").trim();
+        } else {
+            // Default if no title found
+            document.getElementById("applicantTitle").value = "Mr";
+            document.getElementById("applicantNameInput").value = fullName;
+        }
+
+        // Update hidden input with combined title and name
+        document.getElementById("applicantName").value = document.getElementById("applicantTitle").value + " " + document.getElementById("applicantNameInput").value.trim();
+
         document.getElementById("sizeType").value = cells[3].textContent.trim();
         document.getElementById("tareWeight").value = cells[4].textContent.trim();
         document.getElementById("payloadCapacity").value = cells[5].textContent.trim();
@@ -891,6 +1251,7 @@ document.getElementById("add-container-to-main").addEventListener("click", funct
         alert("Please select a container to add!");
     }
 });
+
 
 document.getElementById('fill-table').addEventListener('click', function () {
     const selectedRows = document.querySelectorAll('.modal-content .row-check:checked');
@@ -964,6 +1325,7 @@ document.getElementById('fill-table').addEventListener('click', function () {
 
 
 
+
 // Fetch certificate number on page load
 document.addEventListener("DOMContentLoaded", function () {
     fetch("/get_latest_", { headers: { "X-Requested-With": "XMLHttpRequest" } })  
@@ -1019,7 +1381,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-//search functionality
+// Table search functionality
 // Container Search Handler
 document.getElementById('containerSearch').addEventListener('input', function(e) {
     const term = e.target.value.toLowerCase();
@@ -1101,6 +1463,9 @@ document.getElementById('consignmentSearch').addEventListener('input', function(
         tbody.appendChild(messageRow);
     }
 });
+
+
+
 
 </script>    
     
