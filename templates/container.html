@@ -357,6 +357,8 @@ h1 {
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 p-4">
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -431,7 +433,7 @@ h1 {
         
         {% if container_data and container_data.CertificateNumber != "N/A" %}
             <p><strong>Certificate Number:</strong> {{ container_data.CertificateNumber }}</p>
-            <p><strong>Status:</strong>
+            <p><strong class="stat">Status:</strong>
             <span class="status-indicator 
             {% if container_data.status == 'Open' %} status-open
             {% elif container_data.status == 'In Progress' %} status-in-progress
@@ -1063,54 +1065,214 @@ async function generatePDF() {
         el.style.display = 'none';
     });
 
-    // Capture the main content
-    const element = document.querySelector('.max-w-4xl');
-    const canvas = await html2canvas(element, {
-        scale: 3, // Increased from 2 to 3 for better resolution
-        useCORS: true,
-        logging: true,
-        backgroundColor: '#ffffff'
+    // Collect form data
+    const container = {
+        CertificateNumber: document.getElementById('CertificateNumber').value,
+        date: document.getElementById('date').value,
+        applicant_for_survey: document.getElementById('applicant_for_survey').value,
+        date_of_inspection: document.querySelector('input[name="date_of_inspection"]').value,
+        container_no: document.querySelector('input[name="container_no"]').value,
+        place_of_inspection: document.querySelector('input[name="place_of_inspection"]').value,
+        type: document.querySelector('input[name="type"]').value,
+        size: document.querySelector('input[name="size"]').value,
+        tare_weight: document.getElementById('tare_weight').value,
+        csc_no: document.querySelector('input[name="csc_no"]').value,
+        payload_capacity: document.getElementById('payload_capacity').value,
+        year_of_manufacture: document.querySelector('input[name="year_of_manufacture"]').value,
+        max_gross_weight: document.getElementById('max_gross_weight').value,
+        remarks: document.getElementById('finalRemarks').value,
+        surveyor: document.querySelector('input[name="surveyor"]').value,
+    };
+
+    // Collect and convert photos to data URLs
+    const photoPromises = [];
+    for (let i = 1; i <= 7; i++) {
+        const input = document.querySelector(`input[name="photo_${i}"]`);
+        if (input && input.files[0]) {
+            const promise = new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    container[`photo_${i}`] = e.target.result;
+                    resolve();
+                };
+                reader.readAsDataURL(input.files[0]);
+            });
+            photoPromises.push(promise);
+        }
+    }
+    await Promise.all(photoPromises);
+
+    // Create temporary container
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.backgroundColor = '#ffffff';
+    document.body.appendChild(tempDiv);
+
+    tempDiv.innerHTML = `
+        <!-- Page 1: Header & Table -->
+ <div style="page-break-after: always;">
+    <div class="max-w-4xl mx-auto bg-white p-6 text-center">
+        <h1 style="font-family: 'Cooper Black', sans-serif; font-size: 42px; color:#da3936;">VIKING MARINE INC.</h1>
+          <div class="text-center">
+              <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+              <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
+              <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
+              <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
+              <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
+          </div>
+    </div>
+</div>
+
+                <div class="border-t border-b border-gray-300 py-2 mb-4">
+                    <h2 class="text-lg font-semibold text-center">EMPTY CONTAINER CONDITION SURVEY REPORT</h2>
+                </div>
+
+            <table class="w-full border border-gray-300 mb-4">
+                <thead>
+                    <tr>
+                        <th class="border border-gray-300 p-2 text-left">Field</th>
+                        <th class="border border-gray-300 p-2 text-left">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${Object.entries({
+                        'Report No.': container.CertificateNumber,
+                        'Date': container.date,
+                        'Applicant for Survey': container.applicant_for_survey,
+                        'Date of Inspection': container.date_of_inspection,
+                        'Container No.': container.container_no,
+                        'Place of Inspection': container.place_of_inspection,
+                        'Type': container.type,
+                        'Size': container.size,
+                        'Tare Weight': container.tare_weight,
+                        'CSC No.': container.csc_no,
+                        'Payload Capacity': container.payload_capacity,
+                        'Year of Manufacture': container.year_of_manufacture,
+                        'Max. Gross Weight': container.max_gross_weight
+                    }).map(([key, value]) => `
+                        <tr>
+                            <td class="border border-gray-300 p-2 font-semibold">${key}</td>
+                            <td class="border border-gray-300 p-2">${value || 'N/A'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+
+        <!-- Page 2: Photos -->
+        <div style="page-break-before: always; page-break-after: always;">
+            <div class="max-w-4xl mx-auto bg-white p-6">
+                <h3 class="text-lg font-semibold mb-4">Photos</h3>
+                <div class="photo-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 55px;">
+                    ${Array.from({length: 7}, (_, i) => `
+                        <div style="page-break-inside: avoid; border: 1px solid #ddd; padding: 10px; height: 200px;">
+                            ${container[`photo_${i+1}`] ? 
+                                `<img src="${container[`photo_${i+1}`]}" style="width: 100%; height: 100%; object-fit: contain;">` : 
+                                `<div style="display: flex; height: 100%; align-items: center; justify-content: center; color: #666;">
+                                    No Photo ${i+1}
+                                </div>`
+                            }
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 3: Remarks & Surveyor -->
+        <div style="page-break-before: always;">
+            <div class="max-w-4xl mx-auto bg-white p-6">
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4">Remarks</h3>
+                    <div class="border border-gray-300 p-4 min-h-[150px]">
+                        ${container.remarks}
+                    </div>
+                </div>
+
+                 <div class="mt-8 w-full">
+                  <div class="text-left">
+                    <p class="font-semibold">For Viking Marine Inc.</p>
+                    <p class="italic">"Issued Without Prejudice"</p>
+                    <p class="mt-4">Surveyor: ${container.surveyor}</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+
+    // Wait for images to load
+    await new Promise(resolve => {
+        const images = tempDiv.querySelectorAll('img');
+        if (images.length === 0) return resolve();
+
+        let loaded = 0;
+        const onLoad = () => {
+            if (++loaded === images.length) resolve();
+        };
+
+        images.forEach(img => {
+            img.addEventListener('load', onLoad);
+            if (img.complete) onLoad();
+        });
     });
 
-    // Create PDF
+    // Generate PDF with page splitting
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 10;
-    const imgWidth = pageWidth - 2 * margin;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    const pageContentHeight = pageHeight - 2 * margin; // Content height after margins
+    const contentWidth = pageWidth - margin * 2;
 
-    // Slice the canvas and handle multi-page content
-    let yPosition = 0;
-    while (yPosition < canvas.height) {
-        // Create a slice of the canvas
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = Math.min(pageContentHeight * (canvas.width / imgWidth), canvas.height - yPosition);
+    // Convert to canvas
+    const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+    });
 
-        const pageCtx = pageCanvas.getContext('2d');
-        pageCtx.drawImage(canvas, 0, yPosition, canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
+    // Calculate dimensions
+    const contentHeight = (canvas.height * contentWidth) / canvas.width;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let currentPosition = 0;
 
-        // Convert the sliced canvas to image
-        const imgData = pageCanvas.toDataURL('image/png');
-        doc.addImage(imgData, 'PNG', margin, margin, imgWidth, (pageCanvas.height * imgWidth) / canvas.width);
+    while (currentPosition < contentHeight) {
+        if (currentPosition > 0) doc.addPage();
+        
+        const sectionHeight = Math.min(contentHeight - currentPosition, pageHeight - margin * 2);
+        const sectionCanvas = document.createElement('canvas');
+        sectionCanvas.width = canvas.width;
+        sectionCanvas.height = (sectionHeight / contentHeight) * canvas.height;
 
-        yPosition += pageCanvas.height;
+        const ctx = sectionCanvas.getContext('2d');
+        ctx.drawImage(
+            canvas,
+            0, (currentPosition / contentHeight) * canvas.height,
+            canvas.width, sectionCanvas.height,
+            0, 0,
+            canvas.width, sectionCanvas.height
+        );
 
-        // Add a new page if there's more content to print
-        if (yPosition < canvas.height) doc.addPage();
+        doc.addImage(
+            sectionCanvas,
+            'PNG',
+            margin,
+            margin,
+            contentWidth,
+            sectionHeight
+        );
+
+        currentPosition += sectionHeight;
     }
 
-    // Restore hidden elements
+    // Cleanup
+    tempDiv.remove();
     elementsToHide.forEach((el, index) => {
         el.style.display = originalStyles[index];
     });
 
     // Save PDF
-    const certNo = "{{ container_data.CertificateNumber }}";
-    doc.save(`Container_Report_${certNo}.pdf`);
+    doc.save(`${container.CertificateNumber || 'Container_Report'}.pdf`);
 }
 
   document.addEventListener("DOMContentLoaded", () => {
