@@ -440,32 +440,64 @@ async function printCertificate() {
     font-weight: bold;
     margin-top: 10px;
 }
+.pdf-tableh {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  text-align: left;
+}
 
+.pdf-tableh th,
+.pdf-tableh td {
+  border: none;
+  padding: 6px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.pdf-tableh td:last-child {
+  text-align: right;
+}
             </style>
-<div class="header" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-    <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color: rgba(253,0,0,255);">
-        VIKING MARINE INC.
+            
+<div class="header" style="display: flex; align-items: center; text-align: center;">
+  <!-- Logo -->
+<img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" 
+     style="height: 80px; margin-right: 15px; margin-top: -80px;">
+
+  <!-- Heading & Company Details -->
+  <div style="text-align: center; flex-grow: 1; margin-left: -100px;">
+    <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 28px; margin: 0; display: inline-block; vertical-align: middle;">
+      VIKING MARINE INC.
     </h1>
-    <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
-    <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
-    <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
-    <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
-    <p class="text-sm">
+
+    <div style="margin-top: 3px; line-height: 1.2;">
+      <p class="text-sm font-semibold" style="margin: 0;">SURVEYORS AND CONSULTING ENGINEERS</p>
+      <p class="text-sm" style="margin: 0;">C/O. CONTAINER CORPORATION OF INDIA</p>
+      <p class="text-sm" style="margin: 0;">Whitefield, Bangalore - 560 066.</p>
+      <p class="text-sm" style="margin: 0;">Ph.: +919036015240, +919035015240 &amp; +919036015243</p>
+      <p class="text-sm" style="margin: 0;">
         E-mail: ops@vikingmarine.in, 
         Website: <a href="http://www.vikingmarine.in" target="_blank">www.vikingmarine.in</a>
-    </p>
+      </p>
+    </div>
+  </div>
 </div>
 
-            
+<br>
+<table class="pdf-tableh">
+  <tr>
+    <td><strong>Report No.:</strong> ${form.CertificateNumber.value || ''}</td>
+    <td><strong>Date:</strong> ${form.date.value || ''}</td>
+  </tr>
+</table>
+
+
         <div class="certificate-title">
             CERTIFICATE OF MEASUREMENT REPORT
         </div>
 
-
-
-            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
-                Applicant Information
-            </h2>
             ${createApplicantTable(form)}
 
             <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
@@ -473,14 +505,33 @@ async function printCertificate() {
             </h2>
             ${createSurveyMeasuresTable()}
 
-            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
-                <p><strong>Total No. of Pkgs:</strong> ${form.totalPkgs.value || 'N/A'}</p>
-                <p><strong>Total Volume (Cu. M):</strong> ${form.totalVolume.value || 'N/A'}</p>
-            </div>
-                        <div class="mt-8 w-full">
+                <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                    <div style="border: 1px solid #000; padding: 10px; flex: 1; margin-right: 10px; text-align: center;">
+                        <p><strong>Total No. of Pkgs:</strong></p>
+                        <p>${form.totalPkgs.value || 'N/A'}</p>
+                    </div>
+                    <div style="border: 1px solid #000; padding: 10px; flex: 1; margin-right: 10px; text-align: center;">
+                        <p><strong>Gross Wt.:</strong></p>
+                        <p>${form.gross_weight.value || 'N/A'}</p>
+                    </div>
+                    <div style="border: 1px solid #000; padding: 10px; flex: 1; text-align: center;">
+                        <p><strong>Total Volume (Cu. M):</strong></p>
+                        <p>${form.totalVolume.value || 'N/A'}</p>
+                    </div>
+                </div>
+
+            
+            <div class="mt-8 w-full">
                   <div class="text-left">
-                    <p class="font-semibold">For Viking Marine Inc.</p>
-                    <p class="italic">"Issued Without Prejudice"</p>
+    <p class="text-sm text-left font-bold" style="text-transform: uppercase;">
+        "ISSUED WITHOUT PREJUDICE"
+    </p>                 
+    <p class="font-semibold" style="text-align: left; margin-top: 200px;">
+        For Viking Marine Inc.<br>
+        Authorised Signatory
+    </p>
+
+
                 </div>
             </div>
         `;
@@ -508,7 +559,6 @@ async function printCertificate() {
         pdf.addImage(canvas, 'PNG', 0, 0, imgWidth, imgHeight);
         pdf.save(`Certificate_${form.CertificateNumber.value || 'Report'}.pdf`);
 
-
         // Cleanup
         document.body.removeChild(pdfContainer);
 
@@ -522,12 +572,7 @@ function createApplicantTable(form) {
     return `
         <table class="pdf-table">
             <tbody>
-                <tr>
-                    <th>Certificate No.</th>
-                    <td>${form.CertificateNumber.value || ''}</td>
-                    <th>Date</th>
-                    <td>${form.date.value || ''}</td>
-                </tr>
+
                 <tr>
                     <th>Name of Applicant</th>
                     <td>${(form.applicantTitle.value || '') + ' ' + (form.applicantName.value || '')}</td>
@@ -543,12 +588,11 @@ function createApplicantTable(form) {
                 <tr>
                     <th>Port of Discharge</th>
                     <td>${form.portOfDischarge.value || ''}</td>
-                    <th>Quantity</th>
-                    <td>${form.quantity.value || ''}</td>
+                    <th>S.B. No./ Inovice No.</th>
+                    <td>${form.sb_number.value || ''}</td>
                 </tr>
                 <tr>
-                    <th>Gross Wt.</th>
-                    <td>${form.gross_weight.value || ''}</td>
+
                     <th>C & F Agent</th>
                     <td>${form.cf_agent.value || ''}</td>
                 </tr>
