@@ -1,4 +1,3 @@
-
 <html>
 <head>
     <title>Certificate of Measurement Form</title>
@@ -238,8 +237,8 @@ h1 {
             <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
         </div>
         {% if certificate %}
-        <p><strong>Certificate Number:</strong> {{ certificate.CertificateNumber }}</p>
-        <p><strong>Status:</strong> 
+        <p><strong class="abc">Certificate Number:</strong> {{ certificate.CertificateNumber }}</p>
+        <p><strong class="abc">Status:</strong> 
             <span class="status-indicator 
                 {% if certificate.status == 'Open' %} status-open
                 {% elif certificate.status == 'In Progress' %} status-in-progress
@@ -489,6 +488,13 @@ async function printCertificate() {
             <div style="margin-top: 20px; display: flex; justify-content: space-between;">
                 <p><strong>Total No. of Pkgs:</strong> ${form.totalPkgs.value || 'N/A'}</p>
                 <p><strong>Total Volume (Cu. M):</strong> ${form.totalVolume.value || 'N/A'}</p>
+            </div>
+            
+            <div class="mt-8 w-full">
+                  <div class="text-left">
+                    <p class="font-semibold">For Viking Marine Inc.</p>
+                    <p class="italic">"Issued Without Prejudice"</p>
+                </div>
             </div>
         `;
 
