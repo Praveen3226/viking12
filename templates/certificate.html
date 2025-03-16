@@ -489,13 +489,8 @@ async function printCertificate() {
 
     <div style="margin-top: 3px; line-height: 1.2;">
       <p class="text-sm font-semibold" style="margin: 0;">SURVEYORS AND CONSULTING ENGINEERS</p>
-      <p class="text-sm" style="margin: 0;">C/O. CONTAINER CORPORATION OF INDIA</p>
-      <p class="text-sm" style="margin: 0;">Whitefield, Bangalore - 560 066.</p>
+      <p class="text-sm" style="margin: 0;"># 143,Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
       <p class="text-sm" style="margin: 0;">Ph.: +919036015240, +919035015240 &amp; +919036015243</p>
-      <p class="text-sm" style="margin: 0;">
-        E-mail: ops@vikingmarine.in, 
-        Website: <a href="http://www.vikingmarine.in" target="_blank">www.vikingmarine.in</a>
-      </p>
     </div>
   </div>
 </div>
@@ -504,13 +499,14 @@ async function printCertificate() {
 <table class="pdf-tableh">
   <tr>
     <td><strong>Report No.:</strong> ${form.CertificateNumber.value || ''}</td>
-    <td><strong>Date:</strong> ${form.date.value || ''}</td>
+    <td><strong>Date:</strong> ${new Date(form.date.value).toLocaleDateString('en-GB') || ''}</td>
   </tr>
 </table>
 
 
+
         <div class="certificate-title">
-            CERTIFICATE OF MEASUREMENT REPORT
+            CERTIFICATE OF MEASUREMENT 
         </div>
 
             ${createApplicantTable(form)}
@@ -526,7 +522,7 @@ async function printCertificate() {
                         <p>${form.totalPkgs.value || 'N/A'}</p>
                     </div>
                     <div style="border: 1px solid #000; padding: 10px; flex: 1; margin-right: 10px; text-align: center;">
-                        <p><strong>Gross Wt.:</strong></p>
+                        <p><strong>Gross Wt.(As Declared):</strong></p>
                         <p>${form.gross_weight.value || 'N/A'}</p>
                     </div>
                     <div style="border: 1px solid #000; padding: 10px; flex: 1; text-align: center;">
@@ -536,19 +532,17 @@ async function printCertificate() {
                 </div>
 
             
-            <div class="mt-8 w-full">
-                  <div class="text-left">
-    <p class="text-sm text-left font-bold" style="text-transform: uppercase;">
-        "ISSUED WITHOUT PREJUDICE"
-    </p>                 
-    <p class="font-semibold" style="text-align: left; margin-top: 200px;">
-        For Viking Marine Inc.<br>
-        Authorised Signatory
-    </p>
-
-
+                <div class="mt-8 w-full">
+                <div class="text-left">
+                    <p class="text-sm text-left font-bold" style="text-transform: uppercase;">
+                    "ISSUED WITHOUT PREJUDICE"
+                    </p><br><br><br>                 
+                    <p class="font-semibold" style="text-align: left;">
+                    For Viking Marine Inc.<br><br><br><br><br><br>
+                    Authorised Signatory
+                    </p>
                 </div>
-            </div>
+                </div>
         `;
 
         // Add to document
@@ -585,34 +579,33 @@ async function printCertificate() {
 
 function createApplicantTable(form) {
     return `
-        <table class="pdf-table">
-            <tbody>
+       <table class="pdf-table">
+    <tbody>
+        <tr>
+        <th>Name of Applicant</th>
+        <td colspan="3">${(form.applicantTitle.value || '') + ' ' + (form.applicantName.value || '')}</td>
+        </tr>
+        <tr>
+        <th>Shipper</th>
+        <td>${form.shipper.value || ''}</td>
+        <th>Consignee</th>
+        <td>${form.consignee.value || ''}</td>
+        </tr>
+        <tr>
+        <th>Commodity</th>
+        <td>${form.commodity.value || ''}</td>
+        <th>Port of Discharge</th>
+        <td>${form.portOfDischarge.value || ''}</td>
+        </tr>
+        <tr>
+        <th>S.B. No./ Invoice No.</th>
+        <td>${form.sb_number.value || ''}</td>
+        <th>C & F Agent</th>
+        <td>${form.cf_agent.value || ''}</td>
+        </tr>
+    </tbody>
+    </table>
 
-                <tr>
-                    <th>Name of Applicant</th>
-                    <td>${(form.applicantTitle.value || '') + ' ' + (form.applicantName.value || '')}</td>
-                    <th>Shipper</th>
-                    <td>${form.shipper.value || ''}</td>
-                </tr>
-                <tr>
-                    <th>Consignee</th>
-                    <td>${form.consignee.value || ''}</td>
-                    <th>Commodity</th>
-                    <td>${form.commodity.value || ''}</td>
-                </tr>
-                <tr>
-                    <th>Port of Discharge</th>
-                    <td>${form.portOfDischarge.value || ''}</td>
-                    <th>S.B. No./ Inovice No.</th>
-                    <td>${form.sb_number.value || ''}</td>
-                </tr>
-                <tr>
-
-                    <th>C & F Agent</th>
-                    <td>${form.cf_agent.value || ''}</td>
-                </tr>
-            </tbody>
-        </table>
     `;
 }
 
@@ -716,7 +709,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const year = today.getFullYear();
         const month = ('0' + (today.getMonth() + 1)).slice(-2);
         const day = ('0' + today.getDate()).slice(-2);
-        const formattedDate = `${year}-${month}-${day}`;
+        const formattedDate = `${day}-${month}-${year}`;
         document.getElementById('dateInput').value = formattedDate;
 });
         // Delete functionality
