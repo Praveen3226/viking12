@@ -632,9 +632,9 @@ function createSurveyMeasuresTable() {
 }
 function createSurveyMeasuresTable() {
     return `
-        <table class="w-full border-collapse border border-black text-sm">
-            <thead>
-                <tr>
+                    <table class="w-full border-collapse border border-black text-sm font-bold">
+                <thead>
+                    <tr>
                     <th class="border border-black p-2">Mark & No.s</th>
                     <th class="border border-black p-2">No. of Pkgs</th>
                     <th class="border border-black p-2">Length</th>
@@ -642,22 +642,23 @@ function createSurveyMeasuresTable() {
                     <th class="border border-black p-2">Height</th>
                     <th class="border border-black p-2">Volume in 1 Unit</th>
                     <th class="border border-black p-2">Volume in Cu. M</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${Array.from(document.querySelectorAll('tbody tr'))
+                    </tr>
+                </thead>
+                <tbody class="font-normal">
+                    ${Array.from(document.querySelectorAll('tbody tr'))
                     .map(row => {
                         const inputs = row.querySelectorAll('input');
                         return inputs.length >= 7 ? `
-                            <tr>
-                                ${Array.from(inputs).slice(1).map(input => // Skip first input
-                                    `<td class="border border-black p-2">${input.value || ''}</td>`
-                                ).join('')}
-                            </tr>
+                        <tr>
+                            ${Array.from(inputs).slice(1).map(input => // Skip first input
+                            `<td class="border border-black p-2">${input.value || ''}</td>`
+                            ).join('')}
+                        </tr>
                         ` : '';
                     }).join('')}
-            </tbody>
-        </table>
+                </tbody>
+                </table>
+
     `;
 }
 
