@@ -4,17 +4,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/cooper-black" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-
-/* @import url('https://fonts.cdnfonts.com/css/cooper-black'); 
+        /* @import url('https://fonts.cdnfonts.com/css/cooper-black'); 
 h1 {
-            font-family: 'Copper Black', serif;
+        font-family: 'Cooper Black', sans-serif;
             font-size: 48px; 
             text-align: center; 
         } */
-                h1 {
+
+        h1 {
             -webkit-text-fill-color: #da3936;
         }
+
+    @font-face {
+    font-family: 'Cooper Black Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Cooper Black Regular'), url('COOPBL.woff') format('woff');
+    }
         .footer {
             text-align: center;
             padding: 10px;
@@ -57,6 +66,8 @@ h1 {
             justify-content: space-between;
             align-items: center;
         }
+
+        
 
         .nav-bar h1 {
             color: white;
@@ -110,14 +121,13 @@ h1 {
     align-items: center;
     gap: 8px;
     padding: 8px 15px;
-    border-radius: 50px;
+    border-radius: 50px;  /* ✅ Rounded */
     font-weight: bold;
     text-align: center;
     min-width: 150px;
 }
 
 /* ✅ Status Colors */
-.status-draft { background-color: orange; color: white; }
 .status-open { background-color: rgb(0, 203, 0); color: white; }
 .status-in-progress { background-color: yellow; color: black; }
 .status-completed { background-color: red; color: white; }
@@ -132,6 +142,61 @@ h1 {
     background-color: currentColor;
 }
 
+#flash-message {
+            width: 80%; 
+            max-width: 600px;
+            padding: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            background-color: #10f85d; /* Your preferred color */
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Ensure it stays in place */
+            top: 50%; /* Position vertically at the center */
+            left: 50%; /* Position horizontally at the center */
+            transform: translate(-50%, -50%); /* Offset it by 50% of its own size */
+            z-index: 9999; /* Ensure it stays on top of other elements */
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+        background-color: gold;
+        color: black;
+        border: 1px solid black;
+        padding: 5px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Adjust the search inputs and small inputs if necessary */
+    .search-input,
+    .small-box {
+        background-color: gold;
+        color: black;
+        border: 1px solid black;
+        padding: 5px;
+       
+    }
+
+    /* Style buttons for consistency */
+    .btn {
+        background-color: black;
+        color: gold;
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .btn:hover {
+        background-color: gold;
+        color: black;
+        border: 1px solid black;
+    }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
@@ -153,17 +218,15 @@ h1 {
                 </ul>
             </nav>
         </div>
-        <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color:#da3936 ;">VIKING MARINE INC.</h1>           
-
-        <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+        <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color:rgba(253,0,0,255) ;">VIKING MARINE INC.</h1>            <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
             <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
             <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
             <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
             <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
         </div>
         {% if certificate %}
-        <p><strong>Certificate Number:</strong> {{ certificate.CertificateNumber }}</p>
-        <p><strong>Status:</strong> 
+        <p><strong class="abc">Certificate Number:</strong> {{ certificate.CertificateNumber }}</p>
+        <p><strong class="abc">Status:</strong> 
             <span class="status-indicator 
                 {% if certificate.status == 'Open' %} status-open
                 {% elif certificate.status == 'In Progress' %} status-in-progress
@@ -187,60 +250,44 @@ h1 {
             <div class="flex justify-between mb-4">
                 <div>
                     <label class="text-sm">Cert. No.</label>
-                    <input type="text" id="CertificateNumber" name="CertificateNumber" 
-                           class="border border-gray-300 rounded p-1 ml-2" readonly 
-                           style="background-color: gold; color: black;"/>
+                    <input type="text" id="CertificateNumber" name="CertificateNumber" class="border border-gray-300 rounded p-1 ml-2" readonly style="background-color: gold; color: black;" />
                 </div>
                 <div>
                     <label class="text-sm">Date</label>
-                    <input type="date" class="border border-gray-300 rounded p-1 ml-2" 
-                           id="dateInput" name="date" style="background-color: gold; color: black;"/>
+                    <input type="date" class="border border-gray-300 rounded p-1 ml-2" id="dateInput" name="date" style="background-color: gold; color: black;" />
                 </div>
             </div>
         
             <div>
-                <div>
-                    <label class="text-sm">Name of the applicant</label>
-                    <div class="flex gap-2">
-                        <select name="applicantTitle" class="border border-gray-300 rounded p-1 w-24" 
-                                style="background-color: gold; color: black;">
-                            <option value="Mr">Mr</option>
-                            <option value="Mrs">Mrs</option>
-                        </select>
-                        <input type="text" name="applicantName" class="border border-gray-300 rounded p-1 flex-grow" 
-                               placeholder="Enter applicant's name" style="background-color: gold; color: black;"/>
-                    </div>
-                    <label class="text-sm">Shipper</label>
-                    <input type="text" name="shipper" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                    <label class="text-sm">Consignee</label>
-                    <input type="text" name="consignee" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                    <label class="text-sm">Commodity</label>
-                    <input type="text" name="commodity" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                    <label class="text-sm">Port of Discharge</label>
-                    <input type="text" name="portOfDischarge" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
+                <label class="text-sm">Name of the applicant</label>
+                <div class="flex gap-2">
+                    <!-- Dropdown for title -->
+                    <select name="applicantTitle" class="border border-gray-300 rounded p-1 w-24" style="background-color: gold; color: black;">
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                    </select>
+                    <!-- Input field for applicant's name -->
+                    <input type="text" name="applicantName" class="border border-gray-300 rounded p-1 flex-grow" placeholder="Enter applicant's name" style="background-color: gold; color: black;" />
                 </div>
         
-                <div>
-                    <label class="text-sm">S.B. No.</label>
-                    <input type="text" name="sb_number" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                    <label class="text-sm">Quantity</label>
-                    <input type="text" name="quantity" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                    <label class="text-sm">Gross. Wt.</label>
-                    <input type="text" name="gross_weight" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                    <label class="text-sm">C &amp; F Agent</label>
-                    <input type="text" name="cf_agent" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                    <label class="text-sm">Container No.</label>
-                    <input type="text" name="container_number" class="border border-gray-300 rounded w-full p-1 mt-1" 
-                           style="background-color: gold; color: black;"/>
-                </div>
+                <label class="text-sm">Shipper</label>
+                <input type="text" name="shipper" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">Consignee</label>
+                <input type="text" name="consignee" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">Commodity</label>
+                <input type="text" name="commodity" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">Port of Discharge</label>
+                <input type="text" name="portOfDischarge" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+            </div>
+            <div>
+                <label class="text-sm">S.B. No.</label>
+                <input type="text" name="sb_number" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">Quantity</label>
+                <input type="text" name="quantity" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">Gross. Wt.</label>
+                <input type="text" name="gross_weight" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">C &amp; F Agent</label>
+                <input type="text" name="cf_agent" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
             </div>
         
             <div class="mb-4">
@@ -248,18 +295,32 @@ h1 {
                 <div class="flex justify-between items-center my-2">
                     <div class="flex gap-2">
                         <input type="text" id="searchInput" placeholder="Enter Marks Nos." 
-                               class="border border-gray-300 rounded p-1 w-48 text-sm" 
-                               style="background-color: gold; color: black;">
+                               class="border border-gray-300 rounded p-1 w-48 text-sm">
                         <button type="button" onclick="searchMarks()" 
                                 class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
                             Search
                         </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="addNewRow()" 
+                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                            Add Row
+                        </button>
+                        <button type="button" onclick="toggleDeleteMode()" id="deleteBtn"
+                        class="bg-red-700 text-white px-3 py-1 rounded text-sm hover:bg-red-800">
+                        Delete Rows
+                        </button>
+                        <button type="button" onclick="cancelDelete()" id="cancelBtn"
+            class="cancel-btn text-white px-3 py-1 rounded text-sm" disabled>
+        Cancel
+    </button>
                     </div>
                 </div>
                 <div class="scrollable-table">
                     <table class="w-full border-collapse border border-black text-sm">
                         <thead>
                             <tr>
+                                <th class="border border-black p-1 delete-checkbox">Select</th>
                                 <th class="border border-black p-1">Marks Nos.</th>
                                 <th class="border border-black p-1">No. of Pkgs</th>
                                 <th class="border border-black p-1">Length</th>
@@ -270,35 +331,18 @@ h1 {
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Initial 4 rows -->
                             <tr>
-                                <td class="border border-black p-1 h-8">
-                                    <input type="text" name="marksNos[]" class="w-full border-none" 
-                                           style="background-color: gold; color: black;"/>
+                                <td class="border border-black p-1 delete-checkbox">
+                                    <input type="checkbox" class="row-checkbox">
                                 </td>
-                                <td class="border border-black p-1">
-                                    <input type="text" name="noOfPkgs[]" class="w-full border-none" 
-                                           style="background-color: gold; color: black;"/>
-                                </td>
-                                <td class="border border-black p-1">
-                                    <input type="text" name="length[]" class="w-full border-none" 
-                                           style="background-color: gold; color: black;"/>
-                                </td>
-                                <td class="border border-black p-1">
-                                    <input type="text" name="breadth[]" class="w-full border-none" 
-                                           style="background-color: gold; color: black;"/>
-                                </td>
-                                <td class="border border-black p-1">
-                                    <input type="text" name="height[]" class="w-full border-none" 
-                                           style="background-color: gold; color: black;"/>
-                                </td>
-                                <td class="border border-black p-1">
-                                    <input type="text" name="volumePerUnit[]" class="w-full border-none" readonly 
-                                           style="background-color: gold; color: black;"/>
-                                </td>
-                                <td class="border border-black p-1">
-                                    <input type="text" name="volumeUnit[]" class="w-full border-none" readonly 
-                                           style="background-color: gold; color: black;"/>
-                                </td>
+                                <td class="border border-black p-1 h-8"><input type="text" name="marksNos[]" class="w-full border-none" style="background-color: gold; color: black;" /></td>
+                                <td class="border border-black p-1"><input type="text" name="noOfPkgs[]" class="w-full border-none" style="background-color: gold; color: black;" /></td>
+                                <td class="border border-black p-1"><input type="text" name="length[]" class="w-full border-none" style="background-color: gold; color: black;" /></td>
+                                <td class="border border-black p-1"><input type="text" name="breadth[]" class="w-full border-none" style="background-color: gold; color: black;" /></td>
+                                <td class="border border-black p-1"><input type="text" name="height[]" class="w-full border-none" style="background-color: gold; color: black;" /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumePerUnit[]" class="w-full border-none" readonly style="background-color: gold; color: black;" /></td>
+                                <td class="border border-black p-1"><input type="text" name="volumeUnit[]" class="w-full border-none" readonly style="background-color: gold; color: black;" /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -308,19 +352,27 @@ h1 {
             <div class="flex justify-between mb-4">
                 <div>
                     <label class="text-sm">Total No. of Pkgs</label>
-                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" 
-                           name="totalPkgs" readonly style="background-color: gold; color: black;"/>
+                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" name="totalPkgs" readonly style="background-color: gold; color: black;" />
                 </div>
                 <div>
                     <label class="text-sm">Total No. of Cu. M</label>
-                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" 
-                           name="totalVolume" readonly style="background-color: gold; color: black;"/>
+                    <input type="text" class="border border-gray-300 rounded p-1 ml-2" name="totalVolume" readonly style="background-color: gold; color: black;" />
+                </div>
+            </div>
+        
+            <div class="flex justify-between items-center">
+                <div>
+                  <p  class="text-sm font-bold">For Viking Marine Inc.</p>
+                  <p  class="text-sm italic text-left font-bold">"Issued Without Prejudice"</p>
                 </div>
             </div>
         
             <div class="text-center mt-4">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
-                <button type="submit" id="submitNew" class="bg-green-500 text-white px-4 py-2 rounded">Submit and New</button>
+                <button type="submit" name="action" value="Save as Draft" class="btn btn-secondary">Save as Draft</button>
+                <button type="submit" class="btn btn-secondary">Submit</button>
+                <button type="submit" id="submitNew" class="btn btn-secondary">Submit and New</button>
+                <button type="button" onclick="submitAndPrint()" class="btn btn-secondary">Print</button>
+
             </div>
         
             <footer class="footer">
@@ -331,7 +383,246 @@ h1 {
     </div>
 
     <script>
-        // Generate certificate number on page load
+document.querySelector("button[onclick='submitAndPrint()']").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent immediate form submission
+
+    // First, generate and print the certificate
+    printCertificate().then(() => {
+        // After printing, submit the form
+        document.querySelector("form").submit();
+    }).catch(error => {
+        console.error("Print failed:", error);
+        alert("Error while printing. Please try again.");
+    });
+});
+
+
+
+async function printCertificate() {
+    try {
+        const { jsPDF } = window.jspdf;
+        const form = document.querySelector('form');
+        
+        // Validate required elements
+        if (!form) throw new Error('Form not found');
+        if (!window.jspdf || !html2canvas) throw new Error('Required libraries not loaded');
+
+        // Create PDF content container
+        const pdfContainer = document.createElement('div');
+        pdfContainer.style.width = '210mm';
+        pdfContainer.style.minHeight = '297mm';
+        pdfContainer.style.padding = '20px';
+        pdfContainer.style.backgroundColor = 'white';
+
+        // Build PDF content
+        pdfContainer.innerHTML = `
+            <style>
+                .pdf-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin: 15px 0;
+                }
+                .pdf-table td, .pdf-table th {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .pdf-header {
+                    text-align: center;
+                    margin-bottom: 25px;
+                }
+        .certificate-title {
+    text-align: center;
+    background-color: #b91c1c;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+            </style>
+<div class="header" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 34px; color: rgba(253,0,0,255);">
+        VIKING MARINE INC.
+    </h1>
+    <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
+    <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
+    <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
+    <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
+    <p class="text-sm">
+        E-mail: ops@vikingmarine.in, 
+        Website: <a href="http://www.vikingmarine.in" target="_blank">www.vikingmarine.in</a>
+    </p>
+</div>
+
+            
+        <div class="certificate-title">
+            CERTIFICATE OF MEASUREMENT REPORT
+        </div>
+
+
+
+            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                Applicant Information
+            </h2>
+            ${createApplicantTable(form)}
+
+            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                Survey Measures
+            </h2>
+            ${createSurveyMeasuresTable()}
+
+            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <p><strong>Total No. of Pkgs:</strong> ${form.totalPkgs.value || 'N/A'}</p>
+                <p><strong>Total Volume (Cu. M):</strong> ${form.totalVolume.value || 'N/A'}</p>
+            </div>
+        `;
+
+        // Add to document
+        document.body.appendChild(pdfContainer);
+
+        // Generate PDF
+        const canvas = await html2canvas(pdfContainer, {
+            scale: 2,
+            logging: true,
+            useCORS: true,
+            backgroundColor: '#FFFFFF'
+        });
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(canvas, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`Certificate_${form.CertificateNumber.value || 'Report'}.pdf`);
+
+
+        // Cleanup
+        document.body.removeChild(pdfContainer);
+
+    } catch (error) {
+        console.error('PDF generation failed:', error);
+        alert('Error generating PDF: ' + error.message);
+    }
+}
+
+function createApplicantTable(form) {
+    return `
+        <table class="pdf-table">
+            <tbody>
+                <tr>
+                    <th>Certificate No.</th>
+                    <td>${form.CertificateNumber.value || ''}</td>
+                    <th>Date</th>
+                    <td>${form.date.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Name of Applicant</th>
+                    <td>${(form.applicantTitle.value || '') + ' ' + (form.applicantName.value || '')}</td>
+                    <th>Shipper</th>
+                    <td>${form.shipper.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Consignee</th>
+                    <td>${form.consignee.value || ''}</td>
+                    <th>Commodity</th>
+                    <td>${form.commodity.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Port of Discharge</th>
+                    <td>${form.portOfDischarge.value || ''}</td>
+                    <th>Quantity</th>
+                    <td>${form.quantity.value || ''}</td>
+                </tr>
+                <tr>
+                    <th>Gross Wt.</th>
+                    <td>${form.gross_weight.value || ''}</td>
+                    <th>C & F Agent</th>
+                    <td>${form.cf_agent.value || ''}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+}
+
+function createSurveyMeasuresTable() {
+    return `
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="display: none;"></th> <!-- Hide first column header -->
+                    <th>Marks Nos.</th>
+                    <th>No. of Pkgs</th>
+                    <th>Length</th>
+                    <th>Breadth</th>
+                    <th>Height</th>
+                    <th>Volume in 1 Unit</th>
+                    <th>Volume in Cu. M</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${Array.from(document.querySelectorAll('tbody tr'))
+                    .map(row => {
+                        const inputs = row.querySelectorAll('input');
+                        return inputs.length >= 7 ? `
+                            <tr>
+                                ${Array.from(inputs).slice(1).map(input => // Skip first input
+                                    `<td>${input.value || ''}</td>`
+                                ).join('')}
+                            </tr>
+                        ` : '';
+                    }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+function createSurveyMeasuresTable() {
+    return `
+        <table class="w-full border-collapse border border-black text-sm">
+            <thead>
+                <tr>
+                    <th class="border border-black p-2">Mark & No.s</th>
+                    <th class="border border-black p-2">No. of Pkgs</th>
+                    <th class="border border-black p-2">Length</th>
+                    <th class="border border-black p-2">Breadth</th>
+                    <th class="border border-black p-2">Height</th>
+                    <th class="border border-black p-2">Volume in 1 Unit</th>
+                    <th class="border border-black p-2">Volume in Cu. M</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${Array.from(document.querySelectorAll('tbody tr'))
+                    .map(row => {
+                        const inputs = row.querySelectorAll('input');
+                        return inputs.length >= 7 ? `
+                            <tr>
+                                ${Array.from(inputs).slice(1).map(input => // Skip first input
+                                    `<td class="border border-black p-2">${input.value || ''}</td>`
+                                ).join('')}
+                            </tr>
+                        ` : '';
+                    }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+
+
+
+        //flash message
+        setTimeout(() => {
+            document.getElementById('flash-message').style.display = 'none';
+        }, 2000);
+
+
+        //submit and new 
         document.getElementById("submitNew").addEventListener("click", function(event) {
         event.preventDefault(); // Prevent default form submission
         let form = document.querySelector("form");
@@ -343,10 +634,14 @@ h1 {
         form.submit();
         
         // Redirect after form submission
-        form.addEventListener("submit", function() {
-            window.location.href = "{{ url_for('empcertificate') }}";
+        form.addEventListener("submitNew", function() {
+            window.location.href = "{{ url_for('certificate') }}";
         });
     });
+
+
+        // Generate certificate number on page load
+
 
 document.addEventListener("DOMContentLoaded", function () {
 
