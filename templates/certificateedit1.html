@@ -183,7 +183,8 @@ h1 {
             <span class="bg-red-700 text-white px-4 py-1 rounded">CERTIFICATE OF MEASUREMENT</span>
         </div>
         
-        <form method="POST" action="{{ url_for('update_certificatead', CertificateNumber=certificate.CertificateNumber) }}">
+        <form action="{{  url_for('update_certificatead', CertificateNumber=certificate.CertificateNumber) }}" id="certificateForm" method="POST">
+
 
             <div class="flex justify-between mb-4">
                 <div>
@@ -202,15 +203,15 @@ h1 {
             <div>
                 <label class="text-sm">Name of the applicant</label>
                 <div class="flex gap-2">
-                    <!-- Dropdown for title -->
                     <select name="applicantTitle" class="border border-gray-300 rounded p-1 w-24">
                         <option value="Mr">Mr</option>
                         <option value="Mrs">Mrs</option>
                     </select>
-                    <!-- Input field for name of the applicant -->
                     <input type="text" name="applicantName" class="border border-gray-300 rounded p-1 flex-grow" placeholder="Enter applicant's name" />
+                    <input type="hidden" name="applicant_name" id="applicant_name">
+
                 </div>
-          
+
                 <label class="text-sm">Shipper</label>
                 <input type="text" name="shipper" class="border border-gray-300 rounded w-full p-1 mt-1"
                        value="{{ certificate.shipper }}" />
@@ -348,6 +349,20 @@ h1 {
         </footer>
     </div>
     <script>
+document.getElementById("certificateForm").addEventListener("submit", function (event) {
+    const title = document.querySelector('[name="applicantTitle"]').value;
+    const name = document.querySelector('[name="applicantName"]').value.trim();
+
+    if (!name) {
+        alert("Applicant Name is required!");
+        event.preventDefault();
+        return;
+    }
+
+    const combinedName = `${title} ${name}`;
+    document.getElementById("applicant_name").value = combinedName;
+});
+
          document.addEventListener("DOMContentLoaded", function () {
             // Set current date in the date input field
             const today = new Date();
