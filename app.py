@@ -478,7 +478,7 @@ def update_certificatead(CertificateNumber):
                 # Extract form data
                 form_data = {key: request.form.get(key, '').strip() for key in [
                     "date", "applicant_name", "shipper", "consignee", "commodity", 
-                    "port_of_discharge", "sb_number", "cf_agent", "container_number"
+                    "port_of_discharge", "sb_number", "cf_agent"
                 ]}
 
                 # Safely parse numerical fields
@@ -536,14 +536,14 @@ def update_certificatead(CertificateNumber):
                     SET 
                         date = %s, applicant_name = %s, shipper = %s, consignee = %s, 
                         commodity = %s, port_of_discharge = %s, sb_number = %s, quantity = %s, 
-                        gross_weight = %s, cf_agent = %s, container_number = %s, 
+                        gross_weight = %s, cf_agent = %s,
                         total_volume = %s, total_pkgs = %s, survey_data = %s, status = 'In Progress'
                     WHERE CertificateNumber = %s
                 """
                 values = (
                     form_data["date"], form_data["applicant_name"], form_data["shipper"], form_data["consignee"], 
                     form_data["commodity"], form_data["port_of_discharge"], form_data["sb_number"], 
-                    quantity, gross_weight, form_data["cf_agent"], form_data["container_number"], 
+                    quantity, gross_weight, form_data["cf_agent"],
                     total_volume, total_pkgs, survey_data_json, CertificateNumber
                 )
 
@@ -816,7 +816,7 @@ def update_certificate(CertificateNumber):
                 # Extract form data
                 form_data = {key: request.form.get(key, '').strip() for key in [
                     "date", "applicant_name", "shipper", "consignee", "commodity", 
-                    "port_of_discharge", "sb_number", "cf_agent", "container_number"
+                    "port_of_discharge", "sb_number", "cf_agent"
                 ]}
 
                 # Safely parse numerical fields
@@ -874,14 +874,14 @@ def update_certificate(CertificateNumber):
                     SET 
                         date = %s, applicant_name = %s, shipper = %s, consignee = %s, 
                         commodity = %s, port_of_discharge = %s, sb_number = %s, quantity = %s, 
-                        gross_weight = %s, cf_agent = %s, container_number = %s, 
+                        gross_weight = %s, cf_agent = %s, 
                         total_volume = %s, total_pkgs = %s, survey_data = %s, status = 'In Progress'
                     WHERE CertificateNumber = %s
                 """
                 values = (
                     form_data["date"], form_data["applicant_name"], form_data["shipper"], form_data["consignee"], 
                     form_data["commodity"], form_data["port_of_discharge"], form_data["sb_number"], 
-                    quantity, gross_weight, form_data["cf_agent"], form_data["container_number"], 
+                    quantity, gross_weight, form_data["cf_agent"],
                     total_volume, total_pkgs, survey_data_json, CertificateNumber
                 )
 
