@@ -22,9 +22,7 @@ h1 {
             color: rgba (253,0,0,255) ;
             text-align: center; /
         } */
-        h1 {
-            -webkit-text-fill-color: #da3936;
-        }
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f9f9f9;
@@ -47,9 +45,7 @@ padding: 8px; /* Add padding for better spacing */
 border: 1px solid black; /* Add border to each column */
 padding: 8px; /* Add padding for better spacing */
 }
-h1{
-    -webkit-text-fill-color:rgba(253,0,0,255) ;
-}
+
 .form-container {
     background: #fff;
     padding: 30px;
@@ -68,7 +64,7 @@ h1{
 .form-header h1 {
     margin: 0;
     font-size: 1.8em;
-    color: #333;
+    color: #000000;
 }
 
 .form-header p {
@@ -608,7 +604,8 @@ input[type="text"],
                 </tr>
             </table>
 
-            <h3>Applicant Details</h3>
+            <h1 class="text-xl font-bold text-black">Applicant Details</h1>
+
             <button id="add-container-btn" class="btn" >Add Container</button>
             <div id="add-container-modal" class="modal">
                 <div class="modal-content">
@@ -716,7 +713,7 @@ input[type="text"],
             </table>
             </div>
             
-            <h3>Stuffing Details</h3>
+            <h1 class="text-xl font-bold text-black">Stuffing Details</h1>
             <div class="table-wrapper">
             <table id="added-containers-table" class="custom-table">
                 <tr>
@@ -778,7 +775,7 @@ input[type="text"],
 </table>
 </div>
 
-            <h3>Consignment Details</h3>
+            <h1 class="text-xl font-bold text-black">Consignment Details</h1>
             <div class="table-container">
                 <div class="table-wrapper">
                 <table class="custom-table1" id="main-table">
@@ -823,7 +820,7 @@ input[type="text"],
                 </tr>
             </table>
             </div>
-            <h3>Weather Condition</h3>
+            <h1 class="text-xl font-bold text-black">Weather Condition</h1>
             <div class="form-group">
                 <select name="weatherCondition" >
                     <option value="Sunny">Sunny</option>
@@ -832,7 +829,7 @@ input[type="text"],
                 </select>
             </div>
 
-            <h3>Surveyor Details</h3>
+            <h1 class="text-xl font-bold text-black">Surveyor Details</h1>
             <div class="table-wrapper">
             <table class="custom-table">
                 <tr>
