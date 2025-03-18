@@ -11,7 +11,6 @@ import os
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
 from datetime import datetime
-import regex as re
 
 
 
