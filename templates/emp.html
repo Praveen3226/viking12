@@ -716,55 +716,62 @@ input[type="text"],
             </table>
             </div>
             
-<h3>Stuffing Details</h3>
-<div class="table-wrapper">
-<table id="added-containers-table" class="custom-table">
-    <tr>
-        <th>Stuffing Commencement Date & Time</th>
-        <td>
-            <input type="datetime-local" id="stuffingCommDateTime" name="stuffingCommDateTime" step="1">
-        </td>
-    </tr>
-    <tr>
-        <th>Stuffing Completion Date & Time</th>
-        <td>
-            <input type="datetime-local" id="stuffingCompDateTime" name="stuffingCompDateTime" step="1">
-        </td>
-    </tr>
-<tr>
-    <th>Seal Number(s)</th>
-    <td><input type="text" id="sealNumber" name="sealNumber"></td>
-</tr>
-<tr>
-    <th>Port of Discharge</th>
-    <td><input type="text" id="portOfDischarge" name="portOfDischarge"></td>
-</tr>
-<tr>
-    <th>Place of Stuffing</th>
-    <td><input type="text" id="placeOfStuffing" name="placeOfStuffing"></td>
-</tr>
+            <h3>Stuffing Details</h3>
+            <div class="table-wrapper">
+            <table id="added-containers-table" class="custom-table">
+                <tr>
+                    <th>Stuffing Commencement Date & Time</th>
+                    <td>
+                        <input type="datetime-local" id="stuffingCommDateTime" name="stuffingCommDateTime" step="1">
+                    </td>
+                </tr>
+                <tr>
+                    <th>Stuffing Completion Date & Time</th>
+                    <td>
+                        <input type="datetime-local" id="stuffingCompDateTime" name="stuffingCompDateTime" step="1">
+                    </td>
+                </tr>
+                <tr>
+                    <th>Seal Number(s)</th>
+                    <td><input type="text" id="sealNumber" name="sealNumber"></td>
+                </tr>
+                <tr>
+                    <th>Seal Date & Time</th>
+                    <td>
+                        <input type="datetime-local" id="sealDateTime" name="sealDateTime" step="1">
+                    </td>
+                </tr>
+                <tr>
+                    <th>Port of Discharge</th>
+                    <td><input type="text" id="portOfDischarge" name="portOfDischarge"></td>
+                </tr>
+                <tr>
+                    <th>Place of Stuffing</th>
+                    <td><input type="text" id="placeOfStuffing" name="placeOfStuffing"></td>
+                </tr>
+                <tr>
+                    <th>Total Packages</th>
+                    <td class="input-container">
+                        <input type="text" id="totalPackages" name="totalPackages" readonly class="small-box"> 
+                        <span class="unit">Pk.gs</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Volume</th>
+                    <td class="input-container">
+                        <input type="text" id="volume" name="volume" readonly class="small-box"> 
+                        <span class="unit">CBM</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Gross Weight</th>
+                    <td class="input-container">
+                        <input type="text" id="grossWeight" name="grossWeight" readonly class="small-box">
+                        <span class="unit">Kgs</span>
+                    </td>
+                </tr>
 <!-- Remove CBM and add Total Packages and Volume fields -->
-<tr>
-    <th>Total Packages</th>
-    <td class="input-container">
-        <input type="text" id="totalPackages" name="totalPackages" readonly class="small-box"> 
-        <span class="unit">Pk.gs</span>
-    </td>
-</tr>
-<tr>
-    <th>Volume</th>
-    <td class="input-container">
-        <input type="text" id="volume" name="volume" readonly class="small-box"> 
-        <span class="unit">CBM</span>
-    </td>
-</tr>
-<tr>
-    <th>Gross Weight</th>
-    <td class="input-container">
-        <input type="text" id="grossWeight" name="grossWeight" readonly class="small-box">
-        <span class="unit">Kgs</span>
-    </td>
-</tr>
+
 
 
     
@@ -856,18 +863,29 @@ input[type="text"],
         &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
     </footer>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
 
 
 function generateFCLReportPDF() {
     try {
-        // Create a hidden container for PDF content
-        const pdfContainer = document.createElement('div');
-        pdfContainer.style.position = 'fixed';
-        pdfContainer.style.left = '-9999px';
-        pdfContainer.style.width = '794px'; // A4 width in pixels (210mm)
-        pdfContainer.style.padding = '20px';
-        document.body.appendChild(pdfContainer);    
+        // Create hidden containers for PDF content (two pages)
+        const pdfContainer1 = document.createElement('div');
+        pdfContainer1.style.position = 'fixed';
+        pdfContainer1.style.left = '-9999px';
+        pdfContainer1.style.width = '794px'; // A4 width
+        pdfContainer1.style.padding = '20px';
+        document.body.appendChild(pdfContainer1);
+
+        const pdfContainer2 = document.createElement('div');
+        pdfContainer2.style.position = 'fixed';
+        pdfContainer2.style.left = '-9999px';
+        pdfContainer2.style.width = '794px';
+        pdfContainer2.style.padding = '20px';
+        document.body.appendChild(pdfContainer2);
 
         // Safe value getter with fallback
         const getValue = (id) => {
@@ -883,10 +901,9 @@ function generateFCLReportPDF() {
         // Build consignment details table rows
         let consignmentRows = '';
         const mainTableRows = document.querySelectorAll('#main-table tbody tr');
-        
         mainTableRows.forEach(row => {
             const cells = row.querySelectorAll('td');
-            if (cells.length >= 8) { // Ensure we have enough cells
+            if (cells.length >= 8) {
                 consignmentRows += `
                     <tr>
                         <td style="border: 1px solid #000; padding: 8px;">${cells[1]?.textContent || 'N/A'}</td>
@@ -901,189 +918,272 @@ function generateFCLReportPDF() {
             }
         });
 
-        // Construct PDF HTML structure
-        pdfContainer.innerHTML = `
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h1 style="font-family: 'Cooper Black', sans-serif; font-size: 42px; color: #fd0000;">
-                    VIKING MARINE INC.
-                </h1>
-                <p style="font-size: 14px; font-weight: 600;">SURVEYORS AND CONSULTING ENGINEERS</p>
-                <p style="font-size: 14px;"># 143, Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
-                <p style="font-size: 14px;">Phone: +91-9035015240, +91-9036015249 & +91-9243185125.</p>
-            </div>
+        // Build summary boxes HTML dont remove this
+        const summaryBoxesHTML = `
+        `;
 
-            <!-- Main Report Table -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        // Generate header HTML
+        const generateHeader = () => `
+            <div class="header" style="display: flex; align-items: center; text-align: center;">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" 
+                    style="height: 120px; margin-right: 72px; margin-top: 10px;">
+                <div style="text-align: center; flex-grow: 1; margin-left: -100px;">
+                    <h1 style="font-family: 'Cooper Black', sans-serif; font-size: 28px; margin: 0;">
+                        VIKING MARINE INC.
+                    </h1>
+                    <div style="margin-top: 3px; line-height: 1.2;">
+                        <p style="margin: 0; font-weight: bold;">SURVEYORS AND CONSULTING ENGINEERS</p>
+                        <p style="margin: 0;"># 143,Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
+                        <p style="margin: 0;">Ph.: +919036015240, +919035015240 &amp; +919036015243</p>
+                        <p style="margin: 0;">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <table class="pdf-tableh">
+                <tr>
+                    <td><strong>Report No.:</strong> ${getValue('CertificateNumber')}</td>
+                    <td><strong>Date:</strong> ${new Date(getValue('date')).toLocaleDateString('en-GB') || ''}</td>
+                </tr>
+            </table>
+        `;
+
+        // Shared styles for both pages
+        const allStyles = `
+            <style>
+                .certificate-title {
+                    text-align: center;
+                    background-color: #b91c1c;
+                    color: white;
+                    padding: 10px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-top: 10px;
+                }
+                .pdf-table {
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin: 15px 0;
+                }
+                .pdf-table td, .pdf-table th {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: center;
+                }
+.pdf-tableh {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  text-align: left;
+}
+
+.pdf-tableh th,
+.pdf-tableh td {
+  border: none;
+  padding: 6px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.pdf-tableh td:last-child {
+  text-align: right;
+}
+                @media print {
+                    .header {
+                        position: fixed;
+                        top: 0;
+                        background: white;
+                        padding-bottom: 10px;
+                    }
+                    .pdf-tableh {
+                        margin-top: 150px;
+                    }
+                }
+            </style>
+        `;
+
+        // Page 1 Content (up to summary boxes)
+        pdfContainer1.innerHTML = `
+            ${allStyles}
+            ${generateHeader()}
+            <h2 class="certificate-title">STUFFING SURVEY REPORT </h2>
+            <table class="pdf-table">
                 <tbody>
-                    ${Object.entries({
-                        'Certificate Number': getValue('CertificateNumber'),
-                        'Date': getValue('date'),
-                        'Applicant Name': applicantName || 'N/A',
-                        'Container Number': getValue('containerNumber'),
-                        'Size/Type': getValue('sizeType'),
-                        'Tare Weight': `${getValue('tareWeight')} Kgs`,
-                        'Payload Capacity': `${getValue('payloadCapacity')} Kgs`,
-                        'Declared Total Weight': `${getValue('declaredTotalWeight')} Kgs`,
-                        'Stuffing Commencement': getValue('stuffingCommDateTime'),
-                        'Stuffing Completion': getValue('stuffingCompDateTime'),
-                        'Seal Number': getValue('sealNumber'),
-                        'Port of Discharge': getValue('portOfDischarge'),
-                        'Place of Stuffing': getValue('placeOfStuffing')
-                    }).map(([key, value]) => `
-                        <tr>
-                            <td style="border: 1px solid #000; padding: 8px; font-weight: bold; width: 30%;">${key}</td>
-                            <td style="border: 1px solid #000; padding: 8px; width: 70%;">${value}</td>
-                        </tr>
-                    `).join('')}
+                    <tr>
+                        <th>Applicant for Survey</th>
+                        <td colspan="3">${applicantName}</td>
+                    </tr>
+                    <tr>
+                        <th>Container No.</th>
+                        <td>${getValue('containerNumber')}</td>
+                        <th>Stuffing Comm. Date and Time</th>
+                        <td>${getValue('stuffingCommDateTime')}</td>
+                    </tr>
+                    <tr>
+                        <th>Size/Type</th>
+                        <td>${getValue('sizeType')}</td>
+                        <th>Stuffing Completion Date and Time</th>
+                        <td>${getValue('stuffingCompDateTime')}</td>
+                    </tr>
+                    <tr>
+                        <th>Tare Weight (Kgs)</th>
+                        <td>${getValue('tareWeight')} </td>
+                        <th>Seal Number</th>
+                        <td>${getValue('sealNumber')}</td>
+                    </tr>
+                    <tr>
+                        <th>Payload Capacity (Kgs)</th>
+                        <td>${getValue('payloadCapacity')}</td>
+                        <th>Seal Date & Time</th>
+                        <td>${getValue('sealDateTime')}</td>
+                    </tr>
+                    <tr>
+                        <th>Port of Discharge</th>
+                        <td>${ getValue('portOfDischarge')}</td>
+                        <th>Place of Inspection</th>
+                        <td>${getValue('placeOfStuffing')}</td>
+                    </tr>
                 </tbody>
             </table>
-
-            <!-- Consignment Details -->
-            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Consignment Details</h3>
+            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Details of Consignment: (As declared)</h3>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                 <thead>
                     <tr>
-                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Consignor</th>
-                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Consignee</th>
-                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Description</th>
-                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Marks & Nos.</th>
-                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Packages</th>
-                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Gross Weight</th>
-                        <th style="border: 1px solid #000; padding: 8px; text-align: left;">Volume</th>
+                        <th style="border: 1px solid #000; padding: 8px;">Consignor</th>
+                        <th style="border: 1px solid #000; padding: 8px;">Consignee</th>
+                        <th style="border: 1px solid #000; padding: 8px;">Description</th>
+                        <th style="border: 1px solid #000; padding: 8px;">Marks & Nos.</th>
+                        <th style="border: 1px solid #000; padding: 8px;">Package Count</th>
+                        <th style="border: 1px solid #000; padding: 8px;">Gross Weight (Kgs)</th>
+                        <th style="border: 1px solid #000; padding: 8px;">Volume</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${consignmentRows || '<tr><td colspan="7">No consignment data available</td></tr>'}
                 </tbody>
             </table>
+            ${summaryBoxesHTML}
+        `;
 
-            <!-- Summary Boxes -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
-                ${['volume', 'totalPackages', 'grossWeight'].map(id => {
-                    const value = getValue(id);
-                    const labels = {
-                        volume: { title: 'CBM', unit: 'CBM' },
-                        totalPackages: { title: 'Total Packages', unit: 'Pkgs' },
-                        grossWeight: { title: 'Gross Weight', unit: 'Kgs' }
-                    };
-                    return `
-                        <div style="border: 1px solid #000; padding: 15px; text-align: center;">
-                            <h3 style="font-weight: bold; margin-bottom: 5px;">${labels[id].title}</h3>
-                            <p style="font-size: 18px; font-weight: bold;">
-                                ${value} ${labels[id].unit}
-                            </p>
-                        </div>
-                    `;
-                }).join('')}
+        // Page 2 Content (remarks and surveyor details)
+        pdfContainer2.innerHTML = `
+    <div class="header" style="display: flex; align-items: center; text-align: center; padding-bottom: 10px;">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" 
+            style="height: 120px; margin-right: 50px; margin-top: 10px;">
+        <div style="text-align: center; flex-grow: 1; margin-left: -100px;">
+            <h1 style="font-family: 'Cooper Black', sans-serif; font-size: 28px; margin: 0;">
+                VIKING MARINE INC.
+            </h1>
+            <div style="margin-top: 3px; line-height: 1.2;">
+                <p style="margin: 0; font-weight: bold;">SURVEYORS AND CONSULTING ENGINEERS</p>
+                <p style="margin: 0;"># 143, Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
+                <p style="margin: 0;">Ph.: +919036015240, +919035015240 &amp; +919036015243</p>
+                <p style="margin: 0;">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
             </div>
+        </div>
+    </div>
+    <table class="pdf-tableh" style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+        <tr>
+            <td><strong>Report No.:</strong> ${getValue('CertificateNumber')}</td>
+            <td><strong>Date:</strong> ${new Date(getValue('date')).toLocaleDateString('en-GB') || ''}</td>
+        </tr>
+    </table>
+    
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 20px;">
+        ${['volume', 'totalPackages', 'grossWeight','declaredTotalWeight'].map(id => {
+            const value = getValue(id);
+            const labels = {
+                volume: { title: 'Total Volume', unit: 'CBM' },
+                totalPackages: { title: 'Total Packages', unit: 'Pkgs' },
+                grossWeight: { title: 'Total Gross Wt. In Kgs (As Declared)', unit: 'Kgs' },
+                declaredTotalWeight : { title: 'Total Wt. of the container (As Declared)', unit: 'Kgs' }
+            };
+            return `
+                <div style="border: 1px solid #000; padding: 15px; text-align: center;">
+                    <h3 style="font-weight: bold; margin-bottom: 5px;">${labels[id].title}</h3>
+                    <p style="font-size: 18px; font-weight: bold;">
+                        ${value} ${labels[id].unit}
+                    </p>
+                </div>
+            `;
+        }).join('')}
+    </div>
+    
+    <br>
 
-            <!-- Remarks -->
-            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Remarks</h3>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                ${Object.entries({
-                    'Loading Condition': getValue('loadingCondition'),
-                    'Lashing': getValue('lashing'),
-                    'Others': getValue('others')
-                }).map(([key, value]) => `
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold; width: 30%;">${key}</td>
-                        <td style="border: 1px solid #000; padding: 8px; width: 70%;">${value}</td>
-                    </tr>
-                `).join('')}
-            </table>
-
-            <!-- Surveyor Details -->
-            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Surveyor Details</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                ${Object.entries({
-                    'Name of Surveyor': getValue('surveyorName'),
-                    'Signature': getValue('signature')
-                }).map(([key, value]) => `
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold; width: 30%;">${key}</td>
-                        <td style="border: 1px solid #000; padding: 8px; width: 70%;">${value}</td>
-                    </tr>
-                `).join('')}
-            </table>
-
-<div class="mt-8 w-full">
-    <div class="text-left">
-        <p class="font-semibold">For Viking Marine Inc.</p>
-        <p class="italic">"Issued Without Prejudice"</p>
+    ${allStyles}
+    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Remarks</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        ${Object.entries({
+            'Loading Condition': getValue('loadingCondition'),
+            'Lashing': getValue('lashing'),
+            'Others': getValue('others')
+        }).map(([key, value]) => `
+            <tr>
+                <td style="border: 1px solid #000; padding: 8px; font-weight: bold; width: 30%;">${key}</td>
+                <td style="border: 1px solid #000; padding: 8px; width: 70%;">${value}</td>
+            </tr>
+        `).join('')}
+    </table>
+    <div class="mt-8 w-full">
+        <div style="text-align: left;">
+            
+            <p style="margin-top: 5px;">Surveyor: ${getValue('surveyorName')}</p>
+            <p class="text-sm text-left font-bold" style="text-transform: uppercase;">
+                "ISSUED WITHOUT PREJUDICE"
+            </p>
+        </div>
+        <br>
+        <div style="text-align: right;">
+            <p class="font-semibold">
+                For Viking Marine Inc.<br>
+                Authorised Signatory
+            </p>
+        </div>
     </div>
 </div>
 
-            </div>
-        </div>
         `;
 
         // Generate PDF
-        html2canvas(pdfContainer, { 
+        const pdfOptions = { 
             scale: 2,
             useCORS: true,
             logging: true
-        }).then(canvas => {
-            const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = pageWidth;
-            const imgHeight = (canvas.height * pageWidth) / canvas.width;
-            
-            let position = 0;
-            let remainingHeight = imgHeight;
+        };
 
-            while (remainingHeight > 0) {
-                const sectionHeight = Math.min(pageHeight, remainingHeight);
-                const sectionCanvas = document.createElement('canvas');
-                const sectionContext = sectionCanvas.getContext('2d');
-                
-                sectionCanvas.width = canvas.width;
-                sectionCanvas.height = sectionHeight * (canvas.height / imgHeight);
-                
-                // Draw the section of the main canvas onto the section canvas
-                sectionContext.drawImage(
-                    canvas,
-                    0, // source x
-                    position * (canvas.height / imgHeight), // source y
-                    canvas.width, // source width
-                    sectionHeight * (canvas.height / imgHeight), // source height
-                    0, // destination x
-                    0, // destination y
-                    canvas.width, // destination width
-                    sectionHeight * (canvas.height / imgHeight) // destination height
-                );
+        html2canvas(pdfContainer1, pdfOptions).then(canvas1 => {
+    html2canvas(pdfContainer2, pdfOptions).then(canvas2 => {
+        const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const borderMargin = 5;  // Border margin from page edges
 
-                // Add new page (except first iteration)
-                if (position > 0) pdf.addPage();
+        // Add first page with border
+        const imgHeight1 = (canvas1.height * pageWidth) / canvas1.width;
+        pdf.addImage(canvas1, 'PNG', 0, 0, pageWidth, imgHeight1);
+        pdf.rect(borderMargin, borderMargin, pageWidth - 2 * borderMargin, pageHeight - 2 * borderMargin);
 
-                // Convert section canvas to image and add to PDF
-                const sectionImg = sectionCanvas.toDataURL('image/png');
-                pdf.addImage(
-                    sectionImg,
-                    'PNG',
-                    0, // x
-                    0, // y
-                    imgWidth,
-                    sectionHeight
-                );
+        // Add second page with border
+        pdf.addPage();
+        const imgHeight2 = (canvas2.height * pageWidth) / canvas2.width;
+        pdf.addImage(canvas2, 'PNG', 0, 0, pageWidth, imgHeight2);
+        pdf.rect(borderMargin, borderMargin, pageWidth - 2 * borderMargin, pageHeight - 2 * borderMargin);
 
-                remainingHeight -= sectionHeight;
-                position += sectionHeight;
-            }
-
-            pdf.save('FCL_Report.pdf');
-            document.body.removeChild(pdfContainer);
-        }).catch(error => {
-            console.error('Error generating PDF:', error);
-            alert('Error generating PDF. Please check the console for details.');
-        });
-
+        pdf.save('FCL_Report.pdf');
+        document.body.removeChild(pdfContainer1);
+        document.body.removeChild(pdfContainer2);
+    });
+}).catch(error => {
+    console.error('Error generating PDF:', error);
+    alert('Error generating PDF. Please check the console for details.');
+});
     } catch (error) {
-        console.error('PDF generation failed:', error);
-        alert('Failed to generate PDF. Please check the console for errors.');
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please check the console for details.');
     }
 }
-
     document.addEventListener("DOMContentLoaded", function() {
         function updateApplicantName() {
             const title = document.getElementById("applicantTitle").value;
@@ -1100,7 +1200,7 @@ function generateFCLReportPDF() {
                 //flash message
                 setTimeout(() => {
             document.getElementById('flash-message').style.display = 'none';
-        }, 2000);
+        }, 10000);
 
 
 
@@ -1120,23 +1220,7 @@ document.getElementById("submitNew").addEventListener("click", function(event) {
         });
     });
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Function to format datetime in 24-hour format
-    function formatDateTime(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-    }
 
-    // Set default datetime values in 24-hour format
-    const now = new Date();
-    document.getElementById('stuffingCommDateTime').value = formatDateTime(now);
-    document.getElementById('stuffingCompDateTime').value = formatDateTime(now);
-});
 
 document.getElementById("add-container-btn").addEventListener("click", function () {
     fetch('/get_containers')
@@ -1253,73 +1337,80 @@ document.getElementById("add-container-to-main").addEventListener("click", funct
 });
 
 
-document.getElementById('fill-table').addEventListener('click', function () {
-    const selectedRows = document.querySelectorAll('.modal-content .row-check:checked');
-    const mainTableBody = document.querySelector('#main-table tbody');
+document.addEventListener('DOMContentLoaded', function () {
 
-    let consignmentDetails = [];
-    const existingConsignments = document.getElementById('consignmentDetails').value;
-    if (existingConsignments) {
-        consignmentDetails = JSON.parse(existingConsignments);
-    }
+    // Handle filling the table and update totals
+    document.getElementById('fill-table').addEventListener('click', function () {
+        const selectedRows = document.querySelectorAll('.modal-content .row-check:checked');
+        const mainTableBody = document.querySelector('#main-table tbody');
 
-    let totalPackages = parseInt(document.getElementById('totalPackages').value) || 0;
-    let totalVolume = parseFloat(document.getElementById('volume').value) || 0;
-    let totalGrossWeight = parseFloat(document.getElementById('grossWeight').value) || 0;
+        let consignmentDetails = [];
+        const existingConsignments = document.getElementById('consignmentDetails').value;
+        if (existingConsignments) {
+            consignmentDetails = JSON.parse(existingConsignments);
+        }
 
-    if (selectedRows.length === 0) {
-        alert("Please select at least one consignment!");
-        return;
-    }
+        let totalPackages = parseInt(document.getElementById('totalPackages').value) || 0;
+        let totalVolume = parseFloat(document.getElementById('volume').value) || 0;
+        let totalGrossWeight = parseFloat(document.getElementById('grossWeight').value) || 0;
 
-    selectedRows.forEach((checkbox) => {
-    const row = checkbox.closest('tr');
-    const cells = row.querySelectorAll('td');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one consignment!");
+            return;
+        }
 
-    const consignmentId = checkbox.getAttribute('data-row'); // ✅ Get the ID from checkbox
-    const packages = parseInt(cells[6].textContent.replace(/[^0-9]/g, ''), 10) || 0;
-    const grossWeight = parseFloat(cells[7].textContent.replace(/[^0-9.]/g, '')) || 0;
-    const volume = parseFloat(cells[8]?.textContent?.replace(/[^0-9.]/g, '') || 0);
+        selectedRows.forEach((checkbox) => {
+            const row = checkbox.closest('tr');
+            const cells = row.querySelectorAll('td');
 
-    const consignment = {
-        id: consignmentId,
-        consignor: cells[2].textContent.trim(),  // ✅ Ensure this is "shipper"
-        consignee: cells[3].textContent.trim(),
-        description: cells[4].textContent.trim(), // ✅ "commodity"
-        marksNos: cells[5].textContent.trim(),
-        packages: packages,
-        gross_weight: grossWeight.toFixed(2),
-        volume: volume.toFixed(2)
-    };
+            const consignmentId = checkbox.getAttribute('data-row');
+            const packages = parseInt(cells[6].textContent.replace(/[^0-9]/g, ''), 10) || 0;
+            const grossWeight = parseFloat(cells[7].textContent.replace(/[^0-9.]/g, '')) || 0;
+            const volume = parseFloat(cells[8]?.textContent?.replace(/[^0-9.]/g, '') || 0);
 
-    consignmentDetails.push(consignment);
+            const consignment = {
+                id: consignmentId,
+                consignor: cells[2].textContent.trim(),
+                consignee: cells[3].textContent.trim(),
+                description: cells[4].textContent.trim(),
+                marksNos: cells[5].textContent.trim(),
+                packages: packages,
+                gross_weight: grossWeight.toFixed(2),
+                volume: volume.toFixed(2)
+            };
 
-    const newRow = document.createElement('tr');
-    newRow.innerHTML = `
-        <td>${consignmentId}</td>  <!-- ✅ Display ID -->
-        <td>${cells[2].textContent.trim()}</td>  <!-- Consignor (Shipper) -->
-        <td>${cells[3].textContent.trim()}</td>  <!-- Consignee -->
-        <td>${cells[4].textContent.trim()}</td>  <!-- Description -->
-        <td>${cells[5].textContent.trim()}</td>  <!-- Marks & Nos -->
-        <td>${packages}</td>
-        <td>${grossWeight.toFixed(2)}</td>
-        <td>${volume.toFixed(2)}</td>
-    `;
+            consignmentDetails.push(consignment);
 
-    mainTableBody.appendChild(newRow);
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${consignmentId}</td>
+                <td>${cells[2].textContent.trim()}</td>
+                <td>${cells[3].textContent.trim()}</td>
+                <td>${cells[4].textContent.trim()}</td>
+                <td>${cells[5].textContent.trim()}</td>
+                <td>${packages}</td>
+                <td>${grossWeight.toFixed(2)}</td>
+                <td>${volume.toFixed(2)}</td>
+            `;
 
+            mainTableBody.appendChild(newRow);
 
-        totalPackages += packages;
-        totalGrossWeight += grossWeight;
-        totalVolume += volume;
+            totalPackages += packages;
+            totalGrossWeight += grossWeight;
+            totalVolume += volume;
+        });
+
+        // Update totals
+        document.getElementById('totalPackages').value = totalPackages;
+        document.getElementById('grossWeight').value = totalGrossWeight.toFixed(2);
+        document.getElementById('volume').value = totalVolume.toFixed(2);
+
+        document.getElementById('consignmentDetails').value = JSON.stringify(consignmentDetails);
+
+        // Ensure Seal Date & Time is populated
+
+        document.getElementById('modal').style.display = 'none';
     });
-
-    document.getElementById('totalPackages').value = totalPackages;
-    document.getElementById('grossWeight').value = totalGrossWeight.toFixed(2);
-    document.getElementById('volume').value = totalVolume.toFixed(2);
-
-    document.getElementById('consignmentDetails').value = JSON.stringify(consignmentDetails);
-    document.getElementById('modal').style.display = 'none';
 });
 
 
@@ -1337,12 +1428,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Set today's date as default
-const today = new Date();
-const year = today.getFullYear();
-const month = ('0' + (today.getMonth() + 1)).slice(-2);
-const day = ('0' + today.getDate()).slice(-2);
-const formattedDate = `${year}-${month}-${day}`;
-document.getElementById('date').value = formattedDate;
+
 
 
 document.addEventListener('DOMContentLoaded', function() {
