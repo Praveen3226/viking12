@@ -10,6 +10,8 @@ import string
 import os
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
+from datetime import datetime
+import regex as re
 
 
 
@@ -1860,6 +1862,7 @@ def submit():
         stuffing_comm_date_time = request.form.get('stuffingCommDateTime', '').strip()
         stuffing_comp_date_time = request.form.get('stuffingCompDateTime', '').strip()
         seal_number = request.form.get('sealNumber', '').strip()
+        seal_date_time = request.form.get('sealDateTime', '').strip()
         port_of_discharge = request.form.get('portOfDischarge', '').strip()
         place_of_stuffing = request.form.get('placeOfStuffing', '').strip()
         cbm = request.form.get('volume', '').strip()
@@ -1913,7 +1916,7 @@ def submit():
             UPDATE form
             SET date = %s, applicant_name = %s, container_number = %s, size_type = %s, tare_weight = %s, 
                 payload_capacity = %s, declared_total_weight = %s, stuffing_comm_date_time = %s, 
-                stuffing_comp_date_time = %s, seal_number = %s, port_of_discharge = %s, place_of_stuffing = %s, 
+                stuffing_comp_date_time = %s, seal_number = %s, seal_date_time = %s, port_of_discharge = %s, place_of_stuffing = %s, 
                 cbm = %s, total_gross_weight = %s, loading_condition = %s, lashing = %s, others = %s, 
                 weather_condition = %s, surveyor_name = %s, signature = %s, totalPackages = %s, 
                 consignment_details = %s, status = %s
@@ -1923,7 +1926,7 @@ def submit():
         cursor.execute(update_form_query, (
             date or None, applicant_name or None, container_number or None, size_type or None,
             tare_weight or None, payload_capacity or None, declared_total_weight or None,
-            stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None,
+            stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None, seal_date_time or None,
             port_of_discharge or None, place_of_stuffing or None, cbm or None, gross_weight or None,
             loading_condition or None, lashing or None, others or None, weather_condition or None,
             surveyor_name or None, signature or None, totalPackages or None, json.dumps(consignment_details),
@@ -1964,6 +1967,7 @@ def submit():
             cursor.close()
         if conn:
             conn.close()
+
 
 
 
@@ -2322,6 +2326,7 @@ def submitem():
         stuffing_comm_date_time = request.form.get('stuffingCommDateTime', '').strip()
         stuffing_comp_date_time = request.form.get('stuffingCompDateTime', '').strip()
         seal_number = request.form.get('sealNumber', '').strip()
+        seal_date_time = request.form.get('sealDateTime', '').strip()
         port_of_discharge = request.form.get('portOfDischarge', '').strip()
         place_of_stuffing = request.form.get('placeOfStuffing', '').strip()
         cbm = request.form.get('volume', '').strip()
@@ -2353,7 +2358,7 @@ def submitem():
             for field, value in required_fields.items():
                 if not value:
                     flash(f"Error: {field} is required!", "error")
-                    return redirect(url_for("empforms"))
+                    return redirect(url_for("forms"))
 
         # ✅ Parse and validate consignment details safely
         consignment_details = request.form.get('consignmentDetails', '[]').strip()
@@ -2368,14 +2373,14 @@ def submitem():
         cursor.execute("SELECT 1 FROM form WHERE CertificateNumber = %s", (CertificateNumber,))
         if not cursor.fetchone():
             flash("Error: Certificate Number not found in the database.", "error")
-            return redirect(url_for("empforms"))
+            return redirect(url_for("forms"))
 
         # ✅ Update the form entry
         update_form_query = """
             UPDATE form
             SET date = %s, applicant_name = %s, container_number = %s, size_type = %s, tare_weight = %s, 
                 payload_capacity = %s, declared_total_weight = %s, stuffing_comm_date_time = %s, 
-                stuffing_comp_date_time = %s, seal_number = %s, port_of_discharge = %s, place_of_stuffing = %s, 
+                stuffing_comp_date_time = %s, seal_number = %s, seal_date_time = %s, port_of_discharge = %s, place_of_stuffing = %s, 
                 cbm = %s, total_gross_weight = %s, loading_condition = %s, lashing = %s, others = %s, 
                 weather_condition = %s, surveyor_name = %s, signature = %s, totalPackages = %s, 
                 consignment_details = %s, status = %s
@@ -2385,7 +2390,7 @@ def submitem():
         cursor.execute(update_form_query, (
             date or None, applicant_name or None, container_number or None, size_type or None,
             tare_weight or None, payload_capacity or None, declared_total_weight or None,
-            stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None,
+            stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None, seal_date_time or None,
             port_of_discharge or None, place_of_stuffing or None, cbm or None, gross_weight or None,
             loading_condition or None, lashing or None, others or None, weather_condition or None,
             surveyor_name or None, signature or None, totalPackages or None, json.dumps(consignment_details),
