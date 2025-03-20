@@ -301,6 +301,21 @@ h1 {
                 <input type="text" name="gross_weight" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
                 <label class="text-sm">C &amp; F Agent</label>
                 <input type="text" name="cf_agent" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">Type Of Packing</label>
+                <select name="type_of_packing" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;">
+                    <option value="Pkgs">Pkgs</option>
+                    <option value="Bale">Bale</option>
+                    <option value="Carton">Carton</option>
+                    <option value="Pallet">Pallet</option>
+                    <option value="Box">Box</option>
+                    <option value="Case">Case</option>
+                    <option value="Roll">Roll</option>
+                    <option value="Drum">Drum</option>
+                    <option value="Bag">Bag</option>
+                    <option value="Bundle">Bundle</option>
+                    <option value="Crate">Crate</option>
+                    <option value="Loose">Loose</option>
+                </select>
             </div>
         
             <div class="mb-4">
@@ -440,7 +455,7 @@ async function printCertificate() {
                 .pdf-table td, .pdf-table th {
                     border: 1px solid #000;
                     padding: 8px;
-                    text-align: center;
+                    text-align: left;
                 }
                 .pdf-header {
                     text-align: center;
@@ -491,6 +506,7 @@ async function printCertificate() {
       <p class="text-sm font-semibold" style="margin: 0;">SURVEYORS AND CONSULTING ENGINEERS</p>
       <p class="text-sm" style="margin: 0;"># 143,Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
       <p class="text-sm" style="margin: 0;">Ph.: +919036015240, +919035015240 &amp; +919036015243</p>
+      <p class="text-sm" style="margin: 0;">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
     </div>
   </div>
 </div>
@@ -498,7 +514,7 @@ async function printCertificate() {
 <br>
 <table class="pdf-tableh">
   <tr>
-    <td><strong>Report No.:</strong> ${form.CertificateNumber.value || ''}</td>
+    <td><strong>Certificate No.:</strong> ${form.CertificateNumber.value || ''}</td>
     <td><strong>Date:</strong> ${new Date(form.date.value).toLocaleDateString('en-GB') || ''}</td>
   </tr>
 </table>
@@ -602,6 +618,10 @@ function createApplicantTable(form) {
         <td>${form.sb_number.value || ''}</td>
         <th>C & F Agent</th>
         <td>${form.cf_agent.value || ''}</td>
+        </tr>
+        <tr>
+        <th>Type Of Packing</th>
+        <td>${form.type_of_packing.value || ''}</td>
         </tr>
     </tbody>
     </table>
