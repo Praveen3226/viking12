@@ -480,20 +480,11 @@ button[onclick="exportToExcel()"]:hover {
                     </select>
                 </div> 
                 <button onclick="exportToExcel()">Export to Excel</button>
-                <button id="deleteModeBtn" onclick="enterDeleteMode()" style="background: red; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px;">Delete</button>
-
-                <!-- Hidden Delete Mode Controls -->
-                <div id="deleteControls" style="display: none; gap: 10px;">
-                    <button onclick="deleteSelectedCargo()" style="background: red; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px;">Delete Selected</button>
-                    <button onclick="cancelDeleteMode()" style="background: grey; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px;">Cancel</button>
-                </div>
-                </div>
-
+                <div class="table-container">
                           <table id="cargoTable" style="border: 1px solid #000; border-collapse: collapse;">
                            
                             <thead>
                                 <tr>
-                                    <th style="border: 1px solid #000;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
                                     <th style="border: 1px solid #000;">Sr No</th>
                                     <th style="border: 1px solid #000;">Received Date</th>
                                     <th style="border: 1px solid #000;">CFS Name</th>
@@ -547,33 +538,12 @@ function deleteCargo(id) {
             .catch(error => console.error("Error:", error));
     }
 }
-let deleteMode = false;
-
-// Enter Delete Mode
-function enterDeleteMode() {
-    deleteMode = true;
-    document.getElementById("deleteModeBtn").style.display = "none";
-    document.getElementById("deleteControls").style.display = "flex";
-    document.getElementById("checkboxColumn").style.display = "";
-    loadCargoData();
-}
-
-// Cancel Delete Mode
-function cancelDeleteMode() {
-    deleteMode = false;
-    document.getElementById("deleteModeBtn").style.display = "block";
-    document.getElementById("deleteControls").style.display = "none";
-    document.getElementById("checkboxColumn").style.display = "none";
-    loadCargoData();
-}
-
-// Select/Deselect All Checkboxes
 function toggleSelectAll(source) {
     const checkboxes = document.querySelectorAll("#cargoTableBody input[type='checkbox']");
     checkboxes.forEach(checkbox => checkbox.checked = source.checked);
 }
 
-// Delete Selected Cargo Entries
+// Delete selected cargo entries
 function deleteSelectedCargo() {
     const selectedIds = Array.from(document.querySelectorAll("#cargoTableBody input[type='checkbox']:checked"))
         .map(checkbox => checkbox.value);
@@ -593,7 +563,7 @@ function deleteSelectedCargo() {
         .then(data => {
             if (data.success) {
                 alert(data.message);
-                cancelDeleteMode();  // Exit delete mode and reload data
+                loadCargoData();  // Refresh the table after deletion
             } else {
                 alert("Error: " + data.error);
             }
@@ -601,7 +571,6 @@ function deleteSelectedCargo() {
         .catch(error => console.error("Error:", error));
     }
 }
-
 // Display cargo entries in the table
 // Function to fetch cargo data and populate the table
 async function loadCargoData() {
@@ -613,12 +582,9 @@ async function loadCargoData() {
         cargoTableBody.innerHTML = "";  // Clear existing table rows
 
         result.data.forEach((cargo, index) => {
-            const checkboxCell = deleteMode
-                        ? `<td style="border: 1px solid #000;"><input type="checkbox" value="${cargo[0]}"></td>`
-                        : "";
             const row = `
                 <tr>
-                    ${checkboxCell}     
+
                     <td>${index + 1}</td>
                     <td>${cargo.received_date}</td>
                     <td>${cargo.cfs_name}</td>
