@@ -323,6 +323,106 @@
     margin-top: auto;
 }
 
+/* General Table Styling */
+#cargoTable {
+    width: 100%;
+    border: 1px solid #000;
+    border-collapse: collapse;
+    margin-top: 10px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+/* Table Head */
+#cargoTable thead {
+    background: #ffffff;
+    color: rgb(0, 0, 0);
+}
+
+/* Table Cells */
+#cargoTable th, #cargoTable td {
+    border: 1px solid #000;
+    padding: 8px;
+}
+
+/* Zebra Striping for Rows */
+#cargoTable tbody tr:nth-child(odd) {
+    background: #f2f2f2;
+}
+
+/* Hover Effect */
+#cargoTable tbody tr:hover {
+    background: #d1ecf1;
+    cursor: pointer;
+}
+
+/* Pagination Buttons */
+.pagination button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0 5px;
+    transition: background 0.2s;
+}
+
+.pagination button:hover {
+    background: #0056b3;
+}
+
+/* Filter and Control Panel */
+.space-y-4 > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Input and Select */
+input[type="text"], input[type="date"], select {
+    padding: 5px;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+/* Export Button */
+button[onclick="exportToExcel()"] {
+    background: #0d13c0;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+}
+
+button[onclick="exportToExcel()"]:hover {
+    background: #057ead;
+}
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+.pagination button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0 5px;
+    transition: background 0.2s;
+}
+.pagination button:hover {
+    background: #0056b3;
+}
 
     </style>
 </head>
@@ -366,43 +466,142 @@
             </div>
 
             <div class="space-y-4">
+                <div style="display: flex; align-items: center; gap: 10px;">
                 <input type="text" id="searchInput" class="input w-full" placeholder="Search entries..." onkeyup="filterTable()">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" onchange="filterTable()">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" onchange="filterTable()">
+                    <label for="entriesPerPage">Entries per page:</label>
+                    <select id="entriesPerPage" onchange="changeEntriesPerPage()">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div> 
+                <button onclick="exportToExcel()">Export to Excel</button>
+                <button id="deleteModeBtn" onclick="enterDeleteMode()" style="background: red; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px;">Delete</button>
 
-                <div class="table-container">
-                        <table id="cargoTable">
+                <!-- Hidden Delete Mode Controls -->
+                <div id="deleteControls" style="display: none; gap: 10px;">
+                    <button onclick="deleteSelectedCargo()" style="background: red; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px;">Delete Selected</button>
+                    <button onclick="cancelDeleteMode()" style="background: grey; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px;">Cancel</button>
+                </div>
+                </div>
+
+                          <table id="cargoTable" style="border: 1px solid #000; border-collapse: collapse;">
+                           
                             <thead>
                                 <tr>
-                                    <th>Sr No</th>
-                                    <th>Received Date</th>
-                                    <th>CFS Name</th>
-                                    <th>Shipper</th>
-                                    <th>Destination</th>
-                                    <th>Invoice No</th>
-                                    <th>Invoice Date</th>
-                                    <th>Invoice Value</th>
-                                    <th>Total Pkgs</th>
-                                    <th>Gross Wt</th>
-                                    <th>Net Wt</th>
-                                    <th>Volume</th>
-                                    <th>HBL NO</th>
-                                    <th>SB No</th>
-                                    <th>SB Date</th>
+                                    <th style="border: 1px solid #000;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                                    <th style="border: 1px solid #000;">Sr No</th>
+                                    <th style="border: 1px solid #000;">Received Date</th>
+                                    <th style="border: 1px solid #000;">CFS Name</th>
+                                    <th style="border: 1px solid #000;">Shipper</th>
+                                    <th style="border: 1px solid #000;">Destination</th>
+                                    <th style="border: 1px solid #000;">Invoice No</th>
+                                    <th style="border: 1px solid #000;">Invoice Date</th>
+                                    <th style="border: 1px solid #000;">Invoice Value</th>
+                                    <th style="border: 1px solid #000;">Total Pkgs</th>
+                                    <th style="border: 1px solid #000;">Gross Wt</th>
+                                    <th style="border: 1px solid #000;">Net Wt</th>
+                                    <th style="border: 1px solid #000;">Volume</th>
+                                    <th style="border: 1px solid #000;">HBL NO</th>
+                                    <th style="border: 1px solid #000;">SB No</th>
+                                    <th style="border: 1px solid #000;">SB Date</th>
+                                    <th style="border: 1px solid #000;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="cargoTableBody">
-                                <!-- Data will be inserted here dynamically -->
+                                
                             </tbody>
                         </table>
+                </div>
+                        <div class="pagination">
+                            <button onclick="prevPage()">Previous</button>
+                            <span id="pageInfo"></span>
+                            <button onclick="nextPage()">Next</button>
+                        </div>
                     </div>
-                    
-            </div>
+                </div>
+                
         </main>
     </div>
     <footer class="footer">
         &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
     </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <script>
-    
+function deleteCargo(id) {
+    if (confirm("Are you sure you want to delete this cargo entry?")) {
+        fetch(`/delete_cargo/${id}`, { method: "DELETE" })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Cargo entry deleted successfully!");
+                    loadCargoData(); // Reload the table
+                } else {
+                    alert("Error deleting cargo: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+}
+let deleteMode = false;
+
+// Enter Delete Mode
+function enterDeleteMode() {
+    deleteMode = true;
+    document.getElementById("deleteModeBtn").style.display = "none";
+    document.getElementById("deleteControls").style.display = "flex";
+    document.getElementById("checkboxColumn").style.display = "";
+    loadCargoData();
+}
+
+// Cancel Delete Mode
+function cancelDeleteMode() {
+    deleteMode = false;
+    document.getElementById("deleteModeBtn").style.display = "block";
+    document.getElementById("deleteControls").style.display = "none";
+    document.getElementById("checkboxColumn").style.display = "none";
+    loadCargoData();
+}
+
+// Select/Deselect All Checkboxes
+function toggleSelectAll(source) {
+    const checkboxes = document.querySelectorAll("#cargoTableBody input[type='checkbox']");
+    checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+}
+
+// Delete Selected Cargo Entries
+function deleteSelectedCargo() {
+    const selectedIds = Array.from(document.querySelectorAll("#cargoTableBody input[type='checkbox']:checked"))
+        .map(checkbox => checkbox.value);
+
+    if (selectedIds.length === 0) {
+        alert("Please select at least one entry to delete.");
+        return;
+    }
+
+    if (confirm(`Are you sure you want to delete ${selectedIds.length} selected entries?`)) {
+        fetch("/delete_selected_cargo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cargoIds: selectedIds }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                cancelDeleteMode();  // Exit delete mode and reload data
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+}
+
 // Display cargo entries in the table
 // Function to fetch cargo data and populate the table
 async function loadCargoData() {
@@ -414,8 +613,12 @@ async function loadCargoData() {
         cargoTableBody.innerHTML = "";  // Clear existing table rows
 
         result.data.forEach((cargo, index) => {
+            const checkboxCell = deleteMode
+                        ? `<td style="border: 1px solid #000;"><input type="checkbox" value="${cargo[0]}"></td>`
+                        : "";
             const row = `
                 <tr>
+                    ${checkboxCell}     
                     <td>${index + 1}</td>
                     <td>${cargo.received_date}</td>
                     <td>${cargo.cfs_name}</td>
@@ -431,6 +634,7 @@ async function loadCargoData() {
                     <td>${cargo.hbl_no}</td>
                     <td>${cargo.sb_no}</td>
                     <td>${cargo.sb_date}</td>
+                     <td><button onclick="deleteCargo(${cargo.id})" style="background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">Delete</button></td>
                 </tr>
             `;
             cargoTableBody.innerHTML += row;  // Append each row
@@ -456,24 +660,43 @@ function formatDateTime(dateString) {
 
 // Filter table based on search input
 function filterTable() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase();
-    const tbody = document.getElementById('cargoTableBody');
-    const rows = tbody.getElementsByTagName('tr');
-    
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const tbody = document.getElementById("cargoTableBody");
+    const rows = tbody.getElementsByTagName("tr");
+
     for (let row of rows) {
-        const cells = row.getElementsByTagName('td');
-        let found = false;
-        
-        for (let cell of cells) {
-            if (cell.textContent.toLowerCase().includes(filter)) {
-                found = true;
-                break;
-            }
+        const cells = row.getElementsByTagName("td");
+        const receivedDate = cells[1].textContent;
+        let dateInRange = true;
+
+        if (startDate && new Date(receivedDate) < new Date(startDate)) {
+            dateInRange = false;
         }
-        
-        row.style.display = found ? '' : 'none';
+        if (endDate && new Date(receivedDate) > new Date(endDate)) {
+            dateInRange = false;
+        }
+
+        let textMatch = input === "" || Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(input));
+        row.style.display = dateInRange && textMatch ? "" : "none";
     }
+}
+
+// Export to Excel
+function exportToExcel(filtered = false) {
+    const table = document.getElementById("cargoTable");
+    let exportTable = table.cloneNode(true);
+    if (filtered) {
+        const rows = exportTable.querySelectorAll("tbody tr");
+        rows.forEach(row => {
+            if (row.style.display === "none") {
+                row.remove();
+            }
+        });
+    }
+    const workbook = XLSX.utils.table_to_book(exportTable, { sheet: "Cargo Data" });
+    XLSX.writeFile(workbook, "Cargo_Data.xlsx");
 }
 
 // Handle logout
@@ -490,8 +713,50 @@ async function logout() {
 }
 // Initialize page
 loadCargoEntries();
-    
-        
+// pagination
+let currentPage = 1;
+let entriesPerPage = 10;
+
+function changeEntriesPerPage() {
+    entriesPerPage = parseInt(document.getElementById("entriesPerPage").value);
+    currentPage = 1;
+    displayTable();
+}
+
+function displayTable() {
+    const tbody = document.getElementById("cargoTableBody");
+    const rows = tbody.getElementsByTagName("tr");
+    const totalRows = rows.length;
+    const start = (currentPage - 1) * entriesPerPage;
+    const end = start + entriesPerPage;
+
+    for (let i = 0; i < totalRows; i++) {
+        rows[i].style.display = i >= start && i < end ? "" : "none";
+    }
+
+    document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${Math.ceil(totalRows / entriesPerPage)}`;
+}
+
+function nextPage() {
+    const tbody = document.getElementById("cargoTableBody");
+    if (currentPage * entriesPerPage < tbody.getElementsByTagName("tr").length) {
+        currentPage++;
+        displayTable();
+    }
+}
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayTable();
+    }
+}
+
+window.onload = function () {
+    loadCargoData().then(() => displayTable());
+};
+
+window.onload = loadCargoData; 
 
     </script>
 </body>
