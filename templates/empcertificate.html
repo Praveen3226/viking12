@@ -249,7 +249,7 @@ h1 {
         <form method="POST" action="{{ url_for('submit_cerem') }}">
             <div class="flex justify-between mb-4">
                 <div>
-                    <label class="text-sm">Cert. No.</label>
+                    <label class="text-sm">Report No.</label>
                     <input type="text" id="CertificateNumber" name="CertificateNumber" class="border border-gray-300 rounded p-1 ml-2" readonly style="background-color: gold; color: black;" />
                 </div>
                 <div>
@@ -263,8 +263,9 @@ h1 {
                 <div class="flex gap-2">
                     <!-- Dropdown for title -->
                     <select name="applicantTitle" class="border border-gray-300 rounded p-1 w-24" style="background-color: gold; color: black;">
+                        <option value="M/s">M/s</option>
                         <option value="Mr">Mr</option>
-                        <option value="Mrs">Mrs</option>
+     
                     </select>
                     <!-- Input field for applicant's name -->
                     <input type="text" name="applicantName" class="border border-gray-300 rounded p-1 flex-grow" placeholder="Enter applicant's name" style="background-color: gold; color: black;" />
@@ -280,7 +281,7 @@ h1 {
                 <input type="text" name="portOfDischarge" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
             </div>
             <div>
-                <label class="text-sm">S.B. No.</label>
+                <label class="text-sm">S.B. No./ Inovice No.</label>
                 <input type="text" name="sb_number" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
                 <label class="text-sm">Quantity</label>
                 <input type="text" name="quantity" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
@@ -288,6 +289,21 @@ h1 {
                 <input type="text" name="gross_weight" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
                 <label class="text-sm">C &amp; F Agent</label>
                 <input type="text" name="cf_agent" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;" />
+                <label class="text-sm">Type Of Packing</label>
+                <select name="type_of_packing" class="border border-gray-300 rounded w-full p-1 mt-1" style="background-color: gold; color: black;">
+                    <option value="Pkgs">Pkgs</option>
+                    <option value="Bale">Bale</option>
+                    <option value="Carton">Carton</option>
+                    <option value="Pallet">Pallet</option>
+                    <option value="Box">Box</option>
+                    <option value="Case">Case</option>
+                    <option value="Roll">Roll</option>
+                    <option value="Drum">Drum</option>
+                    <option value="Bag">Bag</option>
+                    <option value="Bundle">Bundle</option>
+                    <option value="Crate">Crate</option>
+                    <option value="Loose">Loose</option>
+                </select>
             </div>
         
             <div class="mb-4">
@@ -363,7 +379,9 @@ h1 {
             <div class="flex justify-between items-center">
                 <div>
                   <p  class="text-sm font-bold">For Viking Marine Inc.</p>
-                  <p  class="text-sm italic text-left font-bold">"Issued Without Prejudice"</p>
+                  <p class="text-sm text-left font-bold" style="text-transform: uppercase;">
+                    "ISSUED WITHOUT PREJUDICE"
+                </p>
                 </div>
             </div>
         
@@ -396,6 +414,8 @@ document.querySelector("button[onclick='submitAndPrint()']").addEventListener("c
     });
 });
 
+
+
 async function printCertificate() {
     try {
         const { jsPDF } = window.jspdf;
@@ -423,7 +443,7 @@ async function printCertificate() {
                 .pdf-table td, .pdf-table th {
                     border: 1px solid #000;
                     padding: 8px;
-                    text-align: center;
+                    text-align: left;
                 }
                 .pdf-header {
                     text-align: center;
@@ -474,6 +494,7 @@ async function printCertificate() {
       <p class="text-sm font-semibold" style="margin: 0;">SURVEYORS AND CONSULTING ENGINEERS</p>
       <p class="text-sm" style="margin: 0;"># 143,Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
       <p class="text-sm" style="margin: 0;">Ph.: +919036015240, +919035015240 &amp; +919036015243</p>
+      <p class="text-sm" style="margin: 0;">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
     </div>
   </div>
 </div>
@@ -481,7 +502,7 @@ async function printCertificate() {
 <br>
 <table class="pdf-tableh">
   <tr>
-    <td><strong>Report No.:</strong> ${form.CertificateNumber.value || ''}</td>
+    <td><strong>Certificate No.:</strong> ${form.CertificateNumber.value || ''}</td>
     <td><strong>Date:</strong> ${new Date(form.date.value).toLocaleDateString('en-GB') || ''}</td>
   </tr>
 </table>
@@ -586,6 +607,10 @@ function createApplicantTable(form) {
         <th>C & F Agent</th>
         <td>${form.cf_agent.value || ''}</td>
         </tr>
+        <tr>
+        <th>Type Of Packing</th>
+        <td>${form.type_of_packing.value || ''}</td>
+        </tr>
     </tbody>
     </table>
 
@@ -654,6 +679,10 @@ function createSurveyMeasuresTable() {
 
     `;
 }
+
+
+
+
         //flash message
         setTimeout(() => {
             document.getElementById('flash-message').style.display = 'none';
@@ -688,7 +717,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const year = today.getFullYear();
         const month = ('0' + (today.getMonth() + 1)).slice(-2);
         const day = ('0' + today.getDate()).slice(-2);
-        const formattedDate = `${year}-${month}-${day}`;
+        const formattedDate = `${day}-${month}-${year}`;
         document.getElementById('dateInput').value = formattedDate;
 });
         // Delete functionality
