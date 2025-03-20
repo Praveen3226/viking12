@@ -301,8 +301,10 @@ def submit_cer():
         port_of_discharge = request.form.get('portOfDischarge', '').strip()
         sb_number = request.form.get('sb_number', '').strip()
         cf_agent = request.form.get('cf_agent', '').strip()
+        type_of_packing = request.form.get('type_of_packing', '').strip()  # ✅ Added Type of Packing
         action = request.form.get('action')  # Determine if saving as draft or submitting
 
+        # Helper function to safely convert values to float
         def safe_float(value):
             try:
                 return float(value) if value.strip() else None  # Return None if empty
@@ -312,6 +314,7 @@ def submit_cer():
         quantity = safe_float(request.form.get('quantity', ''))
         gross_weight = safe_float(request.form.get('gross_weight', ''))
 
+        # Collect survey data
         survey_data = []
         rows = len(request.form.getlist('marksNos[]'))
         for i in range(rows):
@@ -326,27 +329,27 @@ def submit_cer():
             height = safe_float(request.form.getlist('height[]')[i])
             volume_unit = safe_float(request.form.getlist('volumeUnit[]')[i])
             volume_cum = safe_float(request.form.getlist('volumePerUnit[]')[i])
-            survey_data.append(
-                {
-                    'marks_no': marks_no,
-                    'no_of_pkgs': no_of_pkgs,
-                    'length': length,
-                    'breadth': breadth,
-                    'height': height,
-                    'volume_unit': volume_unit,
-                    'volumePerUnit': volume_cum,
-                }
-            )
 
-        # Get total volume and total packages from frontend (instead of calculating)
+            survey_data.append({
+                'marks_no': marks_no,
+                'no_of_pkgs': no_of_pkgs,
+                'length': length,
+                'breadth': breadth,
+                'height': height,
+                'volume_unit': volume_unit,
+                'volumePerUnit': volume_cum,
+            })
+
+        # Get total volume and total packages from frontend
         total_volume = safe_float(request.form.get('totalVolume', ''))
         total_pkgs = safe_float(request.form.get('totalPkgs', ''))
 
         survey_data_json = json.dumps(survey_data)
 
+        # Determine status: Draft or In Progress
         status = "Draft" if action == "Save as Draft" else "In Progress"
 
-        # If submitting, validate required fields
+        # Required field validation only when submitting (not for draft)
         if status == "In Progress":
             required_fields = {
                 "Certificate Number": certificate_number,
@@ -363,6 +366,7 @@ def submit_cer():
                     flash(f"Error: {field} is required!", "error")
                     return redirect(url_for('forms'))
 
+        # Database Operations
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
@@ -372,11 +376,12 @@ def submit_cer():
                 exists = cursor.fetchone()
 
                 if exists:
+                    # Update existing record
                     update_query = """
                         UPDATE cer SET 
                             date = %s, applicant_name = %s, shipper = %s, consignee = %s, 
                             commodity = %s, port_of_discharge = %s, sb_number = %s, quantity = %s, 
-                            gross_weight = %s, cf_agent = %s, 
+                            gross_weight = %s, cf_agent = %s, type_of_packing = %s,
                             total_volume = %s, total_pkgs = %s, survey_data = %s, status = %s
                         WHERE CertificateNumber = %s
                     """
@@ -393,6 +398,7 @@ def submit_cer():
                             quantity,
                             gross_weight,
                             cf_agent,
+                            type_of_packing,
                             total_volume,
                             total_pkgs,
                             survey_data_json,
@@ -401,19 +407,20 @@ def submit_cer():
                         ),
                     )
                 else:
-                    flash("Error: Certificate number not found in database.", "error")
+                    flash("Error: Certificate number not found in the database.", "error")
                     return redirect(url_for('forms'))
 
                 conn.commit()
 
+        # Flash message for success
         flash(
             'Form saved as draft!' if status == "Draft" else 'Form submitted successfully!',
             'success',
         )
 
-        # ✅ Redirect based on action
+        # Redirect based on action
         if action == "Submit and New":
-            return redirect(url_for('certificate'))  # Redirect to form for new entry
+            return redirect(url_for('certificate'))  # Redirect to new entry form
         
         return redirect(url_for('forms'))  # Default redirect to forms page
 
@@ -421,7 +428,7 @@ def submit_cer():
         print(f"Error: {e}")
         flash(f'An error occurred while processing the form. Error: {e}', 'error')
         return redirect(url_for('forms'))
-    
+
 
 
 @app.route('/certificateedit')
@@ -634,8 +641,10 @@ def submit_cerem():
         port_of_discharge = request.form.get('portOfDischarge', '').strip()
         sb_number = request.form.get('sb_number', '').strip()
         cf_agent = request.form.get('cf_agent', '').strip()
+        type_of_packing = request.form.get('type_of_packing', '').strip()  # ✅ Added Type of Packing
         action = request.form.get('action')  # Determine if saving as draft or submitting
 
+        # Helper function to safely convert values to float
         def safe_float(value):
             try:
                 return float(value) if value.strip() else None  # Return None if empty
@@ -645,6 +654,7 @@ def submit_cerem():
         quantity = safe_float(request.form.get('quantity', ''))
         gross_weight = safe_float(request.form.get('gross_weight', ''))
 
+        # Collect survey data
         survey_data = []
         rows = len(request.form.getlist('marksNos[]'))
         for i in range(rows):
@@ -659,27 +669,27 @@ def submit_cerem():
             height = safe_float(request.form.getlist('height[]')[i])
             volume_unit = safe_float(request.form.getlist('volumeUnit[]')[i])
             volume_cum = safe_float(request.form.getlist('volumePerUnit[]')[i])
-            survey_data.append(
-                {
-                    'marks_no': marks_no,
-                    'no_of_pkgs': no_of_pkgs,
-                    'length': length,
-                    'breadth': breadth,
-                    'height': height,
-                    'volume_unit': volume_unit,
-                    'volumePerUnit': volume_cum,
-                }
-            )
 
-        # Get total volume and total packages from frontend (instead of calculating)
+            survey_data.append({
+                'marks_no': marks_no,
+                'no_of_pkgs': no_of_pkgs,
+                'length': length,
+                'breadth': breadth,
+                'height': height,
+                'volume_unit': volume_unit,
+                'volumePerUnit': volume_cum,
+            })
+
+        # Get total volume and total packages from frontend
         total_volume = safe_float(request.form.get('totalVolume', ''))
         total_pkgs = safe_float(request.form.get('totalPkgs', ''))
 
         survey_data_json = json.dumps(survey_data)
 
+        # Determine status: Draft or In Progress
         status = "Draft" if action == "Save as Draft" else "In Progress"
 
-        # If submitting, validate required fields
+        # Required field validation only when submitting (not for draft)
         if status == "In Progress":
             required_fields = {
                 "Certificate Number": certificate_number,
@@ -694,8 +704,9 @@ def submit_cerem():
             for field, value in required_fields.items():
                 if not value:
                     flash(f"Error: {field} is required!", "error")
-                    return redirect(url_for('empforms'))
+                    return redirect(url_for('forms'))
 
+        # Database Operations
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
@@ -705,11 +716,12 @@ def submit_cerem():
                 exists = cursor.fetchone()
 
                 if exists:
+                    # Update existing record
                     update_query = """
                         UPDATE cer SET 
                             date = %s, applicant_name = %s, shipper = %s, consignee = %s, 
                             commodity = %s, port_of_discharge = %s, sb_number = %s, quantity = %s, 
-                            gross_weight = %s, cf_agent = %s, 
+                            gross_weight = %s, cf_agent = %s, type_of_packing = %s,
                             total_volume = %s, total_pkgs = %s, survey_data = %s, status = %s
                         WHERE CertificateNumber = %s
                     """
@@ -726,6 +738,7 @@ def submit_cerem():
                             quantity,
                             gross_weight,
                             cf_agent,
+                            type_of_packing,
                             total_volume,
                             total_pkgs,
                             survey_data_json,
@@ -734,11 +747,12 @@ def submit_cerem():
                         ),
                     )
                 else:
-                    flash("Error: Certificate number not found in database.", "error")
-                    return redirect(url_for('empforms'))
+                    flash("Error: Certificate number not found in the database.", "error")
+                    return redirect(url_for('forms'))
 
                 conn.commit()
 
+        # Flash message for success
         flash(
             'Form saved as draft!' if status == "Draft" else 'Form submitted successfully!',
             'success',
@@ -755,26 +769,6 @@ def submit_cerem():
         flash(f'An error occurred while processing the form. Error: {e}', 'error')
         return redirect(url_for('empforms'))
 
-@app.route('/empcertificateedit')
-@login_required
-def empcertificateedit():
-    try:
-        with get_db_connection() as conn:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                
-                # Fetch all certificate records
-                cursor.execute("""
-                    SELECT CertificateNumber, date, applicant_name, shipper, consignee, total_pkgs, status 
-                    FROM cer
-                """)
-                cer_data = cursor.fetchall()
-
-        return render_template('empcertificateedit.html', cer_data=cer_data)
-    
-    except Exception as e:
-        print(f"Error fetching certificate records: {e}")
-        flash("An error occurred while fetching the certificate records.", "error")
-        return redirect(url_for("empdash"))
     
 
 
