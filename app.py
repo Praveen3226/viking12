@@ -2676,6 +2676,52 @@ def get_cargo():
         cursor.close()
         conn.close()
 
+@app.route("/delete_cargo/<int:cargo_id>", methods=["DELETE"])
+def delete_cargo(cargo_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete cargo entry by ID
+        query = "DELETE FROM cargo WHERE id = %s"
+        cursor.execute(query, (cargo_id,))
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Cargo entry deleted successfully!"})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/delete_filtered_cargo", methods=["POST"])
+def delete_filtered_cargo():
+    try:
+        data = request.get_json()
+        start_date = data.get("startDate")
+        end_date = data.get("endDate")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete query with date filter
+        query = """
+        DELETE FROM cargo
+        WHERE received_date BETWEEN %s AND %s
+        """
+        cursor.execute(query, (start_date, end_date))
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Filtered cargo entries deleted successfully!"})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route('/dashboard')
 def dashboard():
