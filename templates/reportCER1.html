@@ -7,7 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
 <style>
 
 
@@ -63,17 +67,17 @@ h1 {
 
 
            /* Table Scorallable */
-           .table-wrapper {
+           .tableh-wrapper {
             overflow-x: auto;
             margin-bottom: 1rem;
         }
         
-        .table-wrapper table {
+        .tableh-wrapper table {
             min-width: 100%;
             width: auto;
         }
 
-        .table-wrapper th,
+        .tableh-wrapper th,
         .table-wrapper td {
             white-space: nowrap;
         }
@@ -124,19 +128,19 @@ h1 {
     }
 
     .sidebar-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        z-index: 999;
-        display: none;
-    }
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+}
 
-    .sidebar-backdrop.active {
-        display: block;
-    }
+.sidebar-backdrop.active {
+    display: block;
+}
 
     @media (max-width: 1200px) {
         .nav-links {
@@ -147,78 +151,40 @@ h1 {
             display: block;
         }
     }
-    
-    @media print {
-    .max-w-5xl {
-        width: 210mm !important; /* A4 width */
-        margin: 0 auto !important;
-        box-shadow: none !important;
-    }
-    
-    .table-wrapper {
-        overflow: visible !important;
-    }
-}
-.status-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 15px;
-    border-radius: 50px;  /* ✅ Rounded */
-    font-weight: bold;
-    text-align: center;
-    min-width: 150px;
-}
 
-/* ✅ Status Colors */
-.status-open { background-color: rgb(0, 203, 0); color: white; }
-.status-in-progress { background-color: yellow; color: black; }
-.status-completed { background-color: red; color: white; }
-.status-unknown { background-color: gray; color: white; }
 
-/* ✅ Small Status Circle */
-.status-circle {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-    background-color: currentColor;
-}
-.status-badge {
-    display: inline-block;
-    background-color: red; /* Adjust color */
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-@media print {
-            body {
-                margin: 0;
-                padding: 0;
-            }
-            .page-break {
-                page-break-before: always;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                page-break-inside: avoid;
-            }
-            th, td {
-                border: 1px solid black;
-                padding: 8px;
-                text-align: left;
-            }
-            .no-print {
-        display: none !important;
-    }
-        }
-        .print-container {
-            padding: 20px;
-            background: #fff;
-        }
+
+       
         .certificate-title {
+            text-align: center;
+            background-color: #b91c1c;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .pdf-tableh {
+            width: 100%;
+            border-collapse: collapse;
+            border-top: 2px solid black;
+            border-bottom: 2px solid black;
+            text-align: left;
+        }
+        .pdf-tableh th,
+        .pdf-tableh td {
+            border: none;
+            padding: 6px;
+            box-sizing: border-box;
+            white-space: nowrap;
+            
+        }
+        .pdf-tableh td:last-child {
+            text-align: right;
+        }
+
+              
+.certificate-title {
     text-align: center;
     background-color: #b91c1c;
     color: white;
@@ -227,136 +193,167 @@ h1 {
     font-weight: bold;
     margin-top: 10px;
 }
+.pdf-tableh {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  text-align: left;
+}
 
+.pdf-tableh th,
+.pdf-tableh td {
+  border: none;
+  padding: 6px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.pdf-tableh td:last-child {
+  text-align: right;
+}
+.invoice-container {
+            max-width: 800px;
+            margin: auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+.pdf-table { 
+             width: 100%; 
+                    border-collapse: collapse; 
+                    margin: 15px 0;
+                }
+                .pdf-table td, .pdf-table th {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: left;
+                }
+@media print {
+    table {
+        border-collapse: collapse !important;
+    }
+    td, th {
+        border: 1.5pt solid #000 !important;
+    }
+    .certificate-title {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+                
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-gray-100 p-4">
-    <div class="max-w-5xl mx-auto bg-white p-6 shadow-md">
-        <!-- Header -->
-        <div class="text-center">
-            <!-- Navigation Bar -->
-        <div class="nav-bar">
-            <a href="{{ url_for('reportCER') }}" 
-            style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
-            onmouseover="this.style.backgroundColor='#0056b3'"
-            onmouseout="this.style.backgroundColor='#007bff'">
-            Back
-         </a>
-         <!-- Hamburger Button -->
-        <button class="hamburger">
-            <i class="fa fa-bars"></i>
-        </button>
-            <nav class="nav-links">
-                <ul>
-                    <li><a href="{{ url_for('admindash') }}">Home</a></li>
-                    <li><a href="{{ url_for('forms') }}">Forms</a></li>
-                    <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                </ul>
-            </nav>
-        </div>
+<body>
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <a href="{{ url_for('reportCER') }}" 
+        style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; transition: 0.3s;"
+        onmouseover="this.style.backgroundColor='#0056b3'"
+        onmouseout="this.style.backgroundColor='#007bff'">
+        Back
+     </a>
 
-         <!-- Sidebar -->
-       <div class="sidebar" id="sidebar">
-        <ul>
-            <li><a href="{{ url_for('admindash') }}">Home</a></li>
-            <li><a href="{{ url_for('forms') }}">Forms</a></li>
-            <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        </ul>
+     <!-- Hamburger Button -->
+     <button class="hamburger">
+      <i class="fa fa-bars"></i>
+  </button>
+        <nav class="nav-links">
+            <ul>
+                <li><a href="{{ url_for('admindash') }}">Home</a></li>
+                <li><a href="{{ url_for('forms') }}">Forms</a></li>
+                <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
     </div>
 
-
-    <!-- Backdrop -->
-    <div class="sidebar-backdrop"></div>
-    <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 42px; color:#da3936 ;">VIKING MARINE INC.</h1>           
-
-                <p class="text-sm font-semibold">SURVEYORS AND CONSULTING ENGINEERS</p>
-            <p class="text-sm">C/O. CONTAINER CORPORATION OF INDIA</p>
-            <p class="text-sm">Whitefield, Bangalore - 560 066.</p>
-            <p class="text-sm">Ph.: 9243185125, 9035015240 &amp; 9036015247</p>
-            <p class="text-sm">E-mail : ops@vikingmarine.in, Website : www.vikingmarine.in</p>
-        </div>
-        {% if cer %}
-        <p class="no-print"><strong>Certificate Number:</strong> {{ cer.CertificateNumber }}</p>
-        <p class="no-print"><strong>Status:</strong> 
-            <span class="status-badge">{{ cer.status }}</span>
-        </p>
-    {% else %}
-        <p class="no-print">No certificate data available.</p>
-    {% endif %}
-    
-    
-        <!-- Title -->
-        <div class="certificate-title">
-            CERTIFICATE OF MEASUREMENT REPORT
-        </div>
-
-        <!-- Applicant Information -->
-        <div class="mb-6">
-            <h2 class="text-lg font-bold mb-2">Applicant Information</h2>
-            <div class="table-wrapper">
-            <table class="w-full border-collapse border border-black text-sm">
-                <tbody>
-                    <tr>
-                        <td class="border border-black p-2 font-medium">Certificate No.</td>
-                        <td class="border border-black p-2">{{ cer.CertificateNumber }}</td>
-                        <td class="border border-black p-2 font-medium">Date</td>
-                        <td class="border border-black p-2">{{ cer.date }}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-black p-2 font-medium">Name of Applicant</td>
-                        <td class="border border-black p-2">{{ cer.applicant_name }}</td>
-                        <td class="border border-black p-2 font-medium">Shipper</td>
-                        <td class="border border-black p-2">{{ cer.shipper }}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-black p-2 font-medium">Consignee</td>
-                        <td class="border border-black p-2">{{ cer.consignee }}</td>
-                        <td class="border border-black p-2 font-medium">Commodity</td>
-                        <td class="border border-black p-2">{{ cer.commodity }}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-black p-2 font-medium">Port of Discharge</td>
-                        <td class="border border-black p-2">{{ cer.port_of_discharge }}</td>
-                        <td class="border border-black p-2 font-medium">Quantity</td>
-                        <td class="border border-black p-2">{{ cer.quantity }}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-black p-2 font-medium">Gr. Wt.</td>
-                        <td class="border border-black p-2">{{ cer.gross_weight }}</td>
-                        <td class="border border-black p-2 font-medium">C & F Agent</td>
-                        <td class="border border-black p-2">{{ cer.cf_agent }}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-black p-2 font-medium">Container No.</td>
-                        <td class="border border-black p-2">{{ cer.container_number }}</td>
-                    </tr>
-                </tbody>
-            </table>
+     <!-- Sidebar -->
+     <div class="sidebar" id="sidebar">
+      <ul>
+          <li><a href="{{ url_for('admindash') }}">Home</a></li>
+          <li><a href="{{ url_for('forms') }}">Forms</a></li>
+          <li><a href="{{ url_for('certificatert') }}">Reports</a></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-backdrop"></div>
+    <div id="invoice" class="invoice-container">
+        <div  style="display: flex; align-items: center; text-align: center;" class="logo-container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height: 120px; margin-right: 15px; margin-top: 10px;" class="logo">
+        <div style="text-align: center; flex-grow: 1; margin-left: -100px;">
+            <h1 style="font-family: 'Cooper Black', sans-serif; font-weight: normal; font-size: 28px; margin: 0; display: inline-block; vertical-align: middle;">
+                VIKING MARINE INC.
+              </h1>
+                          <div style="margin-top: 3px; line-height: 1.2;">
+                <p style="margin: 0;">SURVEYORS AND CONSULTING ENGINEERS</p>
+                <p style="margin: 0;"># 143,Dinnur Village, Opp. India SATCOM, Kadugodi Post Bangalore - 560067.</p>
+                <p style="margin: 0;">Ph.: +919036015240, +919035015240 &amp; +919036015243</p>
             </div>
         </div>
+     </div>
 
-        <!-- Survey Measures Table -->
-        <div class="mb-6">
-            <h2 class="text-lg font-bold mb-2">Survey Measures</h2>
-            <div class="table-wrapper">
-            <table class="w-full border-collapse border border-black text-sm">
-                <thead>
-                    <tr>
-                        <th class="border border-black p-2">Mark & No.s</th>
-                        <th class="border border-black p-2">No. of Pkgs</th>
-                        <th class="border border-black p-2">Length</th>
-                        <th class="border border-black p-2">Breadth</th>
-                        <th class="border border-black p-2">Height</th>
-                        <th class="border border-black p-2">Volume in 1 Unit</th>
-                        <th class="border border-black p-2">Volume in Cu. M</th>
-                    </tr>
-                </thead>
-                <tbody>
+     <br>
+     <table class="pdf-tableh">
+        <tr>
+            <td><strong>Certificate No.:</strong> {{ cer.CertificateNumber }}</td>
+            <td><strong>Date:</strong> {{ cer.date }}</td>
+        </tr>
+     </table>
+
+     <div class="certificate-title">CERTIFICATE OF MEASUREMENT</div>
+     <h2 class="text-lg font-bold mb-2">Applicant Information</h2>
+
+     <table class="pdf-table">
+        <tbody>
+            <tr>
+            <th>Name of Applicant</th>
+            <td colspan="3">{{ cer.applicant_name }}</td>
+            </tr>
+            <tr>
+            <th>Shipper</th>
+            <td>{{ cer.shipper }}</td>
+            <th>Consignee</th>
+            <td>{{ cer.consignee }}</td>
+            </tr>
+            <tr>
+            <th>Commodity</th>
+            <td>{{ cer.commodity }}</td>
+            <th>Port of Discharge</th>
+            <td>{{ cer.port_of_discharge }}</td>
+            </tr>
+            <tr>
+            <th>S.B. No./ Invoice No.</th>
+            <td>{{ cer.sb_number }}</td>
+            <th>C & F Agent</th>
+            <td>{{ cer.cf_agent }}</td>
+            </tr>
+            <tr>
+                <th>Type Of Packing</th>
+                <td>{{ cer.type_of_packing }}</td>
+            </tr>
+        </tbody>
+        </table>
+
+     <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Survey Measures</h2>
+     {% if survey_data %}
+     <table class="pdf-table">
+        <thead>
+            <tr>
+            <th class="border border-black p-2">Mark & No.s</th>
+            <th class="border border-black p-2">No. of Pkgs</th>
+            <th class="border border-black p-2">Length</th>
+            <th class="border border-black p-2">Breadth</th>
+            <th class="border border-black p-2">Height</th>
+            <th class="border border-black p-2">Volume in 1 Unit</th>
+            <th class="border border-black p-2">Volume in Cu. M</th>
+            </tr>
+        </thead>
+        <tbody>
                     {% for survey in survey_data %}
                     <tr>
                         <td class="border border-black p-2">{{ survey.marks_no}}</td>
@@ -370,176 +367,198 @@ h1 {
                     {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
+
+        <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+            <div style="border: 1px solid #000; padding: 10px; flex: 1; margin-right: 10px; text-align: center;">
+                <p><strong>Total No. of Pkgs:</strong></p>
+                <p>{{ cer.total_pkgs }}</p>
+            </div>
+            <div style="border: 1px solid #000; padding: 10px; flex: 1; margin-right: 10px; text-align: center;">
+                <p><strong>Gross Wt In Kgs.(As Declared):</strong></p>
+                <p>{{ cer.gross_weight }}</p>
+            </div>
+            <div style="border: 1px solid #000; padding: 10px; flex: 1; text-align: center;">
+                <p><strong>Total Volume (Cu. M):</strong></p>
+                <p>{{ cer.total_volume }}</p>
             </div>
         </div>
-
-        <div class="flex justify-between">
-            <div>
-                <p class="font-medium">Total No. of Pkgs: {{cer.total_pkgs}}</p>
-            </div>
-            <div>
-                <p class="font-medium">Total Volume (Cu. M): {{cer.total_volume}}</p>
+    
+        <div class="mt-8 w-full">
+            <div class="text-left">
+                <p style="text-transform: uppercase; font-weight: bold;">"ISSUED WITHOUT PREJUDICE"</p>
+                <br><br><br>
+                <p style="font-weight: bold; text-align: left;">For Viking Marine Inc.<br><br><br><br><br><br>Authorised Signatory</p>
             </div>
         </div>
-
-
+  
         <button onclick="generatePDF()" class="fixed bottom-8 right-8 bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-800 z-50">
             <i class="fas fa-print mr-2"></i>Print PDF
         </button>
+    </div>
+</div>
 
         <!-- Footer -->
-        <div class="flex justify-between items-center">
-            <div>
-              <p  class="text-sm font-bold">For Viking Marine Inc.</p>
-              <p  class="text-sm italic text-left font-bold">"Issued Without Prejudice"</p>
-            </div>
-        </div>
+
     <footer class="footer">
         &copy;  2025 <strong>Bitsmart</strong>. Crafted with care, protected with pride.
     </footer>
     </div>
     </div>
+</div>
 
-    <script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    
+<script>
+
 async function generatePDF() {
-    // Hide unnecessary elements before capturing
-    const elementsToHide = document.querySelectorAll('.header, .footer, .status, .certificate-btn, .nav-bar, .sidebar, .sidebar-backdrop, button');
-    const originalStyles = [];
-
-    elementsToHide.forEach(el => {
-        originalStyles.push(el.style.display);
-        el.style.display = 'none';
-    });
-
-    // Select main content
-    const element = document.getElementById("pdf-content");
-
-    // Capture content with high resolution
-    const canvas = await html2canvas(element, {
-        scale: 3, // Higher resolution
-        useCORS: true,
-        backgroundColor: '#ffffff'
-    });
-
-    // Convert to black and white (grayscale)
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-
-    for (let i = 0; i < pixels.length; i += 4) {
-        const avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3; // Grayscale conversion
-        pixels[i] = avg;  // Red
-        pixels[i + 1] = avg;  // Green
-        pixels[i + 2] = avg;  // Blue
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-    const imgData = canvas.toDataURL('image/png');
-
-    // Create PDF
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+    
+    // Preserve original document state
+    const originalElement = document.getElementById('invoice');
+    const originalStyles = window.getComputedStyle(originalElement);
+    
+    // Create a clean clone with preserved dimensions
+    const clone = originalElement.cloneNode(true);
+    clone.id = 'pdf-clone';
+    
+    // Set up clone styling for accurate rendering
+    Object.assign(clone.style, {
+        position: 'fixed',
+        left: '0',
+        top: '0',
+        zIndex: '99999',
+        width: '100%',
+        background: 'white',
+        visibility: 'visible',
+        transform: 'translateZ(0)'
+    });
 
-    let imgWidth = pageWidth - 20; // 10mm margins
-    let imgHeight = (canvas.height * imgWidth) / canvas.width;
+    // Remove interactive elements but keep headers
+    const elementsToRemove = clone.querySelectorAll('.footer, .certificate-btn, button, .sidebar-backdrop, .sidebar');
+    elementsToRemove.forEach(el => el.remove());
 
-    // If content overflows, split into pages
-    let yPosition = 10;
-    while (imgHeight > 0) {
-        doc.addImage(imgData, 'PNG', 10, yPosition, imgWidth, imgHeight > pageHeight ? pageHeight - 20 : imgHeight);
-        imgHeight -= pageHeight;
-        yPosition = 10;
-
-        if (imgHeight > 0) {
-            doc.addPage();
+    // Add border enforcement styles
+    const borderStyle = document.createElement('style');
+    borderStyle.innerHTML = `
+        /* Force borders for applicant table */
+        .pdf-table, .pdf-table th, .pdf-table td {
+            border: 2px solid #000 !important;
+            border-collapse: collapse !important;
         }
+        
+        /* Force borders for survey measures boxes */
+        div[style*="border: 1px solid #000"] {
+            border: 2px solid #000 !important;
+        }
+        
+        /* Header table borders */
+        .pdf-tableh {
+            border-top: 2px solid #000 !important;
+            border-bottom: 2px solid #000 !important;
+        }
+        
+        .certificate-title {
+            background-color: #b91c1c !important;
+            -webkit-print-color-adjust: exact;
+        }
+    `;
+    clone.appendChild(borderStyle);
+
+    document.body.appendChild(clone);
+
+    try {
+        // Use html2canvas with improved configuration
+        const canvas = await html2canvas(clone, {
+            scale: 3, // Increased scale for better border visibility
+            logging: true,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            scrollX: 0,
+            scrollY: 0,
+            ignoreElements: (element) => {
+                return element.classList.contains('no-print');
+            }
+        });
+
+        // Generate PDF
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+            compress: true
+        });
+
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgRatio = pageWidth / (canvas.width / canvas.height);
+
+        let heightLeft = imgRatio;
+        let position = 0;
+
+        // Handle multi-page content
+        while (heightLeft > 0) {
+            pdf.addImage(canvas, 'PNG', 0, position, pageWidth, imgRatio);
+            heightLeft -= pageHeight;
+            position -= pageHeight;
+            
+            if (heightLeft > 0) {
+                pdf.addPage();
+            }
+        }
+
+        // Save PDF
+        const certNo = "{{ cer.CertificateNumber }}";
+        pdf.save(`Certificate_${certNo}.pdf`);
+
+    } catch (error) {
+        console.error("PDF generation failed:", error);
+        alert('PDF generation failed. Please check the console for details.');
+    } finally {
+        // Clean up
+        clone.remove();
     }
-
-    // Restore hidden elements
-    elementsToHide.forEach((el, index) => {
-        el.style.display = originalStyles[index];
-    });
-
-    // Save the PDF with a dynamic filename
-    const certNo = document.querySelector("#certificate-number")?.textContent.trim() || "shipment_certificate";
-    doc.save(`Certificate_${certNo}.pdf`);
 }
 
 
+// Toggle sidebar
+const hamburger = document.querySelector('.hamburger');
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.querySelector('.sidebar-backdrop');
 
-        // Hamburger Menu Toggle
-        document.querySelector('.hamburger').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.querySelector('.sidebar-backdrop').classList.toggle('active');
-        });
-
-        // Close sidebar when clicking backdrop
-        document.querySelector('.sidebar-backdrop').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.remove('active');
-            this.classList.remove('active');
-        });
-
-        // Close sidebar when clicking a link
-        document.querySelectorAll('.sidebar a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('sidebar').classList.remove('active');
-                document.querySelector('.sidebar-backdrop').classList.remove('active');
-            });
-        });
-
-
-        //print button functionality
-        async function generatePDF() {
-    // Hide unnecessary elements
-    const elementsToHide = document.querySelectorAll('.nav-bar, .sidebar, .sidebar-backdrop, button ,.status ,.status-badge ,.footer');
-    const originalStyles = [];
-    elementsToHide.forEach(el => {
-        originalStyles.push(el.style.display);
-        el.style.display = 'none';
+if (hamburger && sidebar && backdrop) {
+    hamburger.addEventListener('click', function() {
+        sidebar.classList.toggle('active');
+        backdrop.classList.toggle('active');
     });
 
-    // Capture the main content
-    const element = document.querySelector('.max-w-5xl');
-    
-    // Increase scale for better resolution
-    const canvas = await html2canvas(element, {
-        scale: 3, // Increased from 2 to 3 for better resolution
-        useCORS: true,
-        logging: true,
-        backgroundColor: '#ffffff'
+    // Close when clicking backdrop
+    backdrop.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        this.classList.remove('active');
     });
 
-    const imgData = canvas.toDataURL('image/png');
-    
-    // Create PDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Calculate image dimensions to fit PDF page
-    const imgWidth = pageWidth - 20; // 10mm margins on both sides
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    // Add content
-    doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-
-    // Add Bitsmart footer
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(128);
-
-    // Restore hidden elements
-    elementsToHide.forEach((el, index) => {
-        el.style.display = originalStyles[index];
+    // Close when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!sidebar.contains(event.target) && 
+            !hamburger.contains(event.target) &&
+            sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        }
     });
-
-    // Save PDF
-    const certNo = "{{ cer.CertificateNumber }}";
-    doc.save(`Certificate_${certNo}.pdf`);
 }
+
+// Close when clicking links
+document.querySelectorAll('.sidebar a').forEach(link => {
+    link.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        backdrop.classList.remove('active');
+    });
+});
+
+
     </script>
 </body>
 </html>
