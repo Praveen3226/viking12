@@ -609,6 +609,7 @@ input[type="text"],
             </table>
 
             <h1 class="text-xl font-bold text-black">Applicant Details</h1>
+
             <button id="add-container-btn" class="btn" >Add Container</button>
             <div id="add-container-modal" class="modal">
                 <div class="modal-content">
@@ -716,7 +717,7 @@ input[type="text"],
             </table>
             </div>
             
-             <h1 class="text-xl font-bold text-black">Stuffing Details</h1>
+            <h1 class="text-xl font-bold text-black">Stuffing Details</h1>
             <div class="table-wrapper">
             <table id="added-containers-table" class="custom-table">
                 <tr>
@@ -770,6 +771,12 @@ input[type="text"],
                         <span class="unit">Kgs</span>
                     </td>
                 </tr>
+                <th>Total Wt. Of the Container</th>
+                <td class="input-container">
+                    <input type="text" id="TotalContainerWeight" name="TotalContainerWeight" readonly class="small-box">
+                    <span class="unit">Kgs</span>
+                </td>
+            </tr>
 <!-- Remove CBM and add Total Packages and Volume fields -->
 
 
@@ -806,7 +813,7 @@ input[type="text"],
             </div>
         
 
-           <h1 class="text-xl font-bold text-black">Remarks</h1>
+            <h3>Remarks</h3>
             <div class="table-wrapper">
             <table class="custom-table">
                 <tr>
@@ -832,7 +839,7 @@ input[type="text"],
                 </select>
             </div>
 
-             <h1 class="text-xl font-bold text-black">Surveyor Details</h1>
+            <h1 class="text-xl font-bold text-black">Surveyor Details</h1>
             <div class="table-wrapper">
             <table class="custom-table">
                 <tr>
@@ -868,7 +875,6 @@ input[type="text"],
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
-
 
 function generateFCLReportPDF() {
     try {
@@ -1091,13 +1097,13 @@ function generateFCLReportPDF() {
     </table>
     
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 20px;">
-        ${['volume', 'totalPackages', 'grossWeight','declaredTotalWeight'].map(id => {
+        ${['volume', 'totalPackages', 'grossWeight','TotalContainerWeight'].map(id => {
             const value = getValue(id);
             const labels = {
                 volume: { title: 'Total Volume', unit: 'CBM' },
                 totalPackages: { title: 'Total Packages', unit: 'Pkgs' },
                 grossWeight: { title: 'Total Gross Wt. In Kgs (As Declared)', unit: 'Kgs' },
-                declaredTotalWeight : { title: 'Total Wt. of the container (As Declared)', unit: 'Kgs' }
+                TotalContainerWeight : { title: 'Total Wt. of the container ', unit: 'Kgs' }
             };
             return `
                 <div style="border: 1px solid #000; padding: 15px; text-align: center;">
@@ -1129,7 +1135,7 @@ function generateFCLReportPDF() {
     <div class="mt-8 w-full">
         <div style="text-align: left;">
             
-            <p style="margin-top: 5px;">Surveyor: ${getValue('surveyorName')}</p>
+            <p style="margin-top: 5px;">Surveyor: ${getValue('surveyorName')}</p><br><br>
             <p class="text-sm text-left font-bold" style="text-transform: uppercase;">
                 "ISSUED WITHOUT PREJUDICE"
             </p>
@@ -1137,7 +1143,7 @@ function generateFCLReportPDF() {
         <br>
         <div style="text-align: right;">
             <p class="font-semibold">
-                For Viking Marine Inc.<br>
+                For Viking Marine Inc.<br><BR><BR>
                 Authorised Signatory
             </p>
         </div>
@@ -1406,13 +1412,37 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('volume').value = totalVolume.toFixed(2);
 
         document.getElementById('consignmentDetails').value = JSON.stringify(consignmentDetails);
-
+        updateTotalContainerWeight();
         // Ensure Seal Date & Time is populated
 
         document.getElementById('modal').style.display = 'none';
     });
 });
 
+// Function to update total container weight
+document.addEventListener('DOMContentLoaded', () => {
+        const grossWeightInput = document.getElementById('grossWeight');
+        const tareWeightInput = document.getElementById('tareWeight');
+
+        // Add event listeners to recalculate total when inputs change
+        grossWeightInput.addEventListener('input', updateTotalContainerWeight);
+        tareWeightInput.addEventListener('input', updateTotalContainerWeight);
+    });
+
+    function updateTotalContainerWeight() {
+        const grossWeight = parseFloat(document.getElementById('grossWeight').value) || 0;
+        const tareWeight = parseFloat(document.getElementById('tareWeight').value) || 0;
+        
+        const totalContainerWeight = grossWeight + tareWeight;
+        document.getElementById('TotalContainerWeight').value = totalContainerWeight.toFixed(2);
+    }
+
+// Add event listeners to both inputs
+document.getElementById('tareWeight').addEventListener('input', updateTotalContainerWeight);
+document.getElementById('grossWeight').addEventListener('input', updateTotalContainerWeight);
+
+// Update total weight initially in case of pre-filled values
+window.addEventListener('DOMContentLoaded', updateTotalContainerWeight);
 
 
 
