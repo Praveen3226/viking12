@@ -1867,6 +1867,8 @@ def submit():
         signature = request.form.get('signature', '').strip()
         totalPackages = request.form.get('totalPackages', '').strip()
         gross_weight = request.form.get('grossWeight', '').strip()
+        total_container_weight = request.form.get('TotalContainerWeight', '').strip()
+
 
         # Get button action
         action = request.form.get('action', '')
@@ -1909,10 +1911,10 @@ def submit():
             UPDATE form
             SET date = %s, applicant_name = %s, container_number = %s, size_type = %s, tare_weight = %s, 
                 payload_capacity = %s, declared_total_weight = %s, stuffing_comm_date_time = %s, 
-                stuffing_comp_date_time = %s, seal_number = %s, seal_date_time = %s, port_of_discharge = %s, place_of_stuffing = %s, 
-                cbm = %s, total_gross_weight = %s, loading_condition = %s, lashing = %s, others = %s, 
-                weather_condition = %s, surveyor_name = %s, signature = %s, totalPackages = %s, 
-                consignment_details = %s, status = %s
+                stuffing_comp_date_time = %s, seal_number = %s, seal_date_time = %s, port_of_discharge = %s, 
+                place_of_stuffing = %s, cbm = %s, total_gross_weight = %s, total_container_weight = %s, 
+                loading_condition = %s, lashing = %s, others = %s, weather_condition = %s, surveyor_name = %s, 
+                signature = %s, totalPackages = %s, consignment_details = %s, status = %s
             WHERE CertificateNumber = %s
         """
 
@@ -1921,10 +1923,11 @@ def submit():
             tare_weight or None, payload_capacity or None, declared_total_weight or None,
             stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None, seal_date_time or None,
             port_of_discharge or None, place_of_stuffing or None, cbm or None, gross_weight or None,
-            loading_condition or None, lashing or None, others or None, weather_condition or None,
+            total_container_weight or None, loading_condition or None, lashing or None, others or None, weather_condition or None,
             surveyor_name or None, signature or None, totalPackages or None, json.dumps(consignment_details),
             status, CertificateNumber
         ))
+
 
         # ✅ If submitting, update container and consignment status
         if status == "Completed":
@@ -2331,6 +2334,8 @@ def submitem():
         signature = request.form.get('signature', '').strip()
         totalPackages = request.form.get('totalPackages', '').strip()
         gross_weight = request.form.get('grossWeight', '').strip()
+        total_container_weight = request.form.get('TotalContainerWeight', '').strip()
+
 
         # Get button action
         action = request.form.get('action', '')
@@ -2373,10 +2378,10 @@ def submitem():
             UPDATE form
             SET date = %s, applicant_name = %s, container_number = %s, size_type = %s, tare_weight = %s, 
                 payload_capacity = %s, declared_total_weight = %s, stuffing_comm_date_time = %s, 
-                stuffing_comp_date_time = %s, seal_number = %s, seal_date_time = %s, port_of_discharge = %s, place_of_stuffing = %s, 
-                cbm = %s, total_gross_weight = %s, loading_condition = %s, lashing = %s, others = %s, 
-                weather_condition = %s, surveyor_name = %s, signature = %s, totalPackages = %s, 
-                consignment_details = %s, status = %s
+                stuffing_comp_date_time = %s, seal_number = %s, seal_date_time = %s, port_of_discharge = %s, 
+                place_of_stuffing = %s, cbm = %s, total_gross_weight = %s, total_container_weight = %s, 
+                loading_condition = %s, lashing = %s, others = %s, weather_condition = %s, surveyor_name = %s, 
+                signature = %s, totalPackages = %s, consignment_details = %s, status = %s
             WHERE CertificateNumber = %s
         """
 
@@ -2385,10 +2390,11 @@ def submitem():
             tare_weight or None, payload_capacity or None, declared_total_weight or None,
             stuffing_comm_date_time or None, stuffing_comp_date_time or None, seal_number or None, seal_date_time or None,
             port_of_discharge or None, place_of_stuffing or None, cbm or None, gross_weight or None,
-            loading_condition or None, lashing or None, others or None, weather_condition or None,
+            total_container_weight or None, loading_condition or None, lashing or None, others or None, weather_condition or None,
             surveyor_name or None, signature or None, totalPackages or None, json.dumps(consignment_details),
             status, CertificateNumber
         ))
+
 
         # ✅ If submitting, update container and consignment status
         if status == "Completed":
